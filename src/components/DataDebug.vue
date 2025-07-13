@@ -243,7 +243,7 @@ export default {
 
 .debug-header {
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
   background: #3b82f6;
