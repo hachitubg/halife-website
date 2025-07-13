@@ -41,7 +41,7 @@
             </div>
             
             <!-- Thumbnail Images -->
-            <div class="grid grid-cols-4 gap-2">
+            <div v-if="productImages.length > 1" class="grid grid-cols-4 gap-2">
               <div 
                 v-for="(image, index) in productImages" 
                 :key="index"
@@ -61,9 +61,9 @@
               <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">{{ product.name }}</h1>
               <div class="flex items-center space-x-4 text-sm text-gray-600">
                 <span>SKU: THY{{ String(product.id).padStart(3, '0') }}</span>
-                <span class="flex items-center">
+                <span v-if="product.rating > 0" class="flex items-center">
                   <i class="fas fa-star text-yellow-400 mr-1"></i>
-                  4.8 (124 đánh giá)
+                  {{ product.rating }} ({{ product.reviewCount || 0 }} đánh giá)
                 </span>
                 <span :class="product.inStock ? 'text-green-600' : 'text-red-600'">
                   <i :class="product.inStock ? 'fas fa-check-circle' : 'fas fa-times-circle'" class="mr-1"></i>
@@ -91,17 +91,34 @@
                 <span class="font-medium text-gray-700 w-32">Danh mục:</span>
                 <span class="text-blue-600 font-medium">{{ product.category }}</span>
               </div>
+              <div v-if="product.subcategory" class="flex">
+                <span class="font-medium text-gray-700 w-32">Danh mục con:</span>
+                <span>{{ product.subcategory }}</span>
+              </div>
               <div class="flex">
                 <span class="font-medium text-gray-700 w-32">Quy cách:</span>
-                <span>{{ selectedWeight }}</span>
+                <span>{{ product.packageSize || selectedWeight }}</span>
+              </div>
+              <div class="flex">
+                <span class="font-medium text-gray-700 w-32">Đơn vị:</span>
+                <span>{{ product.unit }}</span>
               </div>
               <div class="flex">
                 <span class="font-medium text-gray-700 w-32">Tình trạng:</span>
-                <span class="text-green-600">{{ product.inStock ? 'Còn hàng' : 'Hết hàng' }}</span>
+                <span :class="product.inStock ? 'text-green-600' : 'text-red-600'">
+                  {{ product.inStock ? 'Còn hàng' : 'Hết hàng' }}
+                  <span v-if="product.inStock && product.stockQuantity" class="text-gray-500 text-sm">
+                    ({{ product.stockQuantity }} sản phẩm)
+                  </span>
+                </span>
               </div>
-              <div class="flex">
+              <div v-if="product.originCountry" class="flex">
                 <span class="font-medium text-gray-700 w-32">Xuất xứ:</span>
-                <span>Nhật Bản - Việt Nam</span>
+                <span>{{ product.originCountry }}</span>
+              </div>
+              <div v-if="product.manufacturer" class="flex">
+                <span class="font-medium text-gray-700 w-32">Nhà sản xuất:</span>
+                <span>{{ product.manufacturer }}</span>
               </div>
             </div>
 
@@ -112,15 +129,19 @@
                   <i class="fas fa-gift"></i>
                 </div>
                 <div class="flex-1">
-                  <h3 class="font-bold text-red-600 mb-2">KHUYẾN MÃI ĐặC BIỆT</h3>
+                  <h3 class="font-bold text-red-600 mb-2">KHUYẾN MÃI ĐẶC BIỆT</h3>
                   <div class="space-y-1 text-sm">
                     <div class="flex items-start">
                       <span class="font-medium text-red-600 mr-2">1.</span>
-                      <span>Tặng kèm 1 chai dung dịch sát trùng 100ml</span>
+                      <span>Giảm {{ product.discount }}% cho sản phẩm này</span>
                     </div>
                     <div class="flex items-start">
                       <span class="font-medium text-red-600 mr-2">2.</span>
                       <span>Miễn phí vận chuyển toàn quốc cho đơn hàng trên 500.000₫</span>
+                    </div>
+                    <div v-if="product.targetAnimal" class="flex items-start">
+                      <span class="font-medium text-red-600 mr-2">3.</span>
+                      <span>Phù hợp cho: {{ product.targetAnimal }}</span>
                     </div>
                   </div>
                 </div>
@@ -128,7 +149,7 @@
             </div>
 
             <!-- Weight/Size Selection -->
-            <div>
+            <div v-if="weightOptions.length > 1">
               <h3 class="font-semibold text-gray-800 mb-3">Quy cách đóng gói:</h3>
               <div class="grid grid-cols-3 gap-2">
                 <button 
@@ -144,6 +165,9 @@
                   {{ weight }}
                 </button>
               </div>
+            </div>
+            <div v-else-if="product.packageSize" class="text-sm text-gray-600">
+              <span class="font-medium">Quy cách:</span> {{ product.packageSize }}
             </div>
 
             <!-- Quantity Selection -->
@@ -162,16 +186,20 @@
                     type="number" 
                     v-model.number="quantity" 
                     min="1" 
+                    :max="product.stockQuantity || 999"
                     class="w-16 text-center border-0 focus:outline-none"
                   />
                   <button 
                     @click="increaseQuantity"
-                    class="p-2 hover:bg-gray-100"
+                    :disabled="product.stockQuantity && quantity >= product.stockQuantity"
+                    class="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <i class="fas fa-plus"></i>
                   </button>
                 </div>
-                <span class="text-sm text-gray-600">(Còn {{ Math.floor(Math.random() * 50) + 20 }} sản phẩm)</span>
+                <span v-if="product.stockQuantity" class="text-sm text-gray-600">
+                  (Còn {{ product.stockQuantity }} sản phẩm)
+                </span>
               </div>
             </div>
 
@@ -247,15 +275,50 @@
           
           <div class="mt-6">
             <div v-if="activeTab === 'description'" class="prose max-w-none">
+              <!-- Mô tả ngắn -->
               <p class="text-gray-600 mb-4">{{ product.description }}</p>
+              
+              <!-- Mô tả chi tiết -->
+              <div v-if="product.fullDescription && product.fullDescription !== product.description" class="mb-6">
+                <h4 class="font-semibold mb-3">Mô tả chi tiết:</h4>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <p class="text-gray-700 leading-relaxed">{{ product.fullDescription }}</p>
+                </div>
+              </div>
+
+              <!-- Công dụng -->
+              <div v-if="product.functions && product.functions.length > 0" class="mb-6">
+                <h4 class="font-semibold mb-3">Công dụng:</h4>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                  <ul class="space-y-2">
+                    <li v-for="func in product.functions" :key="func" class="flex items-start">
+                      <i class="fas fa-check-circle text-blue-500 mr-2 mt-1 flex-shrink-0"></i>
+                      <span class="text-gray-700">{{ func }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Thông tin bổ sung -->
               <div class="mt-6">
-                <h4 class="font-semibold mb-3">Thông tin chi tiết:</h4>
+                <h4 class="font-semibold mb-3">Thông tin bổ sung:</h4>
                 <div class="bg-gray-50 p-4 rounded-lg">
                   <ul class="space-y-2 text-sm">
-                    <li><strong>Công nghệ:</strong> Sản xuất theo tiêu chuẩn GMP của Nhật Bản</li>
-                    <li><strong>Hiệu quả:</strong> Tác dụng nhanh, an toàn cho gia súc gia cầm</li>
-                    <li><strong>Bảo quản:</strong> Nơi khô ráo, thoáng mát, tránh ánh sáng trực tiếp</li>
-                    <li><strong>Hạn sử dụng:</strong> 36 tháng kể từ ngày sản xuất</li>
+                    <li v-if="product.activeIngredients">
+                      <strong>Thành phần hoạt chất:</strong> {{ product.activeIngredients }}
+                    </li>
+                    <li v-if="product.targetAnimal">
+                      <strong>Đối tượng sử dụng:</strong> {{ product.targetAnimal }}
+                    </li>
+                    <li v-if="product.storageConditions">
+                      <strong>Bảo quản:</strong> {{ product.storageConditions }}
+                    </li>
+                    <li v-if="product.shelfLife">
+                      <strong>Hạn sử dụng:</strong> {{ product.shelfLife }}
+                    </li>
+                    <li v-if="product.withdrawalTime">
+                      <strong>Thời gian ngưng thuốc:</strong> {{ product.withdrawalTime }}
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -274,17 +337,29 @@
                       <span>Danh mục:</span>
                       <span>{{ product.category }}</span>
                     </div>
+                    <div v-if="product.subcategory" class="flex justify-between py-1 border-b border-gray-200">
+                      <span>Danh mục con:</span>
+                      <span>{{ product.subcategory }}</span>
+                    </div>
                     <div class="flex justify-between py-1 border-b border-gray-200">
                       <span>Quy cách:</span>
-                      <span>{{ selectedWeight }}</span>
+                      <span>{{ product.packageSize || selectedWeight }}</span>
                     </div>
                     <div class="flex justify-between py-1 border-b border-gray-200">
-                      <span>Xuất xứ:</span>
-                      <span>Nhật Bản - Việt Nam</span>
+                      <span>Đơn vị:</span>
+                      <span>{{ product.unit }}</span>
                     </div>
-                    <div class="flex justify-between py-1">
-                      <span>Chứng nhận:</span>
-                      <span>GMP, ISO 9001</span>
+                    <div v-if="product.originCountry" class="flex justify-between py-1 border-b border-gray-200">
+                      <span>Xuất xứ:</span>
+                      <span>{{ product.originCountry }}</span>
+                    </div>
+                    <div v-if="product.manufacturer" class="flex justify-between py-1 border-b border-gray-200">
+                      <span>Nhà sản xuất:</span>
+                      <span>{{ product.manufacturer }}</span>
+                    </div>
+                    <div v-if="product.registrationNumber" class="flex justify-between py-1">
+                      <span>Số đăng ký:</span>
+                      <span>{{ product.registrationNumber }}</span>
                     </div>
                   </div>
                 </div>
@@ -292,17 +367,75 @@
                 <div class="bg-gray-50 p-4 rounded-lg">
                   <h4 class="font-semibold mb-3">Hướng dẫn sử dụng</h4>
                   <div class="text-sm space-y-2">
-                    <p><strong>Liều dùng:</strong> Theo chỉ định của bác sĩ thú y</p>
-                    <p><strong>Cách dùng:</strong> Pha với nước sạch hoặc trộn vào thức ăn</p>
-                    <p><strong>Thời gian ngưng thuốc:</strong> 7-14 ngày trước khi xuất chuồng</p>
-                    <p><strong>Lưu ý:</strong> Không dùng cho động vật có thai</p>
+                    <div v-if="product.dosage">
+                      <p><strong>Liều dùng:</strong> {{ product.dosage }}</p>
+                    </div>
+                    <div v-if="product.usageInstructions">
+                      <p><strong>Cách dùng:</strong> {{ product.usageInstructions }}</p>
+                    </div>
+                    <div v-if="product.withdrawalTime">
+                      <p><strong>Thời gian ngưng thuốc:</strong> {{ product.withdrawalTime }}</p>
+                    </div>
+                    <div v-if="product.targetAnimal">
+                      <p><strong>Đối tượng sử dụng:</strong> {{ product.targetAnimal }}</p>
+                    </div>
+                    <div v-if="product.storageConditions" class="pt-2 border-t border-gray-200">
+                      <p><strong>Bảo quản:</strong> {{ product.storageConditions }}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             
             <div v-if="activeTab === 'reviews'">
-              <div class="text-center py-8">
+              <div v-if="product.reviewCount > 0" class="space-y-6">
+                <!-- Review Summary -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                  <div class="flex items-center justify-between mb-4">
+                    <h4 class="text-lg font-semibold">Đánh giá từ khách hàng</h4>
+                    <div class="text-right">
+                      <div class="flex items-center justify-end mb-1">
+                        <span class="text-2xl font-bold mr-2">{{ product.rating }}</span>
+                        <div class="flex text-yellow-400">
+                          <i v-for="i in 5" :key="i" :class="i <= product.rating ? 'fas fa-star' : 'far fa-star'"></i>
+                        </div>
+                      </div>
+                      <p class="text-sm text-gray-600">{{ product.reviewCount }} đánh giá</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Rating Breakdown -->
+                  <div class="space-y-2">
+                    <div v-for="star in [5,4,3,2,1]" :key="star" class="flex items-center">
+                      <span class="text-sm w-3">{{ star }}</span>
+                      <i class="fas fa-star text-yellow-400 mx-2"></i>
+                      <div class="flex-1 bg-gray-200 rounded-full h-2 mx-2">
+                        <div class="bg-yellow-400 h-2 rounded-full" :style="`width: ${getStarPercentage(star)}%`"></div>
+                      </div>
+                      <span class="text-sm text-gray-600 w-12">{{ getStarCount(star) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sample Reviews -->
+                <div class="space-y-4">
+                  <div v-for="review in sampleReviews" :key="review.id" class="border-b border-gray-200 pb-4">
+                    <div class="flex items-start justify-between mb-2">
+                      <div>
+                        <h5 class="font-medium">{{ review.author }}</h5>
+                        <div class="flex text-yellow-400 text-sm">
+                          <i v-for="i in 5" :key="i" :class="i <= review.rating ? 'fas fa-star' : 'far fa-star'"></i>
+                        </div>
+                      </div>
+                      <span class="text-sm text-gray-500">{{ review.date }}</span>
+                    </div>
+                    <p class="text-gray-700">{{ review.comment }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- No Reviews State -->
+              <div v-else class="text-center py-8">
                 <i class="fas fa-star text-4xl text-gray-300 mb-4"></i>
                 <p class="text-gray-500 mb-4">Chưa có đánh giá nào cho sản phẩm này</p>
                 <button class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
@@ -349,7 +482,7 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="!product" class="text-center py-12">
+      <div v-if="!product && !productNotFound" class="text-center py-12">
         <i class="fas fa-spinner fa-spin text-4xl text-gray-300 mb-4"></i>
         <p class="text-gray-500">Đang tải thông tin sản phẩm...</p>
       </div>
@@ -387,7 +520,7 @@ export default {
       product: null,
       productNotFound: false,
       currentImage: '',
-      selectedWeight: '1 lọ/chai',
+      selectedWeight: '',
       quantity: 1,
       activeTab: 'description',
       tabs: [
@@ -396,7 +529,7 @@ export default {
         { id: 'reviews', name: 'Đánh giá' }
       ],
       relatedProducts: [],
-      weightOptions: ['1 lọ/chai', '5 lọ/thùng', '10 lọ/thùng', '20 lọ/thùng']
+      weightOptions: []
     }
   },
   
@@ -406,13 +539,49 @@ export default {
     },
     
     productImages() {
-      // Generate multiple images for product gallery
+      if (!this.product) return []
+      
+      // Use images from product data if available
+      if (this.product.images && this.product.images.length > 0) {
+        return this.product.images
+      }
+      
+      // Generate multiple images for product gallery using main image and fallbacks
       return [
-        this.product?.image,
+        this.product.image,
         'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=400&fit=crop',
         'https://images.unsplash.com/photo-1571091655789-405eb7a3a3a8?w=400&h=400&fit=crop',
         'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=400&h=400&fit=crop'
       ].filter(Boolean)
+    },
+
+    sampleReviews() {
+      // Generate sample reviews based on product data
+      if (!this.product || this.product.reviewCount === 0) return []
+      
+      return [
+        {
+          id: 1,
+          author: 'Anh Tuấn - Chăn nuôi Hòa Bình',
+          rating: 5,
+          date: '2 tuần trước',
+          comment: `Sản phẩm ${this.product.name} rất hiệu quả, gia súc khỏe mạnh hơn sau khi sử dụng. Sẽ mua lại.`
+        },
+        {
+          id: 2,
+          author: 'Chị Mai - Trang trại Thanh Hóa',
+          rating: 4,
+          date: '1 tháng trước',
+          comment: `Chất lượng tốt, giá cả hợp lý. Giao hàng nhanh chóng. Recommend cho các bạn chăn nuôi.`
+        },
+        {
+          id: 3,
+          author: 'Anh Nam - HTX Nông nghiệp',
+          rating: 5,
+          date: '1 tháng trước',
+          comment: 'Sản phẩm chính hãng, hiệu quả rõ rệt. Đội ngũ tư vấn chuyên nghiệp.'
+        }
+      ]
     }
   },
   
@@ -430,15 +599,48 @@ export default {
       
       if (this.product) {
         this.currentImage = this.product.image
-        this.selectedWeight = this.weightOptions[0]
+        
+        // Set up weight options based on product data
+        this.setupWeightOptions()
+        
         this.loadRelatedProducts()
         this.productNotFound = false
         
         // Update page title
         document.title = `${this.product.name} - HALIFE Animals`
+        
+        // Set meta description
+        const metaDescription = document.querySelector('meta[name="description"]')
+        if (metaDescription) {
+          const description = this.product.metaDescription || this.product.description || this.product.name
+          metaDescription.setAttribute('content', description)
+        }
+
+        // Set meta keywords if available
+        if (this.product.seoKeywords && this.product.seoKeywords.length > 0) {
+          let metaKeywords = document.querySelector('meta[name="keywords"]')
+          if (!metaKeywords) {
+            metaKeywords = document.createElement('meta')
+            metaKeywords.setAttribute('name', 'keywords')
+            document.head.appendChild(metaKeywords)
+          }
+          metaKeywords.setAttribute('content', this.product.seoKeywords.join(', '))
+        }
       } else {
         this.productNotFound = true
         document.title = 'Không tìm thấy sản phẩm - HALIFE Animals'
+      }
+    },
+    
+    setupWeightOptions() {
+      // Set weight options based on product package size or default options
+      if (this.product.packageSize) {
+        this.weightOptions = [this.product.packageSize]
+        this.selectedWeight = this.product.packageSize
+      } else {
+        // Default weight options for products without specific package size
+        this.weightOptions = ['1 lọ/chai', '5 lọ/thùng', '10 lọ/thùng']
+        this.selectedWeight = this.weightOptions[0]
       }
     },
     
@@ -474,7 +676,29 @@ export default {
     },
     
     increaseQuantity() {
-      this.quantity++
+      if (!this.product.stockQuantity || this.quantity < this.product.stockQuantity) {
+        this.quantity++
+      }
+    },
+
+    getStarPercentage(starLevel) {
+      // Calculate percentage for rating breakdown
+      if (!this.product.reviewCount) return 0
+      
+      // Simulate distribution based on average rating
+      const distributions = {
+        5: { 5: 60, 4: 25, 3: 10, 2: 3, 1: 2 },
+        4: { 5: 30, 4: 50, 3: 15, 2: 3, 1: 2 },
+        3: { 5: 10, 4: 20, 3: 40, 2: 20, 1: 10 }
+      }
+      
+      const ratingGroup = Math.round(this.product.rating)
+      return distributions[ratingGroup]?.[starLevel] || 0
+    },
+
+    getStarCount(starLevel) {
+      const percentage = this.getStarPercentage(starLevel)
+      return Math.round((percentage / 100) * this.product.reviewCount)
     },
     
     addToCart() {

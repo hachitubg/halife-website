@@ -12,6 +12,16 @@ const routes = [
     }
   },
   {
+    path: '/file-manager',
+    name: 'file-manager',
+    component: () => import('../views/FileManagerView.vue'),
+    meta: {
+      title: 'File Manager - HALIFE Admin',
+      description: 'Quản lý file Excel và hình ảnh cho HALIFE Animals',
+      requiresAuth: true // Có thể thêm authentication sau
+    }
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('../views/AboutView.vue'),

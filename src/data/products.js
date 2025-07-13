@@ -56,7 +56,7 @@ class ProductDataManager {
    * Khởi tạo và load dữ liệu từ Excel
    * @param {string} excelPath - Đường dẫn đến file Excel
    */
-  async initialize(excelPath = '/data/halife_products.xlsx') {
+  async initialize(excelPath = 'public/data/halife_products.xlsx') {
     if (this.isLoaded || this.isLoading) {
       return;
     }

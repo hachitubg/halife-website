@@ -167,9 +167,7 @@ class ExcelReader {
       
       // Hình ảnh
       image: row.image_url || this.getDefaultProductImage(row.category),
-      images: row.gallery_images ? 
-        row.gallery_images.split(';').map(url => url.trim()) : 
-        [row.image_url || this.getDefaultProductImage(row.category)],
+      images: this.parseProductImages(row.image_url, row.gallery_images, row.category),
       
       // SEO
       tags: row.tags ? row.tags.split(',').map(tag => tag.trim()) : [],
@@ -181,6 +179,30 @@ class ExcelReader {
       updatedDate: row.updated_date || new Date().toISOString().split('T')[0],
       status: row.status || 'active'
     };
+  }
+
+  parseProductImages(mainImage, galleryImages, category) {
+    const images = [];
+    
+    // Thêm hình chính
+    if (mainImage && mainImage.trim()) {
+      images.push(mainImage.trim());
+    }
+    
+    // Thêm gallery images
+    if (galleryImages && galleryImages.trim()) {
+      const galleryUrls = galleryImages.split(';')
+        .map(url => url.trim())
+        .filter(url => url && url !== mainImage); // Loại bỏ trùng lặp
+      images.push(...galleryUrls);
+    }
+    
+    // Nếu không có hình nào, dùng default
+    if (images.length === 0) {
+      images.push(this.getDefaultProductImage(category));
+    }
+    
+    return images;
   }
 
   /**

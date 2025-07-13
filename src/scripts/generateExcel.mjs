@@ -41,8 +41,8 @@ const halifeProducts = [
     stock_quantity: 150,
     rating: 4.8,
     review_count: 45,
-    image_url: "https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&h=400&fit=crop",
-    gallery_images: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=400&fit=crop;https://images.unsplash.com/photo-1571091655789-405eb7a3a3a8?w=400&h=400&fit=crop;https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=400&h=400&fit=crop",
+    image_url: '/images/best-phage-1.jpg',
+    gallery_images: '/images/best-phage-1.jpg;/images/best-phage-2.jpg;/images/best-phage-3.jpg',
     tags: "vi sinh vật,khoáng chất,gia súc,gia cầm,tiêu hóa,best phage",
     seo_keywords: "best phage,vi sinh vật có lợi,khoáng chất gia súc,halife",
     meta_description: "BEST PHAGE - Bộ sản phẩm thức ăn bổ sung vi sinh vật có lợi và khoáng chất cho gia súc gia cầm từ HALIFE",
@@ -79,8 +79,8 @@ const halifeProducts = [
     stock_quantity: 200,
     rating: 4.6,
     review_count: 32,
-    image_url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=400&fit=crop",
-    gallery_images: "https://images.unsplash.com/photo-1585435557343-3b092031d4cc?w=400&h=400&fit=crop;https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=400&fit=crop",
+    image_url: '/images/boost-phage-1.jpg',
+    gallery_images: '/images/boost-phage-1.jpg;/images/boost-phage-2.jpg',
     tags: "thảo dược,tiêu chảy,e.coli,miễn dịch,boost phage",
     seo_keywords: "boost phage,thảo dược tự nhiên,chống tiêu chảy,halife",
     meta_description: "BOOST PHAGE - Thảo dược tự nhiên điều trị tiêu chảy và tăng cường miễn dịch cho gia súc gia cầm",
@@ -117,8 +117,8 @@ const halifeProducts = [
     stock_quantity: 80,
     rating: 4.7,
     review_count: 28,
-    image_url: "https://images.unsplash.com/photo-1628009368231-7bb7cfcb55bb?w=400&h=400&fit=crop",
-    gallery_images: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop",
+    image_url: '/images/good-set-1.jpg',
+    gallery_images: '/images/good-set-1.jpg;/images/good-set-2.jpg',
     tags: "hô hấp,viêm phổi,kháng sinh,good set",
     seo_keywords: "good set,viêm phổi,hô hấp,halife",
     meta_description: "GOOD SET - Bộ sản phẩm cử ly tối ưu điều trị viêm đường hô hấp và viêm phổi cho gia súc",
@@ -155,8 +155,8 @@ const halifeProducts = [
     stock_quantity: 120,
     rating: 4.5,
     review_count: 38,
-    image_url: "https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&h=400&fit=crop",
-    gallery_images: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=400&fit=crop",
+    image_url: '/images/winflo-la-1.jpg',
+    gallery_images: '/images/winflo-la-1.jpg;/images/winflo-la-2.jpg',
     tags: "kháng sinh,florfenicol,nhiễm khuẩn,winflo la",
     seo_keywords: "winflo la,kháng sinh,florfenicol,halife",
     meta_description: "WINFLO LA - Thuốc kháng sinh điều trị nhiễm khuẩn đường ruột và hô hấp cho gia súc gia cầm",
@@ -193,8 +193,8 @@ const halifeProducts = [
     stock_quantity: 95,
     rating: 4.4,
     review_count: 25,
-    image_url: "https://images.unsplash.com/photo-1585435557343-3b092031d4cc?w=400&h=400&fit=crop",
-    gallery_images: "https://images.unsplash.com/photo-1576671081837-49000212a370?w=400&h=400&fit=crop",
+    image_url: '/images/anpha-new-1.jpg',
+    gallery_images: '/images/anpha-new-1.jpg',
     tags: "enrofloxacin,kháng sinh,viêm phổi,anpha new",
     seo_keywords: "anpha new,enrofloxacin,kháng sinh,halife",
     meta_description: "ANPHA NEW - Thuốc kháng sinh chứa Enrofloxacin điều trị nhiễm khuẩn hô hấp và tiêu hóa",
@@ -308,6 +308,54 @@ const templateData = [{
   status: "active"
 }];
 
+
+// Helper function để tạo đường dẫn ảnh đơn giản
+function createSimpleImagePaths(productName, imageCount = 2) {
+  const slug = productName.toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+  
+  const mainImage = `/images/${slug}-1.jpg`;
+  const galleryImages = [];
+  
+  for (let i = 1; i <= imageCount; i++) {
+    galleryImages.push(`/images/${slug}-${i}.jpg`);
+  }
+  
+  return {
+    image_url: mainImage,
+    gallery_images: galleryImages.join(';')
+  };
+}
+
+// Function tự động tạo đường dẫn hình từ tên sản phẩm
+function generateImagePaths(productName, hasMultipleImages = true) {
+  const slug = productName.toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+  
+  const mainImage = `/images/products/${slug}/main.jpg`;
+  
+  if (!hasMultipleImages) {
+    return {
+      image_url: mainImage,
+      gallery_images: mainImage
+    };
+  }
+  
+  const galleryImages = [
+    mainImage,
+    `/images/products/${slug}/detail-1.jpg`,
+    `/images/products/${slug}/detail-2.jpg`,
+    `/images/products/${slug}/package.jpg`
+  ];
+  
+  return {
+    image_url: mainImage,
+    gallery_images: galleryImages.join(';')
+  };
+}
+
 // Function tạo file Excel
 function generateExcelFile() {
   try {
@@ -329,7 +377,7 @@ function generateExcelFile() {
     XLSX.utils.book_append_sheet(workbook, templateSheet, "Template");
     
     // Tạo thư mục public/data nếu chưa có
-    const outputDir = path.join(__dirname, '../public/data');
+    const outputDir = path.join(__dirname, '../../public/data');
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
       console.log('📁 Đã tạo thư mục public/data');

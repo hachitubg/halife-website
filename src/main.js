@@ -98,7 +98,7 @@ async function initializeApp() {
     
     // Bước 1: Khởi tạo dữ liệu sản phẩm
     console.log('📖 Đang tải dữ liệu sản phẩm từ Excel...')
-    await dataAPI.initialize('/data/halife_products.xlsx')
+    await dataAPI.initialize('public/data/halife_products.xlsx')
     
     // Bước 2: Kiểm tra kết quả
     const stats = dataAPI.getStats()
