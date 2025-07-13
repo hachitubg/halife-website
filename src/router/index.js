@@ -12,12 +12,22 @@ const routes = [
     }
   },
   {
-    path: '/file-manager',
-    name: 'file-manager',
-    component: () => import('../views/FileManagerView.vue'),
+    path: '/product-manager',
+    name: 'product-manage',
+    component: () => import('../views/ProductManagerView.vue'),
     meta: {
-      title: 'File Manager - HALIFE Admin',
-      description: 'Quản lý file Excel và hình ảnh cho HALIFE Animals',
+      title: 'Product Manager - HALIFE Admin',
+      description: 'Quản lý sản phẩm cho HALIFE Animals',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/news-editor',
+    name: 'news-editor',
+    component: () => import('../views/NewsEditorView.vue'),
+    meta: {
+      title: 'News Editor - HALIFE Admin',
+      description: 'Thêm và chỉnh sửa tin tức cho HALIFE Animals',
       requiresAuth: true // Có thể thêm authentication sau
     }
   },
@@ -94,6 +104,11 @@ const routes = [
     path: '/lien-he',
     redirect: '/contact'
   },
+  // Admin routes - có thể thêm authentication guard sau
+  {
+    path: '/admin',
+    redirect: '/file-manager'
+  },
   // 404 Not Found - must be last
   {
     path: '/:pathMatch(.*)*',
@@ -160,6 +175,13 @@ router.beforeEach((to, from, next) => {
     // Pass query parameters to component via meta
     to.meta.searchQuery = to.query.search
     to.meta.categoryFilter = to.query.category
+  }
+  
+  // Basic auth check for admin routes (có thể mở rộng sau)
+  if (to.meta.requiresAuth) {
+    // TODO: Add proper authentication check here
+    // For now, just warn in console
+    console.log('⚠️ Admin route accessed:', to.path)
   }
   
   // Analytics tracking (uncomment when ready to use)

@@ -10,7 +10,7 @@
     <div class="md:hidden bg-gradient-to-r from-blue-400 to-cyan-400 p-4">
       <div class="bg-white bg-opacity-20 rounded-lg p-4 text-white text-center">
         <div class="flex items-center justify-center mb-2">
-          <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=50&h=50&fit=crop&crop=center" alt="HALIFE" class="h-12 w-12 rounded-full mr-3">
+          <img src="/public/images/logo_black.png" alt="HALIFE" class="h-12 w-12 rounded-full mr-3">
           <div>
             <h2 class="text-xl font-bold">THUỐC THÚ Y</h2>
             <h3 class="text-lg font-bold">CHẤT LƯỢNG CAO</h3>

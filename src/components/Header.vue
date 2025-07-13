@@ -20,9 +20,9 @@
         
         <!-- Mobile Logo -->
         <router-link to="/" class="flex items-center">
-          <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=60&h=60&fit=crop&crop=center" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
+          <img src="/public/images/logo_black.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
           <div>
-            <h1 class="text-lg font-bold text-blue-600">HALIFE</h1>
+            <h1 class="text-lg font-bold text-blue-600">HALIFE ANIMALS</h1>
           </div>
         </router-link>
 
@@ -44,10 +44,10 @@
       <div class="flex items-center justify-between gap-4">
         <!-- Logo -->
         <router-link to="/" class="flex items-center hover:opacity-90 transition-opacity">
-          <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=80&h=80&fit=crop&crop=center" alt="HALIFE" class="h-12 w-12 mr-3 rounded-full">
+          <img src="/public/images/logo_black.png" alt="HALIFE" class="h-12 w-12 mr-3 rounded-full">
           <div>
-            <h1 class="text-xl font-bold text-blue-600">HALIFE</h1>
-            <p class="text-xs text-gray-600">ANIMALS</p>
+            <h1 class="text-xl font-bold text-blue-600">HALIFE ANIMALS</h1>
+            <p class="text-xs text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
           </div>
         </router-link>
 
@@ -99,7 +99,7 @@
           <!-- Mobile Menu Header -->
           <div class="flex items-center justify-between p-4 border-b">
             <router-link to="/" class="flex items-center" @click="mobileMenuOpen = false">
-              <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=40&h=40&fit=crop&crop=center" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
+              <img src="/public/images/logo_black.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
               <h2 class="font-bold text-blue-600">HALIFE ANIMALS</h2>
             </router-link>
             <button @click="mobileMenuOpen = false" class="p-2">
@@ -178,15 +178,6 @@
               <span>LIÊN HỆ</span>
             </router-link>
 
-            <!-- External Links -->
-            <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-              <i class="fas fa-graduation-cap mr-3 text-blue-500"></i>
-              <span>KIẾN THỨC THÚ Y</span>
-            </a>
-            <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-              <i class="fas fa-store mr-3 text-blue-500"></i>
-              <span>HỆ THỐNG CỬA HÀNG</span>
-            </a>
           </div>
 
           <!-- Mobile Category Menu -->
@@ -280,14 +271,6 @@
             >
               SẢN PHẨM
             </router-link>
-            
-            <a href="#" class="py-3 hover:bg-blue-600 px-4 rounded transition-colors">
-              KIẾN THỨC THÚ Y
-            </a>
-            
-            <a href="#" class="py-3 hover:bg-blue-600 px-4 rounded transition-colors">
-              HỆ THỐNG CỬA HÀNG
-            </a>
             
             <router-link 
               to="/news" 
@@ -430,12 +413,6 @@ export default {
 
 .transition-opacity {
   transition: opacity 0.3s ease;
-}
-
-/* Active link styles */
-.router-link-active {
-  background-color: rgba(37, 99, 235, 0.1);
-  color: #2563eb;
 }
 
 /* Loading state */

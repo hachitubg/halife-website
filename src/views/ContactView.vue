@@ -7,12 +7,12 @@
     />
 
     <!-- Page Header -->
-    <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 py-16 md:py-24">
+    <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 py-16 md:py-12">
       <!-- Background overlay -->
       <div class="absolute inset-0 bg-black opacity-50"></div>
       <div 
         class="absolute inset-0 bg-cover bg-center"
-        style="background-image: url('https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=1200&h=600&fit=crop&crop=center')"
+        style="background-color: #636363"
       ></div>
       
       <!-- Content -->

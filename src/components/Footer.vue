@@ -80,10 +80,10 @@
             <!-- Company Info -->
             <div class="lg:col-span-1">
               <div class="flex items-center mb-4">
-                <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=60&h=60&fit=crop&crop=center" alt="HALIFE" class="h-10 w-10 mr-3 rounded-full">
+                <img src="/public/images/logo_black.png" alt="HALIFE" class="h-10 w-10 mr-3 rounded-full">
                 <div>
-                  <h4 class="font-bold text-blue-600">HALIFE</h4>
-                  <p class="text-sm text-gray-600">ANIMALS</p>
+                  <h4 class="font-bold text-blue-600">HALIFE ANIMALS</h4>
+                  <p class="text-sm text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
                 </div>
               </div>
               

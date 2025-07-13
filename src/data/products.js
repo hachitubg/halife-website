@@ -349,6 +349,70 @@ export const dataAPI = {
   },
 
   /**
+   * Lấy tất cả sản phẩm
+   */
+  getAllProducts() {
+    return dataManager.products; // Trả về tất cả sản phẩm, không chỉ active
+  },
+
+  /**
+   * Lấy tất cả danh mục
+   */
+  getAllCategories() {
+    return dataManager.categories;
+  },
+
+  /**
+   * Lấy sản phẩm theo ID
+   */
+  getProductById(id) {
+    return dataManager.products.find(p => p.id === parseInt(id));
+  },
+
+  /**
+   * Thêm sản phẩm mới
+   */
+  addProduct(productData) {
+    const newProduct = {
+      ...productData,
+      id: Math.max(...dataManager.products.map(p => p.id || 0), 0) + 1,
+      createdDate: new Date().toISOString(),
+      updatedDate: new Date().toISOString(),
+      status: 'active'
+    };
+    dataManager.products.push(newProduct);
+    return newProduct;
+  },
+
+  /**
+   * Cập nhật sản phẩm
+   */
+  updateProduct(id, productData) {
+    const index = dataManager.products.findIndex(p => p.id === parseInt(id));
+    if (index === -1) return null;
+
+    dataManager.products[index] = {
+      ...dataManager.products[index],
+      ...productData,
+      id: parseInt(id), // Giữ nguyên ID
+      updatedDate: new Date().toISOString()
+    };
+    return dataManager.products[index];
+  },
+
+  /**
+   * Xóa sản phẩm
+   */
+  deleteProduct(id) {
+    const index = dataManager.products.findIndex(p => p.id === parseInt(id));
+    if (index === -1) return false;
+
+    const deletedProduct = dataManager.products[index];
+    dataManager.products.splice(index, 1);
+    return deletedProduct;
+  },
+
+  /**
    * Lấy trạng thái loading
    */
   get isLoading() {
