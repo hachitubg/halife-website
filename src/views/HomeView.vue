@@ -169,28 +169,35 @@
         </div>
       </div>
 
-      <!-- Product Categories -->
-      <div class="bg-gray-50 py-8 md:py-12">
-        <div class="container mx-auto px-4">
-          <div class="text-center mb-8">
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-              Danh mục sản phẩm
-            </h2>
-            <p class="text-gray-600">Khám phá các danh mục sản phẩm đa dạng của chúng tôi</p>
-          </div>
-          
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            <div 
-              v-for="category in productCategories.slice(1)" 
-              :key="category"
-              @click="navigateToCategory(category)"
-              class="bg-white rounded-lg p-4 md:p-6 text-center hover:shadow-lg transition-all cursor-pointer group"
-            >
-              <div class="bg-blue-100 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
-                <i class="fas fa-pills text-xl md:text-2xl text-blue-600"></i>
+      <!-- Products by Categories (3 categories only) -->
+      <div class="container mx-auto px-4 py-8 md:py-12">
+        <div v-for="category in selectedCategories" :key="category" class="mb-12">
+          <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
+                  <i :class="getCategoryIcon(category) + ' text-blue-500 mr-2'"></i>
+                  {{ category }}
+                </h3>
+                <p class="text-gray-600 text-sm">{{ getProductCountByCategory(category) }} sản phẩm có sẵn</p>
               </div>
-              <h3 class="font-semibold text-sm md:text-base mb-2 group-hover:text-blue-600 transition-colors">{{ category }}</h3>
-              <p class="text-xs md:text-sm text-gray-500">{{ getProductCountByCategory(category) }} sản phẩm</p>
+              <button @click="navigateToCategory(category)" class="text-blue-500 hover:text-blue-700 text-sm font-medium">
+                Xem tất cả →
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+              <ProductCard
+                v-for="product in getCategoryProducts(category, 5)"
+                :key="product.id"
+                :product="product"
+                :show-quick-actions="true"
+                @add-to-cart="addToCart"
+                @quick-view="showProductQuickView"
+                @add-to-wishlist="addToWishlist"
+                @compare="addToCompare"
+                @share="shareProduct"
+              />
             </div>
           </div>
         </div>
@@ -302,6 +309,11 @@ export default {
 
     latestNews() {
       return getLatestNews(3)
+    },
+
+    // Chọn 3 danh mục đầu tiên (bỏ "Tất cả")
+    selectedCategories() {
+      return this.productCategories.slice(1, 4) // Lấy 3 danh mục đầu
     }
   },
 
@@ -324,6 +336,17 @@ export default {
     
     getProductCountByCategory(category) {
       return getProductsByCategory(category).length
+    },
+
+    // Lấy sản phẩm theo danh mục với giới hạn số lượng
+    getCategoryProducts(category, limit = 5) {
+      return getProductsByCategory(category).slice(0, limit)
+    },
+
+    // Lấy icon cho danh mục
+    getCategoryIcon(categoryName) {
+      const category = this.categories.find(cat => cat.name === categoryName)
+      return category ? category.icon : 'fas fa-pills'
     },
     
     scrollToProducts() {
