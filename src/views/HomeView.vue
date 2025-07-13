@@ -139,14 +139,6 @@
               <p class="text-gray-600 text-sm">Những sản phẩm được tin dùng nhất</p>
             </div>
             <div class="flex items-center space-x-3">
-              <div class="hidden md:flex space-x-2">
-                <button @click="slideProducts('prev')" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors">
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <button @click="slideProducts('next')" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors">
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
               <button @click="$router.push('/products')" class="text-blue-500 hover:text-blue-700 text-sm font-medium">
                 Xem tất cả →
               </button>
@@ -165,6 +157,12 @@
               @compare="addToCompare"
               @share="shareProduct"
             />
+          </div>
+
+          <!-- Debug info cho featured products -->
+          <div v-if="debugMode" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm">
+            <p><strong>Debug - Featured Products:</strong> {{ featuredProducts.length }} sản phẩm</p>
+            <p><strong>Total Products:</strong> {{ allProducts.length }} sản phẩm</p>
           </div>
         </div>
       </div>
@@ -199,6 +197,12 @@
                 @share="shareProduct"
               />
             </div>
+
+            <!-- Debug info cho từng category -->
+            <div v-if="debugMode" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+              <p><strong>Debug - {{ category }}:</strong> {{ getCategoryProducts(category, 5).length }}/{{ getProductCountByCategory(category) }} sản phẩm hiển thị</p>
+              <p><strong>Products:</strong> {{ getCategoryProducts(category, 5).map(p => p.name).join(', ') }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -231,6 +235,11 @@
               @like="likeArticle"
             />
           </div>
+
+          <!-- Debug info cho news -->
+          <div v-if="debugMode" class="mt-4 p-3 bg-green-50 border border-green-200 rounded text-sm">
+            <p><strong>Debug - Latest News:</strong> {{ latestNews.length }} bài viết</p>
+          </div>
         </div>
       </div>
 
@@ -258,6 +267,16 @@
 
     <!-- Footer Component -->
     <Footer />
+
+    <!-- Debug Toggle (chỉ hiện trong development) -->
+    <button 
+      v-if="isDevelopment"
+      @click="debugMode = !debugMode"
+      class="fixed bottom-4 right-4 bg-red-500 text-white p-3 rounded-full shadow-lg hover:bg-red-600 z-50"
+      title="Toggle Debug Mode"
+    >
+      <i class="fas fa-bug"></i>
+    </button>
   </div>
 </template>
 
@@ -273,7 +292,8 @@ import {
   productCategories, 
   sidebarCategories, 
   getFeaturedProducts, 
-  getProductsByCategory
+  getProductsByCategory,
+  dataAPI
 } from '@/data/products.js'
 
 import { 
@@ -294,30 +314,88 @@ export default {
       // Data được import từ các file riêng
       categories: sidebarCategories,
       productCategories: productCategories,
-      products: products,
+      allProducts: [], // Reactive array cho products
       news: news,
       
       // UI state
-      currentProductSlide: 0
+      currentProductSlide: 0,
+      debugMode: false,
+      dataLoaded: false
     }
   },
 
   computed: {
+    isDevelopment() {
+      return import.meta.env.DEV
+    },
+
     featuredProducts() {
-      return getFeaturedProducts()
+      if (!this.dataLoaded || this.allProducts.length === 0) {
+        console.log('🔍 Featured products: No data loaded yet')
+        return []
+      }
+      
+      const featured = getFeaturedProducts()
+      console.log('🔍 Featured products:', featured.length, 'sản phẩm')
+      return featured
     },
 
     latestNews() {
-      return getLatestNews(3)
+      const latest = getLatestNews(3)
+      console.log('🔍 Latest news:', latest.length, 'bài viết')
+      return latest
     },
 
     // Chọn 3 danh mục đầu tiên (bỏ "Tất cả")
     selectedCategories() {
-      return this.productCategories.slice(1, 4) // Lấy 3 danh mục đầu
+      if (!this.dataLoaded) return []
+      
+      // Lấy danh mục từ productCategories (bỏ "Tất cả")
+      const categories = this.productCategories.filter(cat => cat !== 'Tất cả').slice(0, 3)
+      console.log('🔍 Selected categories:', categories)
+      return categories
     }
   },
 
   methods: {
+    async loadData() {
+      console.log('🚀 HomeView: Loading data...')
+      
+      try {
+        // Đợi data được load
+        if (!dataAPI.isLoaded) {
+          console.log('⏳ Waiting for data to load...')
+          await this.waitForDataLoad()
+        }
+        
+        // Update reactive data
+        this.allProducts = [...products] // Copy để trigger reactivity
+        this.dataLoaded = true
+        
+        console.log('✅ HomeView: Data loaded successfully')
+        console.log('📊 Products:', this.allProducts.length)
+        console.log('📂 Categories:', this.productCategories.length)
+        
+      } catch (error) {
+        console.error('❌ HomeView: Error loading data:', error)
+        // Vẫn set dataLoaded = true để hiển thị UI với fallback data
+        this.dataLoaded = true
+      }
+    },
+
+    async waitForDataLoad() {
+      return new Promise((resolve) => {
+        const checkData = () => {
+          if (dataAPI.isLoaded && products.length > 0) {
+            resolve()
+          } else {
+            setTimeout(checkData, 100)
+          }
+        }
+        checkData()
+      })
+    },
+
     handleSearch(query) {
       // Redirect to products page with search query
       this.$router.push({
@@ -335,12 +413,19 @@ export default {
     },
     
     getProductCountByCategory(category) {
-      return getProductsByCategory(category).length
+      if (!this.dataLoaded) return 0
+      const count = getProductsByCategory(category).length
+      console.log(`🔍 ${category}: ${count} sản phẩm`)
+      return count
     },
 
     // Lấy sản phẩm theo danh mục với giới hạn số lượng
     getCategoryProducts(category, limit = 5) {
-      return getProductsByCategory(category).slice(0, limit)
+      if (!this.dataLoaded) return []
+      
+      const products = getProductsByCategory(category).slice(0, limit)
+      console.log(`🔍 ${category} products (${limit}):`, products.length, 'sản phẩm')
+      return products
     },
 
     // Lấy icon cho danh mục
@@ -433,6 +518,24 @@ export default {
         }
       }
     }
+  },
+
+  async mounted() {
+    console.log('🎯 HomeView mounted')
+    
+    // Load data
+    await this.loadData()
+    
+    // Listen for data updates từ dataAPI
+    dataAPI.onDataLoaded(() => {
+      console.log('🔄 HomeView: Data updated, reloading...')
+      this.loadData()
+    })
+  },
+
+  beforeUnmount() {
+    // Cleanup listeners
+    dataAPI.offDataLoaded(this.loadData)
   }
 }
 </script>
