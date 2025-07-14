@@ -812,8 +812,10 @@
   </div>
 </template>
 
+// src/views/ProductManagerView.vue - Script section được cập nhật
+
 <script>
-import { ProductManagerAPI } from '@/utils/productManagerAPI.js'
+import { ProductAPI } from '@/utils/productAPI.js'
 
 export default {
   name: 'ProductManagerView',
@@ -928,14 +930,14 @@ export default {
   },
 
   methods: {
-    // Data Loading
+    // Data Loading - UPDATED to use ProductAPI
     async loadData() {
       this.loading = true;
       try {
         const [products, categories, stats] = await Promise.all([
-          ProductManagerAPI.getAllProducts(),
-          ProductManagerAPI.getAllCategories(),
-          ProductManagerAPI.getProductStats()
+          ProductAPI.getAllProducts(),
+          ProductAPI.getAllCategories(),
+          ProductAPI.getProductStats()
         ]);
 
         this.products = products;
@@ -953,7 +955,7 @@ export default {
       this.loadingMessage = 'Đang reload dữ liệu từ Excel...';
 
       try {
-        await ProductManagerAPI.reloadDataFromExcel();
+        await ProductAPI.reloadDataFromExcel();
         await this.loadData();
         this.showMessage('Đã reload dữ liệu từ Excel thành công!', 'success');
       } catch (error) {
@@ -963,9 +965,9 @@ export default {
       }
     },
 
-    // Product Operations
+    // Product Operations - UPDATED to use ProductAPI
     async saveProduct() {
-      const validation = ProductManagerAPI.validateProduct(this.form);
+      const validation = ProductAPI.validateProduct(this.form);
       if (!validation.isValid) {
         this.showMessage('Lỗi: ' + validation.errors.join(', '), 'error');
         return;
@@ -974,29 +976,68 @@ export default {
       this.formLoading = true;
 
       try {
+        // Debug BEFORE preparing formData
+        console.log('🔍 BEFORE preparing formData:');
+        console.log('   this.form.additionalImages:', JSON.parse(JSON.stringify(this.form.additionalImages)));
+        console.log('   this.form.additionalImages length:', this.form.additionalImages ? this.form.additionalImages.length : 'undefined');
+        console.log('   this.form object keys:', Object.keys(this.form));
+
         // Chuẩn bị dữ liệu form
         const formData = {
-          ...this.form,
+          // Base form data
+          name: this.form.name,
+          category: this.form.category,
+          description: this.form.description,
+          fullDescription: this.form.fullDescription,
+          image: this.form.image,
+          inStock: this.form.inStock,
+          isFeatured: this.form.isFeatured,
+          packageSize: this.form.packageSize,
+          stockQuantity: parseInt(this.form.stockQuantity) || 0,
+          targetAnimal: this.form.targetAnimal,
+          manufacturer: this.form.manufacturer,
+          originCountry: this.form.originCountry,
+          registrationNumber: this.form.registrationNumber,
+          activeIngredients: this.form.activeIngredients,
+          dosage: this.form.dosage,
+          usageInstructions: this.form.usageInstructions,
+          warnings: this.form.warnings,
+          storageConditions: this.form.storageConditions,
+          
           // Convert text inputs to arrays
           tags: this.form.tagsText ? this.form.tagsText.split(',').map(tag => tag.trim()) : [],
           functions: this.form.functionsText ? this.form.functionsText.split(',').map(func => func.trim()) : [],
+          
           // Convert numeric fields
           price: parseInt(this.form.price) || 0,
           originalPrice: parseInt(this.form.originalPrice) || parseInt(this.form.price) || 0,
-          stockQuantity: parseInt(this.form.stockQuantity) || 0,
           rating: parseFloat(this.form.rating) || 0,
-          reviewCount: parseInt(this.form.reviewCount) || 0
+          reviewCount: parseInt(this.form.reviewCount) || 0,
+          
+          // FIX: Đặt images cuối cùng để tránh bị overwrite
+          images: Array.isArray(this.form.additionalImages) ? [...this.form.additionalImages] : []
         };
+
+        // Debug AFTER preparing formData
+        console.log('🔍 AFTER preparing formData:');
+        console.log('   formData.images:', JSON.parse(JSON.stringify(formData.images)));
+        console.log('   formData.images length:', formData.images ? formData.images.length : 'undefined');
+
+        // Debug log để kiểm tra
+        console.log('🖼️ Form data being sent:');
+        console.log('   Main image:', formData.image);
+        console.log('   Gallery images (additionalImages):', this.form.additionalImages);
+        console.log('   Gallery images (images):', formData.images);
 
         let result;
         if (this.showEditModal) {
-          result = await ProductManagerAPI.updateProduct(
+          result = await ProductAPI.updateProduct(
             this.selectedProduct.id, 
             formData, 
             this.selectedImageFile
           );
         } else {
-          result = await ProductManagerAPI.createProduct(formData, this.selectedImageFile);
+          result = await ProductAPI.createProduct(formData, this.selectedImageFile);
         }
 
         this.showMessage(result.message, 'success');
@@ -1010,16 +1051,26 @@ export default {
     },
 
     async deleteProduct(product) {
-      if (!confirm(`Bạn có chắc muốn xóa sản phẩm "${product.name}"?\nHành động này không thể hoàn tác.`)) {
+      if (!confirm(`Bạn có chắc muốn xóa sản phẩm "${product.name}"?\n\nHành động này sẽ:\n- Xóa sản phẩm khỏi danh sách\n- Xóa tất cả hình ảnh liên quan\n- Không thể hoàn tác`)) {
         return;
       }
 
       this.globalLoading = true;
-      this.loadingMessage = 'Đang xóa sản phẩm...';
+      this.loadingMessage = 'Đang xóa sản phẩm và hình ảnh...';
 
       try {
-        const result = await ProductManagerAPI.deleteProduct(product.id);
-        this.showMessage(result.message, 'success');
+        const result = await ProductAPI.deleteProduct(product.id);
+        
+        // Hiển thị thông tin chi tiết về việc xóa
+        let message = result.message;
+        if (result.deletedImages && result.deletedImages.length > 0) {
+          message += `\n✅ Đã xóa ${result.deletedImages.length} hình ảnh`;
+        }
+        if (result.failedDeletes && result.failedDeletes.length > 0) {
+          message += `\n⚠️ Không thể xóa ${result.failedDeletes.length} hình ảnh`;
+        }
+        
+        this.showMessage(message, 'success');
         await this.loadData();
         
         // Close modals if showing deleted product
@@ -1034,7 +1085,7 @@ export default {
       }
     },
 
-    // Modal Operations
+    // Modal Operations (không thay đổi)
     viewProduct(product) {
       this.selectedProduct = product;
       this.showViewModal = true;
@@ -1042,6 +1093,14 @@ export default {
 
     editProduct(product) {
       this.selectedProduct = product;
+      
+      // FIX: Xử lý đúng additional images khi edit
+      const additionalImages = [];
+      if (product.images && Array.isArray(product.images)) {
+        // Bỏ ảnh chính (đầu tiên) và lấy các ảnh còn lại
+        additionalImages.push(...product.images.slice(1));
+      }
+      
       this.form = {
         name: product.name || '',
         category: product.category || '',
@@ -1052,7 +1111,8 @@ export default {
         packageSize: product.packageSize || '',
         stockQuantity: product.stockQuantity || 0,
         image: product.image || '',
-        additionalImages: product.images ? product.images.slice(1) : [],
+        // Fix: Load additional images từ product.images (trừ ảnh chính)
+        additionalImages: additionalImages,
         inStock: product.inStock !== false,
         isFeatured: product.isFeatured || false,
         targetAnimal: product.targetAnimal || '',
@@ -1069,11 +1129,16 @@ export default {
         tagsText: product.tags ? product.tags.join(', ') : '',
         functionsText: product.functions ? product.functions.join(', ') : ''
       };
+      
       this.selectedImageFile = null;
       this.imagePreview = null;
       this.activeTab = 'basic';
       this.showViewModal = false;
       this.showEditModal = true;
+      
+      // Debug log
+      console.log('✏️ Edit product - loaded additionalImages:', this.form.additionalImages);
+      console.log('✏️ Edit product - original images:', product.images);
     },
 
     closeModal() {
@@ -1095,7 +1160,7 @@ export default {
         packageSize: '',
         stockQuantity: 0,
         image: '',
-        additionalImages: [],
+        additionalImages: [], // FIX: Đảm bảo luôn là array
         inStock: true,
         isFeatured: false,
         targetAnimal: '',
@@ -1115,9 +1180,12 @@ export default {
       this.selectedImageFile = null;
       this.imagePreview = null;
       this.activeTab = 'basic';
+      
+      // Debug log
+      console.log('🔄 Form reset - additionalImages:', this.form.additionalImages);
     },
 
-    // File Operations
+    // File Operations (không thay đổi)
     handleImageSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1152,7 +1220,7 @@ export default {
       this.showUploadModal = false;
 
       try {
-        const result = await ProductManagerAPI.uploadExcel(file);
+        const result = await ProductAPI.uploadExcel(file);
         this.showMessage(result.message, 'success');
       } catch (error) {
         this.showMessage('Lỗi upload Excel: ' + error.message, 'error');
@@ -1167,7 +1235,7 @@ export default {
       this.loadingMessage = 'Đang tải xuống Excel...';
 
       try {
-        const result = await ProductManagerAPI.downloadExcel();
+        const result = await ProductAPI.downloadExcel();
         this.showMessage(result.message, 'success');
       } catch (error) {
         this.showMessage('Lỗi tải xuống: ' + error.message, 'error');
@@ -1176,7 +1244,7 @@ export default {
       }
     },
 
-    // Utilities
+    // Utilities (không thay đổi)
     formatPrice(price) {
       if (!price) return '0 VNĐ';
       return new Intl.NumberFormat('vi-VN', {
@@ -1186,11 +1254,20 @@ export default {
     },
 
     handleImageError(event) {
-      event.target.src = '/images/no-image.png';
+      // Thay thế bằng ảnh placeholder base64 thay vì file không tồn tại
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik02MCA2MEgxNDBWMTQwSDYwVjYwWiIgc3Ryb2tlPSIjOUIzOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iMTAiIHN0cm9rZT0iIzlCOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTcwIDExMEwxMDAgODBMMTMwIDExMCIgc3Ryb2tlPSIjOUIzOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHRleHQgeD0iMTAwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzlCMzNENiI+S2jDtG5nIGPDsyDhuKNuaDwvdGV4dD4KPC9zdmc+';
     },
 
-    // Image handling
-    handleAdditionalImages(event) {
+    // Thêm method kiểm tra và xử lý ảnh
+    getImageSrc(product) {
+      if (!product.image || product.image.trim() === '' || product.image === 'nan') {
+        return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik02MCA2MEgxNDBWMTQwSDYwVjYwWiIgc3Ryb2tlPSIjOUIzOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iMTAiIHN0cm9rZT0iIzlCOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTcwIDExMEwxMDAgODBMMTMwIDExMCIgc3Ryb2tlPSIjOUIzOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHRleHQgeD0iMTAwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzlCMzNENiI+S2jDtG5nIGPDsyDhuKNuaDwvdGV4dD4KPC9zdmc+';
+      }
+      return product.image;
+    },
+
+    // Image handling - FIXED để upload thực sự
+    async handleAdditionalImages(event) {
       const files = Array.from(event.target.files);
       if (files.length === 0) return;
 
@@ -1207,109 +1284,81 @@ export default {
         return true;
       });
 
-      // Create previews
-      validFiles.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.form.additionalImages.push(e.target.result);
-        };
-        reader.readAsDataURL(file);
-      });
-
-      event.target.value = '';
-    },
-
-    removeAdditionalImage(index) {
-      this.form.additionalImages.splice(index, 1);
-    },
-
-    // Tab navigation helper
-    nextTab() {
-      const currentIndex = this.formTabs.findIndex(tab => tab.id === this.activeTab);
-      if (currentIndex < this.formTabs.length - 1) {
-        this.activeTab = this.formTabs[currentIndex + 1].id;
+      if (validFiles.length === 0) {
+        event.target.value = '';
+        return;
       }
-    },
 
-    prevTab() {
-      const currentIndex = this.formTabs.findIndex(tab => tab.id === this.activeTab);
-      if (currentIndex > 0) {
-        this.activeTab = this.formTabs[currentIndex - 1].id;
-      }
-    },
+      // Show loading
+      this.formLoading = true;
+      this.loadingMessage = `Đang upload ${validFiles.length} ảnh...`;
 
-    // Enhanced table display
-    getDiscountPercentage(product) {
-      if (!product.originalPrice || !product.price) return 0;
-      const original = parseInt(product.originalPrice);
-      const current = parseInt(product.price);
-      if (original <= current) return 0;
-      return Math.round(((original - current) / original) * 100);
-    },
-
-    getProductStatus(product) {
-      if (!product.inStock) return { text: 'Hết hàng', class: 'bg-red-100 text-red-800' };
-      if (product.stockQuantity && product.stockQuantity < 10) return { text: 'Sắp hết', class: 'bg-yellow-100 text-yellow-800' };
-      return { text: 'Còn hàng', class: 'bg-green-100 text-green-800' };
-    },
-
-    // Export/Import helpers
-    async exportToCSV() {
       try {
-        const products = await ProductManagerAPI.getAllProducts();
-        
-        // Create CSV content
-        const headers = [
-          'ID', 'Tên sản phẩm', 'Danh mục', 'Giá', 'Giá gốc', 'Mô tả', 
-          'Kích thước gói', 'Tồn kho', 'Còn hàng', 'Nổi bật', 'Đối tượng',
-          'Nhà sản xuất', 'Xuất xứ', 'Số đăng ký', 'Thành phần', 'Liều dùng',
-          'Cách dùng', 'Cảnh báo', 'Bảo quản', 'Đánh giá', 'Lượt đánh giá'
-        ];
-        
-        let csvContent = '\uFEFF'; // BOM for UTF-8
-        csvContent += headers.join(',') + '\n';
-        
-        products.forEach(product => {
-          const row = [
-            product.id || '',
-            `"${(product.name || '').replace(/"/g, '""')}"`,
-            `"${(product.category || '').replace(/"/g, '""')}"`,
-            product.price || '',
-            product.originalPrice || '',
-            `"${(product.description || '').replace(/"/g, '""')}"`,
-            `"${(product.packageSize || '').replace(/"/g, '""')}"`,
-            product.stockQuantity || 0,
-            product.inStock ? 'Có' : 'Không',
-            product.isFeatured ? 'Có' : 'Không',
-            `"${(product.targetAnimal || '').replace(/"/g, '""')}"`,
-            `"${(product.manufacturer || '').replace(/"/g, '""')}"`,
-            `"${(product.originCountry || '').replace(/"/g, '""')}"`,
-            `"${(product.registrationNumber || '').replace(/"/g, '""')}"`,
-            `"${(product.activeIngredients || '').replace(/"/g, '""')}"`,
-            `"${(product.dosage || '').replace(/"/g, '""')}"`,
-            `"${(product.usageInstructions || '').replace(/"/g, '""')}"`,
-            `"${(product.warnings || '').replace(/"/g, '""')}"`,
-            `"${(product.storageConditions || '').replace(/"/g, '""')}"`,
-            product.rating || 0,
-            product.reviewCount || 0
-          ];
-          csvContent += row.join(',') + '\n';
+        // Upload từng file
+        const uploadPromises = validFiles.map(async (file) => {
+          try {
+            const result = await ProductAPI.uploadProductImage(file);
+            return result.url;
+          } catch (error) {
+            this.showMessage(`Lỗi upload ${file.name}: ${error.message}`, 'error');
+            return null;
+          }
         });
+
+        // Đợi tất cả upload xong
+        const uploadedUrls = await Promise.all(uploadPromises);
         
-        // Download CSV
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `halife_products_export_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        // Thêm các URL thành công vào gallery
+        const successUrls = uploadedUrls.filter(url => url !== null);
         
-        this.showMessage('Đã xuất dữ liệu ra file CSV thành công!', 'success');
+        if (successUrls.length > 0) {
+          // FIX: Đảm bảo mảng được khởi tạo và cập nhật đúng
+          if (!Array.isArray(this.form.additionalImages)) {
+            this.form.additionalImages = [];
+          }
+          
+          // Thêm URLs mới vào mảng hiện có
+          this.form.additionalImages.push(...successUrls);
+          
+          // Debug log
+          console.log('🖼️ After adding images:');
+          console.log('   additionalImages length:', this.form.additionalImages.length);
+          console.log('   additionalImages content:', this.form.additionalImages);
+          
+          this.showMessage(`Đã upload thành công ${successUrls.length}/${validFiles.length} ảnh`, 'success');
+        }
+
       } catch (error) {
-        this.showMessage('Lỗi xuất dữ liệu: ' + error.message, 'error');
+        this.showMessage(`Lỗi upload ảnh: ${error.message}`, 'error');
+      } finally {
+        this.formLoading = false;
+        event.target.value = '';
+      }
+    },
+
+    async removeAdditionalImage(index) {
+      try {
+        const imageUrl = this.form.additionalImages[index];
+        
+        // Xóa file trên server nếu là URL upload thực
+        if (imageUrl && imageUrl.startsWith('/images/')) {
+          try {
+            await ProductAPI.deleteProductImage(imageUrl);
+          } catch (error) {
+            console.warn('Không thể xóa file trên server:', error.message);
+          }
+        }
+        
+        // Xóa khỏi mảng
+        this.form.additionalImages.splice(index, 1);
+        
+        // Debug log
+        console.log('🗑️ After removing image:');
+        console.log('   additionalImages length:', this.form.additionalImages.length);
+        console.log('   additionalImages content:', this.form.additionalImages);
+        
+      } catch (error) {
+        this.showMessage(`Lỗi xóa ảnh: ${error.message}`, 'error');
       }
     },
 
