@@ -80,7 +80,7 @@
       </div>
 
       <!-- Company Features -->
-      <div class="bg-gray-50 py-8 md:py-12">
+      <!-- <div class="bg-gray-50 py-8 md:py-12">
         <div class="container mx-auto px-4">
           <div class="text-center mb-8">
             <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
@@ -125,83 +125,203 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Featured Products -->
       <div id="products" class="container mx-auto px-4 py-8 md:py-12">
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
+          <!-- Header -->
           <div class="flex items-center justify-between mb-6">
             <div>
-              <h3 class="text-xl md:text-2xl font-bold text-blue-600 flex items-center mb-2">
-                <i class="fas fa-fire text-orange-500 mr-2"></i>
+              <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
+                <div class="bg-yellow-100 p-2 rounded-lg mr-3">
+                  <i class="fas fa-star text-yellow-500"></i>
+                </div>
                 SẢN PHẨM NỔI BẬT
               </h3>
               <p class="text-gray-600 text-sm">Những sản phẩm được tin dùng nhất</p>
             </div>
             <div class="flex items-center space-x-3">
-              <button @click="$router.push('/products')" class="text-blue-500 hover:text-blue-700 text-sm font-medium">
-                Xem tất cả →
+              <!-- Navigation for large screens -->
+              <div class="hidden lg:flex items-center space-x-2">
+                <button 
+                  @click="prevFeaturedSlide" 
+                  :disabled="currentFeaturedSlide === 0"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <i class="fas fa-chevron-left text-gray-600"></i>
+                </button>
+                <button 
+                  @click="nextFeaturedSlide"
+                  :disabled="currentFeaturedSlide >= maxFeaturedSlide"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <i class="fas fa-chevron-right text-gray-600"></i>
+                </button>
+              </div>
+              <button @click="$router.push('/products')" class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center">
+                Xem tất cả <i class="fas fa-arrow-right ml-1 text-xs"></i>
               </button>
             </div>
           </div>
           
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-            <ProductCard
-              v-for="product in featuredProducts"
-              :key="product.id"
-              :product="product"
-              :show-quick-actions="true"
-              @add-to-cart="addToCart"
-              @quick-view="showProductQuickView"
-              @add-to-wishlist="addToWishlist"
-              @compare="addToCompare"
-              @share="shareProduct"
-            />
+          <!-- Products Carousel -->
+          <div class="relative overflow-hidden">
+            <div 
+              class="flex transition-transform duration-300 ease-in-out"
+              :style="{ transform: `translateX(-${currentFeaturedSlide * 100}%)` }"
+            >
+              <div 
+                v-for="slide in featuredSlides" 
+                :key="slide"
+                class="w-full flex-shrink-0"
+              >
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                  <ProductCard
+                    v-for="product in getFeaturedSlideProducts(slide)"
+                    :key="product.id"
+                    :product="product"
+                    :show-quick-actions="true"
+                    @add-to-cart="addToCart"
+                    @quick-view="showProductQuickView"
+                    @add-to-wishlist="addToWishlist"
+                    @compare="addToCompare"
+                    @share="shareProduct"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-
-          <!-- Debug info cho featured products -->
-          <div v-if="debugMode" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm">
-            <p><strong>Debug - Featured Products:</strong> {{ featuredProducts.length }} sản phẩm</p>
-            <p><strong>Total Products:</strong> {{ allProducts.length }} sản phẩm</p>
+          
+          <!-- Mobile navigation và indicators -->
+          <div v-if="featuredSlides.length > 1" class="lg:hidden mt-6 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <button 
+                @click="prevFeaturedSlide" 
+                :disabled="currentFeaturedSlide === 0"
+                class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i class="fas fa-chevron-left text-gray-600"></i>
+              </button>
+              <button 
+                @click="nextFeaturedSlide"
+                :disabled="currentFeaturedSlide >= maxFeaturedSlide"
+                class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i class="fas fa-chevron-right text-gray-600"></i>
+              </button>
+            </div>
+            
+            <!-- Slide indicators -->
+            <div class="flex items-center space-x-1">
+              <div 
+                v-for="n in featuredSlides.length" 
+                :key="n"
+                @click="currentFeaturedSlide = n - 1"
+                class="w-2 h-2 rounded-full transition-colors cursor-pointer"
+                :class="currentFeaturedSlide === n - 1 ? 'bg-blue-500' : 'bg-gray-300'"
+              ></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Products by Categories (3 categories only) -->
+      <!-- Products by Categories -->
       <div class="container mx-auto px-4 py-8 md:py-12">
-        <div v-for="category in selectedCategories" :key="category" class="mb-12">
+        <div v-for="(category, index) in selectedCategories" :key="category" class="mb-12">
           <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
+            <!-- Category Header -->
             <div class="flex items-center justify-between mb-6">
               <div>
                 <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
-                  <i :class="getCategoryIcon(category) + ' text-blue-500 mr-2'"></i>
+                  <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                    <i :class="getCategoryIcon(category) + ' text-blue-500'"></i>
+                  </div>
                   {{ category }}
                 </h3>
                 <p class="text-gray-600 text-sm">{{ getProductCountByCategory(category) }} sản phẩm có sẵn</p>
               </div>
-              <button @click="navigateToCategory(category)" class="text-blue-500 hover:text-blue-700 text-sm font-medium">
-                Xem tất cả →
-              </button>
+              <div class="flex items-center space-x-3">
+                <!-- Navigation buttons -->
+                <div class="hidden lg:flex items-center space-x-2">
+                  <button 
+                    @click="prevCategorySlide(index)" 
+                    :disabled="getCategoryCurrentSlide(index) === 0"
+                    class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <i class="fas fa-chevron-left text-gray-600"></i>
+                  </button>
+                  <button 
+                    @click="nextCategorySlide(index)"
+                    :disabled="getCategoryCurrentSlide(index) >= getCategoryMaxSlide(category)"
+                    class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <i class="fas fa-chevron-right text-gray-600"></i>
+                  </button>
+                </div>
+                <button @click="navigateToCategory(category)" class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center">
+                  Xem tất cả <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                </button>
+              </div>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-              <ProductCard
-                v-for="product in getCategoryProducts(category, 5)"
-                :key="product.id"
-                :product="product"
-                :show-quick-actions="true"
-                @add-to-cart="addToCart"
-                @quick-view="showProductQuickView"
-                @add-to-wishlist="addToWishlist"
-                @compare="addToCompare"
-                @share="shareProduct"
-              />
+            <!-- Category Products Carousel -->
+            <div class="relative overflow-hidden">
+              <div 
+                class="flex transition-transform duration-300 ease-in-out"
+                :style="{ transform: `translateX(-${getCategoryCurrentSlide(index) * 100}%)` }"
+              >
+                <div 
+                  v-for="slide in getCategorySlides(category)" 
+                  :key="slide"
+                  class="w-full flex-shrink-0"
+                >
+                  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                    <ProductCard
+                      v-for="product in getCategorySlideProducts(category, slide)"
+                      :key="product.id"
+                      :product="product"
+                      :show-quick-actions="true"
+                      @add-to-cart="addToCart"
+                      @quick-view="showProductQuickView"
+                      @add-to-wishlist="addToWishlist"
+                      @compare="addToCompare"
+                      @share="shareProduct"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <!-- Debug info cho từng category -->
-            <div v-if="debugMode" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
-              <p><strong>Debug - {{ category }}:</strong> {{ getCategoryProducts(category, 5).length }}/{{ getProductCountByCategory(category) }} sản phẩm hiển thị</p>
-              <p><strong>Products:</strong> {{ getCategoryProducts(category, 5).map(p => p.name).join(', ') }}</p>
+            
+            <!-- Mobile navigation cho category -->
+            <div v-if="getCategorySlides(category).length > 1" class="lg:hidden mt-6 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <button 
+                  @click="prevCategorySlide(index)" 
+                  :disabled="getCategoryCurrentSlide(index) === 0"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="fas fa-chevron-left text-gray-600"></i>
+                </button>
+                <button 
+                  @click="nextCategorySlide(index)"
+                  :disabled="getCategoryCurrentSlide(index) >= getCategoryMaxSlide(category)"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="fas fa-chevron-right text-gray-600"></i>
+                </button>
+              </div>
+              
+              <!-- Slide indicators cho category -->
+              <div class="flex items-center space-x-1">
+                <div 
+                  v-for="n in getCategorySlides(category).length" 
+                  :key="n"
+                  @click="setCategorySlide(index, n - 1)"
+                  class="w-2 h-2 rounded-full transition-colors cursor-pointer"
+                  :class="getCategoryCurrentSlide(index) === n - 1 ? 'bg-blue-500' : 'bg-gray-300'"
+                ></div>
+              </div>
             </div>
           </div>
         </div>
@@ -212,14 +332,16 @@
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
           <div class="flex items-center justify-between mb-6">
             <div>
-              <h3 class="text-xl md:text-2xl font-bold text-blue-600 flex items-center mb-2">
-                <i class="fas fa-newspaper text-green-500 mr-2"></i>
+              <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
+                <div class="bg-green-100 p-2 rounded-lg mr-3">
+                  <i class="fas fa-newspaper text-green-500"></i>
+                </div>
                 TIN TỨC & KIẾN THỨC
               </h3>
               <p class="text-gray-600 text-sm">Cập nhật thông tin và kiến thức chuyên môn</p>
             </div>
-            <button @click="$router.push('/news')" class="text-blue-500 hover:text-blue-700 text-sm font-medium">
-              Xem tất cả →
+            <button @click="$router.push('/news')" class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center">
+              Xem tất cả <i class="fas fa-arrow-right ml-1 text-xs"></i>
             </button>
           </div>
           
@@ -234,11 +356,6 @@
               @share="shareArticle"
               @like="likeArticle"
             />
-          </div>
-
-          <!-- Debug info cho news -->
-          <div v-if="debugMode" class="mt-4 p-3 bg-green-50 border border-green-200 rounded text-sm">
-            <p><strong>Debug - Latest News:</strong> {{ latestNews.length }} bài viết</p>
           </div>
         </div>
       </div>
@@ -267,16 +384,6 @@
 
     <!-- Footer Component -->
     <Footer />
-
-    <!-- Debug Toggle (chỉ hiện trong development) -->
-    <button 
-      v-if="isDevelopment"
-      @click="debugMode = !debugMode"
-      class="fixed bottom-4 right-4 bg-red-500 text-white p-3 rounded-full shadow-lg hover:bg-red-600 z-50"
-      title="Toggle Debug Mode"
-    >
-      <i class="fas fa-bug"></i>
-    </button>
   </div>
 </template>
 
@@ -317,32 +424,26 @@ export default {
       allProducts: [], // Reactive array cho products
       news: news,
       
-      // UI state
-      currentProductSlide: 0,
-      debugMode: false,
+      // Carousel state
+      currentFeaturedSlide: 0,
+      categorySlides: {}, // Track slides for each category
+      itemsPerSlide: 5, // Số sản phẩm mỗi slide
       dataLoaded: false
     }
   },
 
   computed: {
-    isDevelopment() {
-      return import.meta.env.DEV
-    },
-
     featuredProducts() {
       if (!this.dataLoaded || this.allProducts.length === 0) {
-        console.log('🔍 Featured products: No data loaded yet')
         return []
       }
       
       const featured = getFeaturedProducts()
-      console.log('🔍 Featured products:', featured.length, 'sản phẩm')
       return featured
     },
 
     latestNews() {
       const latest = getLatestNews(3)
-      console.log('🔍 Latest news:', latest.length, 'bài viết')
       return latest
     },
 
@@ -352,33 +453,37 @@ export default {
       
       // Lấy danh mục từ productCategories (bỏ "Tất cả")
       const categories = this.productCategories.filter(cat => cat !== 'Tất cả').slice(0, 3)
-      console.log('🔍 Selected categories:', categories)
       return categories
+    },
+
+    // Featured products carousel
+    featuredSlides() {
+      if (!this.featuredProducts.length) return []
+      return Array.from({ length: Math.ceil(this.featuredProducts.length / this.itemsPerSlide) }, (_, i) => i)
+    },
+
+    maxFeaturedSlide() {
+      return Math.max(0, this.featuredSlides.length - 1)
     }
   },
 
   methods: {
     async loadData() {
-      console.log('🚀 HomeView: Loading data...')
-      
       try {
         // Đợi data được load
         if (!dataAPI.isLoaded) {
-          console.log('⏳ Waiting for data to load...')
           await this.waitForDataLoad()
         }
         
         // Update reactive data
-        this.allProducts = [...products] // Copy để trigger reactivity
+        this.allProducts = [...products]
         this.dataLoaded = true
         
-        console.log('✅ HomeView: Data loaded successfully')
-        console.log('📊 Products:', this.allProducts.length)
-        console.log('📂 Categories:', this.productCategories.length)
+        // Initialize category slides
+        this.initializeCategorySlides()
         
       } catch (error) {
         console.error('❌ HomeView: Error loading data:', error)
-        // Vẫn set dataLoaded = true để hiển thị UI với fallback data
         this.dataLoaded = true
       }
     },
@@ -396,8 +501,13 @@ export default {
       })
     },
 
+    initializeCategorySlides() {
+      this.selectedCategories.forEach((category, index) => {
+        this.$set(this.categorySlides, index, 0)
+      })
+    },
+
     handleSearch(query) {
-      // Redirect to products page with search query
       this.$router.push({
         path: '/products',
         query: { search: query }
@@ -405,7 +515,6 @@ export default {
     },
     
     navigateToCategory(category) {
-      // Navigate to products page with category filter
       this.$router.push({
         path: '/products',
         query: { category: category }
@@ -415,17 +524,7 @@ export default {
     getProductCountByCategory(category) {
       if (!this.dataLoaded) return 0
       const count = getProductsByCategory(category).length
-      console.log(`🔍 ${category}: ${count} sản phẩm`)
       return count
-    },
-
-    // Lấy sản phẩm theo danh mục với giới hạn số lượng
-    getCategoryProducts(category, limit = 5) {
-      if (!this.dataLoaded) return []
-      
-      const products = getProductsByCategory(category).slice(0, limit)
-      console.log(`🔍 ${category} products (${limit}):`, products.length, 'sản phẩm')
-      return products
     },
 
     // Lấy icon cho danh mục
@@ -440,35 +539,88 @@ export default {
         element.scrollIntoView({ behavior: 'smooth' })
       }
     },
-    
-    slideProducts(direction) {
-      // TODO: Implement product carousel
-      console.log('Slide products:', direction)
+
+    // Featured products carousel methods
+    getFeaturedSlideProducts(slideIndex) {
+      const start = slideIndex * this.itemsPerSlide
+      const end = start + this.itemsPerSlide
+      return this.featuredProducts.slice(start, end)
+    },
+
+    nextFeaturedSlide() {
+      if (this.currentFeaturedSlide < this.maxFeaturedSlide) {
+        this.currentFeaturedSlide++
+      }
+    },
+
+    prevFeaturedSlide() {
+      if (this.currentFeaturedSlide > 0) {
+        this.currentFeaturedSlide--
+      }
+    },
+
+    // Category carousel methods
+    getCategoryProducts(category) {
+      if (!this.dataLoaded) return []
+      return getProductsByCategory(category)
+    },
+
+    getCategorySlides(category) {
+      const products = this.getCategoryProducts(category)
+      if (!products.length) return []
+      return Array.from({ length: Math.ceil(products.length / this.itemsPerSlide) }, (_, i) => i)
+    },
+
+    getCategorySlideProducts(category, slideIndex) {
+      const products = this.getCategoryProducts(category)
+      const start = slideIndex * this.itemsPerSlide
+      const end = start + this.itemsPerSlide
+      return products.slice(start, end)
+    },
+
+    getCategoryCurrentSlide(index) {
+      return this.categorySlides[index] || 0
+    },
+
+    getCategoryMaxSlide(category) {
+      return Math.max(0, this.getCategorySlides(category).length - 1)
+    },
+
+    nextCategorySlide(index) {
+      const maxSlide = this.getCategoryMaxSlide(this.selectedCategories[index])
+      if (this.getCategoryCurrentSlide(index) < maxSlide) {
+        this.$set(this.categorySlides, index, this.getCategoryCurrentSlide(index) + 1)
+      }
+    },
+
+    prevCategorySlide(index) {
+      if (this.getCategoryCurrentSlide(index) > 0) {
+        this.$set(this.categorySlides, index, this.getCategoryCurrentSlide(index) - 1)
+      }
+    },
+
+    setCategorySlide(index, slideIndex) {
+      this.$set(this.categorySlides, index, slideIndex)
     },
 
     // Product actions
     addToCart(product) {
-      console.log('Thêm vào giỏ hàng:', product.name)
       alert(`Đã thêm "${product.name}" vào giỏ hàng`)
     },
 
     showProductQuickView(product) {
-      console.log('Xem nhanh sản phẩm:', product.name)
       alert(`Xem nhanh: ${product.name}`)
     },
 
     addToWishlist(product) {
-      console.log('Thêm vào yêu thích:', product.name)
       alert(`Đã thêm "${product.name}" vào danh sách yêu thích`)
     },
 
     addToCompare(product) {
-      console.log('Thêm vào so sánh:', product.name)
       alert(`Đã thêm "${product.name}" vào danh sách so sánh`)
     },
 
     shareProduct(product) {
-      console.log('Chia sẻ sản phẩm:', product.name)
       if (navigator.share) {
         navigator.share({
           title: product.name,
@@ -486,12 +638,10 @@ export default {
     },
 
     showComments(article) {
-      console.log('Hiển thị bình luận cho:', article.title)
       alert('Tính năng bình luận đang phát triển')
     },
 
     shareArticle(article) {
-      console.log('Chia sẻ bài viết:', article.title)
       if (navigator.share) {
         navigator.share({
           title: article.title,
@@ -505,7 +655,6 @@ export default {
 
     likeArticle(data) {
       const { article, isLiked } = data
-      console.log(isLiked ? 'Đã thích:' : 'Bỏ thích:', article.title)
       
       const newsItem = this.news.find(item => item.id === article.id)
       if (newsItem) {
@@ -521,14 +670,11 @@ export default {
   },
 
   async mounted() {
-    console.log('🎯 HomeView mounted')
-    
     // Load data
     await this.loadData()
     
     // Listen for data updates từ dataAPI
     dataAPI.onDataLoaded(() => {
-      console.log('🔄 HomeView: Data updated, reloading...')
       this.loadData()
     })
   },
@@ -560,21 +706,57 @@ html {
   50% { transform: translateY(-10px); }
 }
 
+/* Carousel transitions */
+.carousel-slide {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Product card hover effects */
+.product-card:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Section headers with icon backgrounds */
+.section-icon {
+  transition: all 0.3s ease;
+}
+
+.section-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Navigation button effects */
+.nav-button {
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.nav-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Slide indicators */
+.slide-indicator {
+  transition: all 0.3s ease;
+}
+
+.slide-indicator:hover {
+  transform: scale(1.2);
+}
+
 /* Category hover effects */
 .category-item:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
   transition: all 0.3s ease;
 }
 
 /* Feature card hover effects */
 .feature-card:hover {
   transform: translateY(-3px);
-  transition: all 0.3s ease;
-}
-
-/* CTA button animations */
-.cta-button:hover {
-  transform: scale(1.05);
   transition: all 0.3s ease;
 }
 
@@ -603,5 +785,21 @@ html {
   .section-spacing {
     padding: 2rem 0;
   }
+}
+
+/* Loading animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideInUp 0.6s ease-out;
 }
 </style>

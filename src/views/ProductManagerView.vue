@@ -1196,11 +1196,6 @@ export default {
         return;
       }
 
-      if (file.size > 5 * 1024 * 1024) {
-        this.showMessage('File không được vượt quá 5MB', 'error');
-        return;
-      }
-
       this.selectedImageFile = file;
       
       // Create preview

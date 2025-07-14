@@ -699,12 +699,6 @@ def upload_image():
         file.seek(0, os.SEEK_END)
         file_size = file.tell()
         file.seek(0)
-        
-        if file_size > 5 * 1024 * 1024:
-            return jsonify({
-                'success': False,
-                'message': 'File quá lớn. Kích thước tối đa: 5MB'
-            }), 400
 
         # Tạo tên file unique
         file_extension = file.filename.rsplit('.', 1)[1].lower()

@@ -209,10 +209,6 @@ export class ProductAPI {
         throw new Error('File phải là hình ảnh');
       }
 
-      if (file.size > 5 * 1024 * 1024) { // 5MB
-        throw new Error('File không được vượt quá 5MB');
-      }
-
       // Tạo FormData để upload
       const formData = new FormData();
       formData.append('file', file);
