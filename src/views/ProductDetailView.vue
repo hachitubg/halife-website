@@ -26,30 +26,41 @@
           <!-- Product Images -->
           <div class="space-y-4">
             <!-- Main Image -->
-            <div class="relative">
+            <div class="main-image-container">
               <img 
                 :src="currentImage" 
                 :alt="product.name" 
-                class="w-full h-80 md:h-96 object-cover rounded-lg"
+                class="main-product-image"
+                @error="handleMainImageError"
               />
-              <div v-if="product.discount > 0" class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+              <!-- Badges trên ảnh chính -->
+              <div v-if="product.discount > 0" class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
                 -{{ product.discount }}%
               </div>
-              <div v-if="product.isFeatured" class="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+              <div v-if="product.isFeatured" class="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold z-10">
                 <i class="fas fa-star mr-1"></i>Nổi bật
+              </div>
+              <!-- Zoom overlay -->
+              <div class="image-zoom-overlay">
+                <i class="fas fa-search-plus text-white text-xl"></i>
               </div>
             </div>
             
             <!-- Thumbnail Images -->
-            <div v-if="productImages.length > 1" class="grid grid-cols-4 gap-2">
+            <div v-if="productImages.length > 1" class="thumbnail-grid">
               <div 
                 v-for="(image, index) in productImages" 
                 :key="index"
-                class="cursor-pointer border-2 rounded-lg overflow-hidden"
-                :class="{ 'border-blue-500': currentImage === image, 'border-gray-200': currentImage !== image }"
+                class="thumbnail-container"
+                :class="{ 'active': currentImage === image }"
                 @click="currentImage = image"
               >
-                <img :src="image" :alt="`${product.name} ${index + 1}`" class="w-full h-20 object-cover" />
+                <img 
+                  :src="image" 
+                  :alt="`${product.name} ${index + 1}`" 
+                  class="thumbnail-image"
+                  @error="handleThumbnailError"
+                />
               </div>
             </div>
           </div>
@@ -586,6 +597,15 @@ export default {
   },
   
   methods: {
+
+    handleMainImageError(event) {
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y5ZmFmYiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y5ZmFmYiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOWNhM2FmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1hZ2U8L3RleHQ+PC9zdmc+'
+    },
+    
+    handleThumbnailError(event) {
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y5ZmFmYiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y5ZmFmYiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOWNhM2FmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1hZ2U8L3RleHQ+PC9zdmc+'
+    },
+
     handleSearch(query) {
       this.$router.push({
         path: '/products',
@@ -842,5 +862,122 @@ input[type="number"] {
   .text-3xl {
     font-size: 1.75rem;
   }
+}
+
+/* Main Image Container */
+.main-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #f8fafc;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  cursor: zoom-in;
+  border: 1px solid #e5e7eb;
+}
+
+/* Main Product Image */
+.main-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background-color: white;
+  transition: transform 0.3s ease;
+}
+
+.main-image-container:hover .main-product-image {
+  transform: scale(1.05);
+}
+
+/* Zoom Overlay */
+.image-zoom-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.main-image-container:hover .image-zoom-overlay {
+  opacity: 1;
+}
+
+/* Thumbnail Grid */
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+/* Thumbnail Container */
+.thumbnail-container {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
+}
+
+.thumbnail-container:hover {
+  border-color: #9ca3af;
+  transform: scale(1.05);
+}
+
+.thumbnail-container.active {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Thumbnail Image */
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background-color: white;
+  transition: transform 0.2s ease;
+}
+
+.thumbnail-container:hover .thumbnail-image {
+  transform: scale(1.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .main-image-container {
+    aspect-ratio: 4 / 3;
+  }
+  
+  .thumbnail-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .thumbnail-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
+  }
+}
+
+/* Loading placeholder */
+.main-product-image[src=""],
+.thumbnail-image[src=""] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 3rem;
 }
 </style>

@@ -1,8 +1,6 @@
-// src/data/products.js - Updated to use Excel data source
-
+// src/data/products.js
 import excelReader from '@/utils/excelReader.js';
 
-// Backup data (fallback khi không đọc được Excel)
 const fallbackProducts = [
   {
     id: 1,
@@ -40,7 +38,6 @@ const fallbackCategories = [
   { name: 'Phụ kiện khác', icon: 'fas fa-box' }
 ];
 
-// State management cho data
 class ProductDataManager {
   constructor() {
     this.isLoaded = false;
@@ -52,39 +49,23 @@ class ProductDataManager {
     this.error = null;
   }
 
-  /**
-   * Khởi tạo và load dữ liệu từ Excel
-   * @param {string} excelPath - Đường dẫn đến file Excel
-   */
-  async initialize(excelPath = 'public/data/halife_products.xlsx') {
-    if (this.isLoaded || this.isLoading) {
-      return;
-    }
+  async initialize(excelPath = '/data/halife_products.xlsx') {
+    if (this.isLoaded || this.isLoading) return;
 
     this.isLoading = true;
     this.error = null;
 
     try {
-      console.log('🔄 Đang tải dữ liệu sản phẩm từ Excel...');
-      
-      // Đọc dữ liệu từ Excel
       const excelData = await excelReader.readExcelFile(excelPath);
       
-      // Process dữ liệu
       this.products = excelData.products;
       this.categories = excelData.categories;
-      
-      // Tạo danh sách danh mục cho UI
       this.productCategories = this.generateProductCategories();
       this.sidebarCategories = this.generateSidebarCategories();
       
       this.isLoaded = true;
       this.isLoading = false;
       
-      console.log('✅ Dữ liệu sản phẩm đã được tải thành công');
-      console.log(`📊 ${this.products.length} sản phẩm, ${this.categories.length} danh mục`);
-      
-      // Dispatch event để các component biết data đã sẵn sàng
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('productsDataLoaded', {
           detail: { 
@@ -97,10 +78,6 @@ class ProductDataManager {
       }
       
     } catch (error) {
-      console.warn('⚠️ Không thể tải dữ liệu từ Excel, sử dụng dữ liệu fallback');
-      console.error('Chi tiết lỗi:', error);
-      
-      // Sử dụng dữ liệu fallback
       this.products = this.convertFallbackProducts();
       this.categories = this.convertFallbackCategories();
       this.productCategories = this.generateFallbackProductCategories();
@@ -110,7 +87,6 @@ class ProductDataManager {
       this.isLoaded = true;
       this.isLoading = false;
       
-      // Dispatch event với fallback data
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('productsDataLoaded', {
           detail: { 
@@ -125,19 +101,11 @@ class ProductDataManager {
     }
   }
 
-  /**
-   * Tạo danh sách danh mục cho ProductsView
-   * @returns {Array} - Danh sách tên danh mục
-   */
   generateProductCategories() {
     const uniqueCategories = [...new Set(this.products.map(p => p.category))];
     return ['Tất cả', ...uniqueCategories.sort()];
   }
 
-  /**
-   * Tạo danh sách danh mục cho sidebar
-   * @returns {Array} - Danh sách danh mục với icon
-   */
   generateSidebarCategories() {
     return this.categories
       .filter(cat => cat.is_active)
@@ -148,10 +116,6 @@ class ProductDataManager {
       }));
   }
 
-  /**
-   * Convert dữ liệu fallback sang format mới
-   * @returns {Array} - Dữ liệu sản phẩm fallback
-   */
   convertFallbackProducts() {
     return fallbackProducts.map(product => ({
       ...product,
@@ -173,10 +137,6 @@ class ProductDataManager {
     }));
   }
 
-  /**
-   * Convert danh mục fallback
-   * @returns {Array} - Dữ liệu danh mục fallback
-   */
   convertFallbackCategories() {
     return fallbackCategories.map((cat, index) => ({
       id: index + 1,
@@ -187,25 +147,17 @@ class ProductDataManager {
     }));
   }
 
-  /**
-   * Tạo danh mục fallback cho ProductsView
-   * @returns {Array} - Danh sách danh mục fallback
-   */
   generateFallbackProductCategories() {
     const uniqueCategories = [...new Set(fallbackProducts.map(p => p.category))];
     return ['Tất cả', ...uniqueCategories.sort()];
   }
 
-  /**
-   * Force reload dữ liệu
-   */
   async reload(excelPath) {
     this.isLoaded = false;
     this.isLoading = false;
     await this.initialize(excelPath);
   }
 
-  // Getter methods for backward compatibility
   get allProducts() {
     return this.products.filter(p => p.inStock && p.status === 'active');
   }
@@ -218,9 +170,6 @@ class ProductDataManager {
     return this.sidebarCategories;
   }
 
-  /**
-   * Lấy thống kê
-   */
   getStats() {
     return {
       totalProducts: this.allProducts.length,
@@ -229,18 +178,14 @@ class ProductDataManager {
       inStockProducts: this.allProducts.filter(p => p.inStock).length,
       isLoaded: this.isLoaded,
       isLoading: this.isLoading,
-      error: this.error,
-      lastUpdated: this.products.length > 0 ? 
-        Math.max(...this.products.map(p => new Date(p.updatedDate || p.createdDate))) : 
-        null
+      error: this.error
     };
   }
 }
 
-// Tạo instance singleton
 const dataManager = new ProductDataManager();
 
-// Export reactive data objects để tương thích với code cũ
+// Proxy exports
 export const products = new Proxy([], {
   get(target, prop) {
     const allProducts = dataManager.allProducts;
@@ -248,23 +193,9 @@ export const products = new Proxy([], {
     if (typeof prop === 'string' && !isNaN(prop)) {
       return allProducts[parseInt(prop)];
     }
-    if (prop === 'length') {
-      return allProducts.length;
-    }
-    if (prop === 'filter') {
-      return allProducts.filter.bind(allProducts);
-    }
-    if (prop === 'map') {
-      return allProducts.map.bind(allProducts);
-    }
-    if (prop === 'find') {
-      return allProducts.find.bind(allProducts);
-    }
-    if (prop === 'slice') {
-      return allProducts.slice.bind(allProducts);
-    }
-    if (prop === 'forEach') {
-      return allProducts.forEach.bind(allProducts);
+    if (prop === 'length') return allProducts.length;
+    if (typeof allProducts[prop] === 'function') {
+      return allProducts[prop].bind(allProducts);
     }
     if (prop === Symbol.iterator) {
       return allProducts[Symbol.iterator].bind(allProducts);
@@ -280,14 +211,9 @@ export const productCategories = new Proxy([], {
     if (typeof prop === 'string' && !isNaN(prop)) {
       return allCategories[parseInt(prop)];
     }
-    if (prop === 'length') {
-      return allCategories.length;
-    }
-    if (prop === 'includes') {
-      return allCategories.includes.bind(allCategories);
-    }
-    if (prop === 'filter') {
-      return allCategories.filter.bind(allCategories);
+    if (prop === 'length') return allCategories.length;
+    if (typeof allCategories[prop] === 'function') {
+      return allCategories[prop].bind(allCategories);
     }
     return allCategories[prop];
   }
@@ -300,14 +226,9 @@ export const sidebarCategories = new Proxy([], {
     if (typeof prop === 'string' && !isNaN(prop)) {
       return sidebarItems[parseInt(prop)];
     }
-    if (prop === 'length') {
-      return sidebarItems.length;
-    }
-    if (prop === 'map') {
-      return sidebarItems.map.bind(sidebarItems);
-    }
-    if (prop === 'filter') {
-      return sidebarItems.filter.bind(sidebarItems);
+    if (prop === 'length') return sidebarItems.length;
+    if (typeof sidebarItems[prop] === 'function') {
+      return sidebarItems[prop].bind(sidebarItems);
     }
     return sidebarItems[prop];
   }
@@ -339,39 +260,24 @@ export const searchProducts = (query) => {
   );
 };
 
-// API để quản lý dữ liệu
+// Data API
 export const dataAPI = {
-  /**
-   * Khởi tạo dữ liệu (gọi trong main.js hoặc App.vue)
-   */
   async initialize(excelPath) {
     await dataManager.initialize(excelPath);
   },
 
-  /**
-   * Lấy tất cả sản phẩm
-   */
   getAllProducts() {
-    return dataManager.products; // Trả về tất cả sản phẩm, không chỉ active
+    return dataManager.products;
   },
 
-  /**
-   * Lấy tất cả danh mục
-   */
   getAllCategories() {
     return dataManager.categories;
   },
 
-  /**
-   * Lấy sản phẩm theo ID
-   */
   getProductById(id) {
     return dataManager.products.find(p => p.id === parseInt(id));
   },
 
-  /**
-   * Thêm sản phẩm mới
-   */
   addProduct(productData) {
     const newProduct = {
       ...productData,
@@ -384,9 +290,6 @@ export const dataAPI = {
     return newProduct;
   },
 
-  /**
-   * Cập nhật sản phẩm
-   */
   updateProduct(id, productData) {
     const index = dataManager.products.findIndex(p => p.id === parseInt(id));
     if (index === -1) return null;
@@ -394,15 +297,12 @@ export const dataAPI = {
     dataManager.products[index] = {
       ...dataManager.products[index],
       ...productData,
-      id: parseInt(id), // Giữ nguyên ID
+      id: parseInt(id),
       updatedDate: new Date().toISOString()
     };
     return dataManager.products[index];
   },
 
-  /**
-   * Xóa sản phẩm
-   */
   deleteProduct(id) {
     const index = dataManager.products.findIndex(p => p.id === parseInt(id));
     if (index === -1) return false;
@@ -412,53 +312,32 @@ export const dataAPI = {
     return deletedProduct;
   },
 
-  /**
-   * Lấy trạng thái loading
-   */
   get isLoading() {
     return dataManager.isLoading;
   },
 
-  /**
-   * Lấy thông tin lỗi
-   */
   get error() {
     return dataManager.error;
   },
 
-  /**
-   * Kiểm tra dữ liệu đã được load chưa
-   */
   get isLoaded() {
     return dataManager.isLoaded;
   },
 
-  /**
-   * Force reload dữ liệu
-   */
   async reload(excelPath) {
     await dataManager.reload(excelPath);
   },
 
-  /**
-   * Lấy thống kê
-   */
   getStats() {
     return dataManager.getStats();
   },
 
-  /**
-   * Listen for data changes
-   */
   onDataLoaded(callback) {
     if (typeof window !== 'undefined') {
       window.addEventListener('productsDataLoaded', callback);
     }
   },
 
-  /**
-   * Remove data change listener
-   */
   offDataLoaded(callback) {
     if (typeof window !== 'undefined') {
       window.removeEventListener('productsDataLoaded', callback);
@@ -466,15 +345,4 @@ export const dataAPI = {
   }
 };
 
-// Export data manager instance cho advanced usage
 export { dataManager };
-
-// Auto-initialize khi module được import (nếu đang ở browser)
-if (typeof window !== 'undefined') {
-  // Defer initialization để không block app startup
-  setTimeout(() => {
-    dataAPI.initialize().catch(err => {
-      console.warn('Lỗi khởi tạo dữ liệu sản phẩm:', err.message);
-    });
-  }, 100);
-}

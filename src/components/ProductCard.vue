@@ -18,20 +18,22 @@
       <i class="fas fa-star mr-1"></i>Hot
     </div>
     
-    <!-- Product Image -->
-    <div class="relative overflow-hidden rounded mb-2 md:mb-3">
+    <!-- Product Image - FIXED -->
+    <div class="product-image-container">
       <img 
         :src="product.image" 
         :alt="product.name" 
-        class="w-full h-32 md:h-40 lg:h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+        class="product-image"
         :class="{ 'opacity-60': !product.inStock }"
+        loading="lazy"
+        @error="handleImageError"
       >
       
       <!-- Quick View Overlay -->
-      <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div class="image-overlay">
         <button 
           @click.stop="viewProductDetail"
-          class="bg-white text-gray-800 px-3 py-1 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors"
+          class="quick-view-btn"
         >
           <i class="fas fa-eye mr-1"></i>Xem nhanh
         </button>
@@ -171,6 +173,11 @@ export default {
       this.$router.push(`/product/${this.product.id}`)
     },
     
+    handleImageError(event) {
+      // Fallback image when image fails to load
+      event.target.src = '/images/placeholder-product.png'
+    },
+    
     formatPrice(price) {
       if (typeof price === 'string') {
         return price.replace(/,/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -192,6 +199,83 @@ export default {
 </script>
 
 <style scoped>
+/* FIXED: Product Image Container */
+.product-image-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Square aspect ratio */
+  overflow: hidden;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  background-color: #f8fafc; /* Light background for loading */
+}
+
+@media (min-width: 768px) {
+  .product-image-container {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* FIXED: Product Image */
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Hiển thị toàn bộ ảnh trong container */
+  object-position: center;
+  transition: transform 0.3s ease;
+  background-color: white;
+}
+
+/* Alternative: Use cover for crop effect */
+.product-image.cover-mode {
+  object-fit: cover; /* Cắt ảnh để fill container */
+}
+
+/* Hover effect */
+.group:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* Image Overlay */
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.group:hover .image-overlay {
+  opacity: 1;
+}
+
+/* Quick View Button */
+.quick-view-btn {
+  background-color: white;
+  color: #374151;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.quick-view-btn:hover {
+  background-color: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .product-image-container {
+    aspect-ratio: 4 / 3; /* Slightly wider on mobile */
+  }
+}
+
+/* Text utilities */
 .line-clamp-2 {
   display: -webkit-box;
   line-clamp: 2;
@@ -201,14 +285,6 @@ export default {
 
 .transition-all {
   transition: all 0.3s ease;
-}
-
-.group:hover .group-hover\:scale-105 {
-  transform: scale(1.05);
-}
-
-.group:hover .group-hover\:opacity-100 {
-  opacity: 1;
 }
 
 /* Ensure consistent card heights */
@@ -245,5 +321,13 @@ button:disabled {
 /* Card hover effect */
 .cursor-pointer:hover {
   transform: translateY(-2px);
+}
+
+/* Loading state for images */
+.product-image[src=""] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 2rem;
 }
 </style>
