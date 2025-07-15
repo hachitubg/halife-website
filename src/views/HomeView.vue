@@ -503,7 +503,7 @@ export default {
 
     initializeCategorySlides() {
       this.selectedCategories.forEach((category, index) => {
-        this.$set(this.categorySlides, index, 0)
+        this.categorySlides[index] = 0
       })
     },
 
@@ -589,18 +589,18 @@ export default {
     nextCategorySlide(index) {
       const maxSlide = this.getCategoryMaxSlide(this.selectedCategories[index])
       if (this.getCategoryCurrentSlide(index) < maxSlide) {
-        this.$set(this.categorySlides, index, this.getCategoryCurrentSlide(index) + 1)
+        this.categorySlides[index] = this.getCategoryCurrentSlide(index) + 1
       }
     },
 
     prevCategorySlide(index) {
       if (this.getCategoryCurrentSlide(index) > 0) {
-        this.$set(this.categorySlides, index, this.getCategoryCurrentSlide(index) - 1)
+        this.categorySlides[index] = this.getCategoryCurrentSlide(index) - 1
       }
     },
 
     setCategorySlide(index, slideIndex) {
-      this.$set(this.categorySlides, index, slideIndex)
+      this.categorySlides[index] = slideIndex
     },
 
     // Product actions

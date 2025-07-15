@@ -1,15 +1,5 @@
 <template>
   <header class="bg-white shadow-sm">
-    <!-- Top Banner - Hide on mobile -->
-    <div class="bg-gradient-to-r from-orange-400 to-red-500 text-white py-2 px-4 hidden md:block">
-      <div class="container mx-auto flex justify-between items-center">
-        <div class="text-sm font-semibold">
-          SỨC KHỎE VÀNG - NGÀN ƯU ĐÃI!
-        </div>
-        <button class="text-white hover:text-gray-200" @click="closeBanner">&times;</button>
-      </div>
-    </div>
-
     <!-- Mobile Header -->
     <div class="md:hidden bg-white px-4 py-3">
       <div class="flex items-center justify-between">
@@ -224,7 +214,7 @@
         <div class="flex items-center">
           <!-- Category Dropdown -->
           <div class="relative group">
-            <button class="flex items-center px-4 py-3 bg-blue-600 hover:bg-blue-700 transition-colors">
+            <button class="flex items-center px-4 py-3 hover:bg-blue-700 transition-colors">
               <i class="fas fa-bars mr-2"></i>
               Danh mục sản phẩm
               <i class="fas fa-chevron-down ml-2"></i>

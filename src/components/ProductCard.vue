@@ -30,7 +30,7 @@
       <!-- Quick View Overlay -->
       <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button 
-          @click.stop="$emit('quick-view', product)"
+          @click.stop="viewProductDetail"
           class="bg-white text-gray-800 px-3 py-1 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors"
         >
           <i class="fas fa-eye mr-1"></i>Xem nhanh
