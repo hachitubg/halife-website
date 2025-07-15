@@ -12,7 +12,7 @@
       <div class="absolute inset-0 bg-black opacity-50"></div>
       <div 
         class="absolute inset-0 bg-cover bg-center"
-        style="background-image: url('https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=1200&h=600&fit=crop')"
+        style="background-color: #515151;"
       ></div>
       
       <!-- Content -->
@@ -32,15 +32,15 @@
           </h2>
           <div class="w-24 h-1 bg-blue-500 mx-auto mb-6"></div>
           <p class="text-lg text-gray-600 leading-relaxed">
-            Thế giới hải sản chuyên bán hải sản tươi sống các loại: nhum biển, bào ngư, sam biển, ruột ốc, cá ninja, tôm hùm, tôm mũ ni,... và thực phẩm: trứng non, ngọc kê, gà mười tiêu, gà xông khói, chân giò xông khói, luồn ngổng, tuối heo xông khói,...
+            Công ty Cổ phần Thuốc Thú y HALIFE Việt Nhật (HALIFE Animal Health) là đơn vị tiên phong trong việc phát triển và ứng dụng giải pháp thú y công nghệ cao, mang tầm quốc tế, được chuyển giao trực tiếp từ Nhật Bản. Chúng tôi tập trung nghiên cứu, sản xuất và phân phối các sản phẩm sinh học – đặc biệt là dòng Best Phage độc quyền – nhằm thay thế kháng sinh truyền thống, hướng tới chăn nuôi an toàn, sạch và bền vững
           </p>
         </div>
 
         <!-- Featured Image -->
         <div class="mb-12">
           <img 
-            src="https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=1000&h=600&fit=crop" 
-            alt="Thế giới hải sản HALIFE" 
+            src="/public/images/Halife_anh_bia.jpg" 
+            alt="HALIFE" 
             class="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
           />
         </div>
@@ -93,9 +93,7 @@
               <h3 class="text-2xl font-bold text-gray-800">Tầm nhìn</h3>
             </div>
             <p class="text-gray-600 leading-relaxed">
-              Trở thành công ty hàng đầu Việt Nam trong lĩnh vực cung cấp thuốc thú y và hải sản tươi sống, 
-              ứng dụng công nghệ tiên tiến từ Nhật Bản, mang đến những sản phẩm chất lượng cao nhất cho 
-              người tiêu dùng Việt Nam.
+              Trở thành thương hiệu dẫn đầu về thuốc thú y sinh học, tiên phong thay thế kháng sinh bằng công nghệ an toàn và bền vững cho ngành chăn nuôi.
             </p>
           </div>
 
@@ -108,9 +106,7 @@
               <h3 class="text-2xl font-bold text-gray-800">Sứ mệnh</h3>
             </div>
             <p class="text-gray-600 leading-relaxed">
-              Cung cấp các sản phẩm thuốc thú y và hải sản tươi sống chất lượng cao, an toàn, 
-              góp phần nâng cao sức khỏe và chất lượng cuộc sống. Đồng thời xây dựng hệ sinh thái 
-              bền vững trong ngành chăn nuôi và thủy sản.
+              Mang đến giải pháp thú y sinh học an toàn, không kháng sinh – giúp vật nuôi khỏe mạnh, người chăn nuôi yên tâm và cộng đồng được bảo vệ trước nguy cơ kháng kháng sinh.
             </p>
           </div>
         </div>
