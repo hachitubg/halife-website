@@ -6,7 +6,7 @@
       :categories="categories"
     />
 
-    <!-- Mobile Hero Banner (chỉ hiển thị trên mobile) -->
+    <!-- Mobile Hero Banner -->
     <div class="md:hidden bg-gradient-to-r from-blue-400 to-cyan-400 p-4">
       <div class="bg-white bg-opacity-20 rounded-lg p-4 text-white text-center">
         <div class="flex items-center justify-center mb-2">
@@ -68,7 +68,6 @@
                 </button>
               </div>
             </div>
-            <!-- Decorative elements -->
             <div class="absolute top-10 right-10 opacity-20">
               <i class="fas fa-pills text-6xl"></i>
             </div>
@@ -79,58 +78,9 @@
         </div>
       </div>
 
-      <!-- Company Features -->
-      <!-- <div class="bg-gray-50 py-8 md:py-12">
-        <div class="container mx-auto px-4">
-          <div class="text-center mb-8">
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-              Tại sao chọn HALIFE?
-            </h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">
-              Chúng tôi cam kết mang đến những sản phẩm thuốc thú y chất lượng cao với công nghệ tiên tiến từ Nhật Bản
-            </p>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
-              <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-award text-2xl text-blue-600"></i>
-              </div>
-              <h3 class="font-semibold text-lg mb-2">Chất lượng cao</h3>
-              <p class="text-gray-600 text-sm">Sản phẩm được kiểm nghiệm nghiêm ngặt theo tiêu chuẩn quốc tế</p>
-            </div>
-            
-            <div class="bg-white rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
-              <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-flask text-2xl text-green-600"></i>
-              </div>
-              <h3 class="font-semibold text-lg mb-2">Công nghệ Nhật Bản</h3>
-              <p class="text-gray-600 text-sm">Ứng dụng công nghệ tiên tiến và quy trình sản xuất hiện đại</p>
-            </div>
-            
-            <div class="bg-white rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
-              <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-shipping-fast text-2xl text-orange-600"></i>
-              </div>
-              <h3 class="font-semibold text-lg mb-2">Giao hàng nhanh</h3>
-              <p class="text-gray-600 text-sm">Hệ thống phân phối toàn quốc, giao hàng trong 24h</p>
-            </div>
-            
-            <div class="bg-white rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
-              <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-headset text-2xl text-purple-600"></i>
-              </div>
-              <h3 class="font-semibold text-lg mb-2">Hỗ trợ 24/7</h3>
-              <p class="text-gray-600 text-sm">Đội ngũ chuyên gia thú y sẵn sàng tư vấn mọi lúc</p>
-            </div>
-          </div>
-        </div>
-      </div> -->
-
       <!-- Featured Products -->
       <div id="products" class="container mx-auto px-4 py-8 md:py-12">
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-          <!-- Header -->
           <div class="flex items-center justify-between mb-6">
             <div>
               <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
@@ -142,7 +92,6 @@
               <p class="text-gray-600 text-sm">Những sản phẩm được tin dùng nhất</p>
             </div>
             <div class="flex items-center space-x-3">
-              <!-- Navigation for large screens -->
               <div class="hidden lg:flex items-center space-x-2">
                 <button 
                   @click="prevFeaturedSlide" 
@@ -165,7 +114,6 @@
             </div>
           </div>
           
-          <!-- Products Carousel -->
           <div class="relative overflow-hidden">
             <div 
               class="flex transition-transform duration-300 ease-in-out"
@@ -193,7 +141,6 @@
             </div>
           </div>
           
-          <!-- Mobile navigation và indicators -->
           <div v-if="featuredSlides.length > 1" class="lg:hidden mt-6 flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <button 
@@ -212,7 +159,6 @@
               </button>
             </div>
             
-            <!-- Slide indicators -->
             <div class="flex items-center space-x-1">
               <div 
                 v-for="n in featuredSlides.length" 
@@ -230,7 +176,6 @@
       <div class="container mx-auto px-4 py-8 md:py-12">
         <div v-for="(category, index) in selectedCategories" :key="category" class="mb-12">
           <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-            <!-- Category Header -->
             <div class="flex items-center justify-between mb-6">
               <div>
                 <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
@@ -242,7 +187,6 @@
                 <p class="text-gray-600 text-sm">{{ getProductCountByCategory(category) }} sản phẩm có sẵn</p>
               </div>
               <div class="flex items-center space-x-3">
-                <!-- Navigation buttons -->
                 <div class="hidden lg:flex items-center space-x-2">
                   <button 
                     @click="prevCategorySlide(index)" 
@@ -265,7 +209,6 @@
               </div>
             </div>
             
-            <!-- Category Products Carousel -->
             <div class="relative overflow-hidden">
               <div 
                 class="flex transition-transform duration-300 ease-in-out"
@@ -293,7 +236,6 @@
               </div>
             </div>
             
-            <!-- Mobile navigation cho category -->
             <div v-if="getCategorySlides(category).length > 1" class="lg:hidden mt-6 flex items-center justify-between">
               <div class="flex items-center space-x-2">
                 <button 
@@ -312,7 +254,6 @@
                 </button>
               </div>
               
-              <!-- Slide indicators cho category -->
               <div class="flex items-center space-x-1">
                 <div 
                   v-for="n in getCategorySlides(category).length" 
@@ -392,8 +333,6 @@ import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import NewsCard from '@/components/NewsCard.vue'
-
-// Import data từ các file riêng biệt
 import { 
   products, 
   productCategories, 
@@ -402,7 +341,6 @@ import {
   getProductsByCategory,
   dataAPI
 } from '@/data/products.js'
-
 import { 
   news, 
   getLatestNews 
@@ -418,45 +356,32 @@ export default {
   },
   data() {
     return {
-      // Data được import từ các file riêng
       categories: sidebarCategories,
       productCategories: productCategories,
-      allProducts: [], // Reactive array cho products
+      allProducts: [],
       news: news,
-      
-      // Carousel state
       currentFeaturedSlide: 0,
-      categorySlides: {}, // Track slides for each category
-      itemsPerSlide: 5, // Số sản phẩm mỗi slide
+      categorySlides: {},
+      itemsPerSlide: 5,
       dataLoaded: false
     }
   },
 
   computed: {
     featuredProducts() {
-      if (!this.dataLoaded || this.allProducts.length === 0) {
-        return []
-      }
-      
-      const featured = getFeaturedProducts()
-      return featured
+      if (!this.dataLoaded || this.allProducts.length === 0) return []
+      return getFeaturedProducts()
     },
 
     latestNews() {
-      const latest = getLatestNews(3)
-      return latest
+      return getLatestNews(3)
     },
 
-    // Chọn 3 danh mục đầu tiên (bỏ "Tất cả")
     selectedCategories() {
       if (!this.dataLoaded) return []
-      
-      // Lấy danh mục từ productCategories (bỏ "Tất cả")
-      const categories = this.productCategories.filter(cat => cat !== 'Tất cả').slice(0, 3)
-      return categories
+      return this.productCategories.filter(cat => cat !== 'Tất cả').slice(0, 3)
     },
 
-    // Featured products carousel
     featuredSlides() {
       if (!this.featuredProducts.length) return []
       return Array.from({ length: Math.ceil(this.featuredProducts.length / this.itemsPerSlide) }, (_, i) => i)
@@ -470,20 +395,15 @@ export default {
   methods: {
     async loadData() {
       try {
-        // Đợi data được load
         if (!dataAPI.isLoaded) {
           await this.waitForDataLoad()
         }
         
-        // Update reactive data
         this.allProducts = [...products]
         this.dataLoaded = true
-        
-        // Initialize category slides
         this.initializeCategorySlides()
         
       } catch (error) {
-        console.error('❌ HomeView: Error loading data:', error)
         this.dataLoaded = true
       }
     },
@@ -523,11 +443,9 @@ export default {
     
     getProductCountByCategory(category) {
       if (!this.dataLoaded) return 0
-      const count = getProductsByCategory(category).length
-      return count
+      return getProductsByCategory(category).length
     },
 
-    // Lấy icon cho danh mục
     getCategoryIcon(categoryName) {
       const category = this.categories.find(cat => cat.name === categoryName)
       return category ? category.icon : 'fas fa-pills'
@@ -540,7 +458,6 @@ export default {
       }
     },
 
-    // Featured products carousel methods
     getFeaturedSlideProducts(slideIndex) {
       const start = slideIndex * this.itemsPerSlide
       const end = start + this.itemsPerSlide
@@ -559,7 +476,6 @@ export default {
       }
     },
 
-    // Category carousel methods
     getCategoryProducts(category) {
       if (!this.dataLoaded) return []
       return getProductsByCategory(category)
@@ -603,7 +519,6 @@ export default {
       this.categorySlides[index] = slideIndex
     },
 
-    // Product actions
     addToCart(product) {
       alert(`Đã thêm "${product.name}" vào giỏ hàng`)
     },
@@ -632,7 +547,6 @@ export default {
       }
     },
 
-    // News actions
     readArticle(article) {
       this.$router.push(`/article/${article.id}`)
     },
@@ -655,7 +569,6 @@ export default {
 
     likeArticle(data) {
       const { article, isLiked } = data
-      
       const newsItem = this.news.find(item => item.id === article.id)
       if (newsItem) {
         if (isLiked) {
@@ -670,17 +583,13 @@ export default {
   },
 
   async mounted() {
-    // Load data
     await this.loadData()
-    
-    // Listen for data updates từ dataAPI
     dataAPI.onDataLoaded(() => {
       this.loadData()
     })
   },
 
   beforeUnmount() {
-    // Cleanup listeners
     dataAPI.offDataLoaded(this.loadData)
   }
 }
@@ -691,12 +600,6 @@ export default {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Hero banner animations */
 .hero-element {
   animation: float 6s ease-in-out infinite;
 }
@@ -706,18 +609,15 @@ html {
   50% { transform: translateY(-10px); }
 }
 
-/* Carousel transitions */
 .carousel-slide {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Product card hover effects */
 .product-card:hover {
   transform: translateY(-2px);
   transition: all 0.3s ease;
 }
 
-/* Section headers with icon backgrounds */
 .section-icon {
   transition: all 0.3s ease;
 }
@@ -726,7 +626,6 @@ html {
   transform: scale(1.1);
 }
 
-/* Navigation button effects */
 .nav-button {
   transition: all 0.3s ease;
 }
@@ -739,7 +638,6 @@ html {
   transform: scale(0.95);
 }
 
-/* Slide indicators */
 .slide-indicator {
   transition: all 0.3s ease;
 }
@@ -748,19 +646,16 @@ html {
   transform: scale(1.2);
 }
 
-/* Category hover effects */
 .category-item:hover {
   transform: translateY(-2px);
   transition: all 0.3s ease;
 }
 
-/* Feature card hover effects */
 .feature-card:hover {
   transform: translateY(-3px);
   transition: all 0.3s ease;
 }
 
-/* Mobile responsiveness */
 @media (max-width: 768px) {
   .container {
     padding-left: 1rem;
@@ -776,7 +671,6 @@ html {
   }
 }
 
-/* Section spacing */
 .section-spacing {
   padding: 4rem 0;
 }
@@ -787,7 +681,6 @@ html {
   }
 }
 
-/* Loading animations */
 @keyframes slideInUp {
   from {
     opacity: 0;
