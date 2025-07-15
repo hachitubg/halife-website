@@ -15,5 +15,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets'
+  },
+  server: {
+    host: '0.0.0.0',
+    port: process.env.PORT || 5173
+  },
   logLevel: 'error',
 })
