@@ -1,210 +1,174 @@
-# HALIFE Website - Veterinary Products Management System
+# HALIFE Animals Website
 
-Website quản lý sản phẩm thú y của công ty HALIFE Việt Nhật. Hệ thống bao gồm frontend Vue.js và Python API backend để quản lý dữ liệu Excel.
+Website chính thức của công ty HALIFE Animals - Nhà cung cấp thuốc thú y và hải sản tươi sống với công nghệ độc quyền từ Nhật Bản.
 
-## 🛠 Tech Stack
+## Công nghệ sử dụng
 
-- **Frontend**: Vue 3 + Vite + Tailwind CSS
-- **Backend**: Python Flask API
-- **Database**: Excel files (`.xlsx`)
-- **UI**: Responsive design with Font Awesome icons
+- Frontend: Vue 3, TailwindCSS
+- Backend API: Python FastAPI 
+- Database: Excel files (halife_products.xlsx)
 
-## 📁 Project Structure
-halife-website/
-├── public/
-│   ├── data/
-│   │   └── halife_products.xlsx    # Excel data file
-│   └── images/                     # Product images
-├── src/
-│   ├── components/                 # Vue components
-│   ├── views/                      # Vue pages
-│   ├── utils/                      # Utilities
-│   └── data/                       # Data management
-├── api/
-│   ├── excel_api.py               # Python Flask API
-│   ├── requirements.txt           # Python dependencies
-│   └── test_api.py               # API tests
-├── package.json
-└── README.md
+## Tính năng chính
 
-## 🚀 Quick Start
+- 🏠 Trang chủ giới thiệu công ty
+- 📦 Danh mục & chi tiết sản phẩm
+- 📰 Tin tức & bài viết chuyên môn
+- 👥 Trang quản trị nội dung
+- 📱 Responsive design
 
-### Prerequisites
+## Cài đặt và Chạy
 
-- **Node.js** (v16+): [Download here](https://nodejs.org/)
-- **Python** (v3.8+): [Download here](https://python.org/)
-- **npm** hoặc **yarn**
-
-### 1. Clone Repository
-
+### Frontend
 ```bash
-git clone <repository-url>
-cd halife-website
-2. Setup Frontend (Vue.js)
-bash# Install dependencies
+# Install dependencies
 npm install
 
-# Start development server
-npm run dev
-Frontend sẽ chạy tại: http://localhost:5173
-3. Setup Backend (Python API)
-bash# Navigate to API directory
-cd api
-
-# Install Python dependencies
-pip install -r requirements.txt
-# Hoặc: pip3 install -r requirements.txt
-
-# Start API server
-python excel_api.py
-# Hoặc: python3 excel_api.py
-Backend API sẽ chạy tại: http://localhost:8000
-4. Test Setup
-
-Frontend: http://localhost:5173
-API Health Check: http://localhost:8000
-API Test: http://localhost:8000/api/test
-
-🔧 Development
-Frontend Development
-bash# Install new dependencies
-npm install <package-name>
-
-# Run development server with hot reload
+# Run development server
 npm run dev
 
 # Build for production
 npm run build
+```
 
-# Preview production build
-npm run preview
-Backend Development
-bashcd api
+### Backend API
+```bash
+cd api
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
 
-# Install new Python packages
-pip install <package-name>
+## Cấu trúc Project
 
-# Add to requirements.txt
-pip freeze > requirements.txt
+### Root Configuration Files
+```
+├── .gitignore               # Git ignore rules
+├── index.html              # Entry HTML file
+├── package.json            # NPM dependencies and scripts
+├── vite.config.js          # Vite build configuration
+├── tailwind.config.js      # Tailwind CSS configuration
+├── postcss.config.js       # PostCSS plugins configuration
+└── jsconfig.json           # JavaScript language configuration
+```
 
-# Run API in debug mode
-python excel_api.py
-🗂 Key Features
+### Source Code (`/src`)
+```
+src/
+├── App.vue                 # Root Vue component
+├── main.js                 # Vue application entry point
+├── assets/                 # Static assets (images, fonts, etc.)
+├── components/             # Reusable Vue components
+│   ├── Footer.vue
+│   ├── Header.vue 
+│   ├── Navigation.vue
+│   └── ui/                # UI components
+├── views/                  # Page components
+│   ├── HomeView.vue 
+│   ├── ProductsView.vue
+│   ├── NewsView.vue
+│   └── admin/             # Admin views
+├── router/                 # Vue Router configuration
+│   └── index.js           # Route definitions
+├── utils/                  # Helper functions
+│   ├── excelReader.js     # Excel data handling
+│   └── productAPI.js      # Product API integration
+└── data/                   # Static data files
+    ├── products.js
+    └── news.js
+```
 
-Product Management: CRUD operations for veterinary products
-Excel Integration: Read/write product data from Excel files
-Image Management: Upload and manage product images
-Category Management: Organize products by categories
-Responsive Design: Works on desktop and mobile
-Real-time Updates: Live data synchronization
+### Backend API (`/api`)
+```
+api/
+├── main.py                 # FastAPI main application
+├── excel_api.py           # Excel data handling
+├── news_api.py            # News endpoints
+└── requirements.txt       # Python dependencies
+```
 
-📊 API Endpoints
-MethodEndpointDescriptionGET/Health checkGET/api/testAPI testGET/api/productsGet all productsPOST/api/productsCreate new productPUT/api/products/<id>Update productDELETE/api/products/<id>Delete productGET/api/categoriesGet all categoriesPOST/api/reloadReload data from Excel
-🌐 Deployment
-Frontend Deployment (Vercel/Netlify)
-bash# Build production files
+### Public Assets (`/public`)
+```
+public/
+├── favicon.ico
+├── robots.txt
+├── data/
+│   └── halife_products.xlsx   # Product database
+└── images/
+    ├── products/
+    └── news/
+```
+
+## Configuration Details
+
+### Environment Variables
+```env
+# .env.development
+VITE_API_URL=http://localhost:8000
+VITE_SITE_TITLE=HALIFE Animals
+
+# .env.production
+VITE_API_URL=https://api.halife.vn
+VITE_SITE_TITLE=HALIFE Animals
+```
+
+### Key Dependencies
+```json
+{
+  "dependencies": {
+    "vue": "^3.x",
+    "vue-router": "^4.x",
+    "tailwindcss": "^3.x",
+    "axios": "^1.x"
+  }
+}
+```
+
+### Vite Configuration
+```javascript
+export default {
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
+  },
+  server: {
+    port: 3000
+  }
+}
+```
+
+### TailwindCSS Theme
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#1a5f7a',
+        secondary: '#2c88b0'
+      }
+    }
+  }
+}
+```
+
+## Development
+
+1. Clone repository
+2. Install dependencies (npm install)
+3. Start dev server (npm run dev)
+4. Start API server (cd api && uvicorn main:app --reload)
+
+## Build & Deploy
+
+```bash
+# Build frontend
 npm run build
 
-# Upload dist/ folder to hosting service
-# Or connect GitHub repo to auto-deploy
-Backend Deployment (PythonAnywhere/Heroku)
-bash# For Heroku
-echo "web: python api/excel_api.py" > Procfile
+# Deploy to production
+# Copy dist/ folder to web server
+# Start production API server
+```
 
-# Deploy
-git add .
-git commit -m "Deploy"
-git push heroku main
-Self-hosted Deployment
-bash# Install PM2 for process management
-npm install -g pm2
+## License
 
-# Start frontend (after build)
-npm run build
-serve -s dist -l 3000
-
-# Start backend
-cd api
-pm2 start excel_api.py --name "halife-api"
-🔄 Data Management
-Excel File Structure
-Products Sheet:
-
-ID, Name, Category, Price, Description, Image URL, etc.
-
-Categories Sheet:
-
-ID, Name, Icon, Sort Order, Status
-
-Backup & Restore
-bash# Backup current data
-cp public/data/halife_products.xlsx backup/halife_products_$(date +%Y%m%d).xlsx
-
-# Restore from backup
-cp backup/halife_products_YYYYMMDD.xlsx public/data/halife_products.xlsx
-🐛 Troubleshooting
-Common Issues
-
-Port 5173 already in use
-bash# Kill process using port
-lsof -ti:5173 | xargs kill -9
-
-Python API not starting
-bash# Check Python version
-python --version
-
-# Reinstall dependencies
-pip install -r requirements.txt --force-reinstall
-
-CORS errors
-
-Ensure Flask-CORS is installed
-Check API is running on port 8000
-
-
-Excel file not found
-bash# Check file exists
-ls -la public/data/halife_products.xlsx
-
-# Create sample file if missing
-python api/create_sample_excel.py
-
-
-📝 Development Notes
-Environment Variables
-Create .env file for configuration:
-envVITE_API_URL=http://localhost:8000
-VITE_UPLOAD_MAX_SIZE=5242880
-PYTHON_ENV=development
-Code Style
-
-Frontend: ESLint + Prettier
-Backend: PEP 8 Python style guide
-
-Testing
-bash# Frontend tests
-npm run test
-
-# Backend tests
-cd api
-python test_api.py
-🤝 Contributing
-
-Fork the repository
-Create feature branch: git checkout -b feature/amazing-feature
-Commit changes: git commit -m 'Add amazing feature'
-Push to branch: git push origin feature/amazing-feature
-Open Pull Request
-
-📞 Support
-
-Technical Issues: Create GitHub issue
-Business Inquiries: contact@halife.vn
-Documentation: Check /docs folder
-
-📄 License
-This project is licensed under the MIT License - see LICENSE file for details.
-
-Version: 1.0.0
-Last Updated: $(date +%Y-%m-%d)
-Maintained by: HALIFE Development Team
+Copyright © 2025 HALIFE Animals. All rights reserved.
