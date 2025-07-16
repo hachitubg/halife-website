@@ -1,7 +1,5 @@
-// src/utils/productAPI.js
-// API Service để kết nối với Python Backend
-
-const API_BASE_URL = 'http://localhost:8000/api';
+// Use environment variable for API base URL
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 export class ProductAPI {
   
