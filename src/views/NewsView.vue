@@ -27,20 +27,9 @@
       <div class="flex flex-col lg:flex-row gap-6">
         <!-- Sidebar -->
         <div class="lg:w-80">
-          <!-- Mobile Filter Toggle -->
-          <button 
-            @click="showMobileFilters = !showMobileFilters"
-            class="lg:hidden w-full mb-4 bg-green-500 text-white py-3 px-4 rounded-lg flex items-center justify-between"
-          >
-            <span>
-              <i class="fas fa-filter mr-2"></i>
-              Lọc tin tức
-            </span>
-            <i :class="showMobileFilters ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-          </button>
 
           <!-- Filters Content -->
-          <div :class="['lg:block', showMobileFilters ? 'block' : 'hidden']">
+          <div class="lg:block hidden">
             <div class="bg-white rounded-lg shadow-sm p-4 md:p-6 space-y-6">
               <!-- Categories Filter -->
               <div>
@@ -323,12 +312,12 @@ import NewsCard from '@/components/NewsCard.vue'
 import { sidebarCategories } from '@/data/products.js'
 
 import { 
-  news, 
   newsCategories, 
   getNewsByCategory,
   getFeaturedNews,
   getPopularNews,
-  searchNews 
+  searchNews,
+  newsService 
 } from '@/data/news.js'
 
 export default {
@@ -341,9 +330,9 @@ export default {
   data() {
     return {
       // Data
-      categories: sidebarCategories,
       newsCategories: newsCategories,
-      news: news,
+      news: [],
+      newsLoaded: false,
       
       // Filters
       selectedCategory: 'Tất cả',
@@ -363,16 +352,11 @@ export default {
       // Sort
       sortBy: 'newest',
       
-      // Mobile
-      showMobileFilters: false,
-      
       // Date ranges
       dateRanges: [
         { label: 'Tất cả', days: null },
-        { label: 'Hôm nay', days: 1 },
         { label: '7 ngày qua', days: 7 },
-        { label: '30 ngày qua', days: 30 },
-        { label: '3 tháng qua', days: 90 }
+        { label: '30 ngày qua', days: 30 }
       ]
     }
   },
@@ -472,14 +456,6 @@ export default {
       this.searchQuery = query
       this.searchResults = searchNews(query)
       this.currentPage = 1
-      
-      // Update URL with search query
-      this.$router.replace({
-        path: '/news',
-        query: { ...this.$route.query, search: query }
-      })
-      
-      console.log(`Tìm thấy ${this.searchResults.length} bài viết cho từ khóa: "${query}"`)
     },
     
     clearSearch() {
@@ -563,6 +539,17 @@ export default {
           newsItem.isLiked = false
         }
       }
+    },
+
+    async loadNews() {
+      try {
+        await newsService.getAllNews()
+        this.news = newsService.newsData || []
+        this.newsLoaded = true
+      } catch (error) {
+        console.error('Error loading news:', error)
+        this.newsLoaded = true
+      }
     }
   },
   
@@ -592,7 +579,9 @@ export default {
     }
   },
   
-  mounted() {
+  async mounted() {
+    await this.loadNews() // THÊM DÒNG NÀY
+    
     // Set default date range
     this.selectedDateRange = this.dateRanges[0]
     

@@ -258,7 +258,7 @@
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import { sidebarCategories } from '@/data/products.js'
-import { news, getNewsById, getRelatedNews } from '@/data/news.js'
+import { getNewsById, getRelatedNews, newsService } from '@/data/news.js'
 
 export default {
   name: 'ArticleDetailView',
@@ -268,7 +268,6 @@ export default {
   },
   data() {
     return {
-      categories: sidebarCategories,
       article: null,
       articleNotFound: false,
       relatedArticles: [],
@@ -280,7 +279,8 @@ export default {
         email: '',
         website: '',
         saveInfo: false
-      }
+      },
+      newsLoaded: false
     }
   },
   
@@ -437,7 +437,19 @@ export default {
     viewArticle(articleId) {
       // Navigate to another article
       this.$router.push(`/article/${articleId}`)
-    }
+    },
+
+    async loadNews() {
+      try {
+        await newsService.getAllNews()
+        this.newsLoaded = true
+        this.loadArticle() // Load article sau khi có data
+      } catch (error) {
+        console.error('Error loading news:', error)
+        this.newsLoaded = true
+        this.articleNotFound = true
+      }
+    },
   },
   
   watch: {
@@ -456,8 +468,8 @@ export default {
     }
   },
   
-  mounted() {
-    this.loadArticle()
+  async mounted() {
+    await this.loadNews()
   }
 }
 </script>

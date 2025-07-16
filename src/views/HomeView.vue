@@ -29,26 +29,6 @@
       <!-- Desktop Category Sidebar & Hero Banner -->
       <div class="hidden md:block container mx-auto px-4 py-6">
         <div class="flex gap-6">
-          <!-- Sidebar -->
-          <div class="w-72 bg-white rounded-lg shadow-sm p-4">
-            <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
-              <i class="fas fa-list mr-2 text-blue-500"></i>
-              Danh mục sản phẩm
-            </h3>
-            <div class="space-y-2">
-              <div 
-                v-for="category in categories" 
-                :key="category.name" 
-                @click="navigateToCategory(category.name)"
-                class="flex items-center p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors group"
-              >
-                <i :class="category.icon + ' text-blue-500 mr-3 group-hover:text-blue-600'"></i>
-                <span class="group-hover:text-blue-600">{{ category.name }}</span>
-                <i class="fas fa-chevron-right ml-auto text-gray-400 group-hover:text-blue-500"></i>
-              </div>
-            </div>
-          </div>
-
           <!-- Hero Banner -->
           <div class="flex-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-lg p-8 text-white relative overflow-hidden">
             <div class="relative z-10">
@@ -342,8 +322,8 @@ import {
   dataAPI
 } from '@/data/products.js'
 import { 
-  news, 
-  getLatestNews 
+  getLatestNews,
+  newsService 
 } from '@/data/news.js'
 
 export default {
@@ -359,27 +339,26 @@ export default {
       categories: sidebarCategories,
       productCategories: productCategories,
       allProducts: [],
-      news: news,
       currentFeaturedSlide: 0,
       categorySlides: {},
       itemsPerSlide: 5,
-      dataLoaded: false
+      dataLoaded: false,
+      newsLoaded: false
     }
   },
 
   computed: {
     featuredProducts() {
-      if (!this.dataLoaded || this.allProducts.length === 0) return []
-      return getFeaturedProducts()
+      return this.dataLoaded ? getFeaturedProducts() : []
     },
 
     latestNews() {
+      if (!this.newsLoaded) return []
       return getLatestNews(3)
     },
 
     selectedCategories() {
-      if (!this.dataLoaded) return []
-      return this.productCategories.filter(cat => cat !== 'Tất cả').slice(0, 3)
+      return this.dataLoaded ? this.productCategories.filter(cat => cat !== 'Tất cả').slice(0, 3) : []
     },
 
     featuredSlides() {
@@ -395,30 +374,16 @@ export default {
   methods: {
     async loadData() {
       try {
-        if (!dataAPI.isLoaded) {
-          await this.waitForDataLoad()
-        }
-        
         this.allProducts = [...products]
         this.dataLoaded = true
         this.initializeCategorySlides()
         
+        await newsService.getAllNews()
+        this.newsLoaded = true
       } catch (error) {
         this.dataLoaded = true
+        this.newsLoaded = true
       }
-    },
-
-    async waitForDataLoad() {
-      return new Promise((resolve) => {
-        const checkData = () => {
-          if (dataAPI.isLoaded && products.length > 0) {
-            resolve()
-          } else {
-            setTimeout(checkData, 100)
-          }
-        }
-        checkData()
-      })
     },
 
     initializeCategorySlides() {
@@ -567,18 +532,8 @@ export default {
       }
     },
 
-    likeArticle(data) {
-      const { article, isLiked } = data
-      const newsItem = this.news.find(item => item.id === article.id)
-      if (newsItem) {
-        if (isLiked) {
-          newsItem.likes = (newsItem.likes || 0) + 1
-          newsItem.isLiked = true
-        } else {
-          newsItem.likes = Math.max((newsItem.likes || 1) - 1, 0)
-          newsItem.isLiked = false
-        }
-      }
+    likeArticle(article) {
+      console.log('Liked article:', article.title)
     }
   },
 

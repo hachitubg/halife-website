@@ -8,6 +8,8 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 import uuid
 import shutil
+import json
+from datetime import datetime, timezone
 
 app = Flask(__name__)
 CORS(app)
@@ -16,6 +18,9 @@ CORS(app)
 EXCEL_FILE = '../public/data/halife_products.xlsx'
 UPLOAD_FOLDER = '../public/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+# Đường dẫn file news JSON
+NEWS_FILE = '../public/data/news.json'
 
 # Tạo thư mục upload nếu chưa có
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -773,6 +778,783 @@ def delete_image():
 def uploaded_file(filename):
     """Serve uploaded images"""
     return send_from_directory(UPLOAD_FOLDER, filename)
+
+
+def safe_json_read(file_path, default_data=None):
+    """Đọc file JSON an toàn"""
+    try:
+        if not os.path.exists(file_path):
+            # Tạo file với dữ liệu mặc định nếu chưa có
+            if default_data:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(default_data, f, ensure_ascii=False, indent=2)
+            return default_data or {"news": [], "categories": []}
+        
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error reading JSON file {file_path}: {e}")
+        return default_data or {"news": [], "categories": []}
+
+def safe_json_write(file_path, data):
+    """Ghi file JSON an toàn với backup"""
+    try:
+        # Backup file hiện tại
+        if os.path.exists(file_path):
+            backup_file = file_path + '.backup'
+            shutil.copy2(file_path, backup_file)
+        
+        # Ghi dữ liệu mới
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        
+        return True
+    except Exception as e:
+        print(f"Error writing JSON file {file_path}: {e}")
+        # Khôi phục từ backup nếu có lỗi
+        backup_file = file_path + '.backup'
+        if os.path.exists(backup_file):
+            shutil.copy2(backup_file, file_path)
+        return False
+
+def generate_news_id():
+    """Tạo ID unique cho tin tức mới"""
+    return int(datetime.now().timestamp() * 1000)
+
+def format_vietnamese_date():
+    """Format ngày theo kiểu Việt Nam"""
+    return datetime.now().strftime('%d/%m/%Y')
+
+def calculate_read_time(content):
+    """Tính thời gian đọc dự kiến"""
+    if not content:
+        return "1 phút"
+    
+    # Loại bỏ HTML tags và đếm từ
+    import re
+    text_only = re.sub('<[^<]+?>', '', content)
+    words = len(text_only.split())
+    
+    # Tính theo 200 từ/phút
+    minutes = max(1, round(words / 200))
+    return f"{minutes} phút"
+
+# ==============================================
+# NEWS API ENDPOINTS
+# ==============================================
+
+@app.route('/api/news', methods=['GET'])
+def get_all_news():
+    """Lấy tất cả tin tức"""
+    try:
+        # Đọc dữ liệu từ file JSON
+        data = safe_json_read(NEWS_FILE)
+        news_list = data.get('news', [])
+        
+        # Lọc theo query parameters
+        category = request.args.get('category')
+        featured = request.args.get('featured')
+        published = request.args.get('published', 'true')
+        limit = request.args.get('limit', type=int)
+        search = request.args.get('search', '').lower()
+        
+        # Áp dụng filters
+        filtered_news = news_list
+        
+        # Filter published
+        if published.lower() == 'true':
+            filtered_news = [n for n in filtered_news if n.get('isPublished', False)]
+        
+        # Filter category
+        if category and category != 'Tất cả':
+            filtered_news = [n for n in filtered_news if n.get('category') == category]
+        
+        # Filter featured
+        if featured:
+            is_featured = featured.lower() == 'true'
+            filtered_news = [n for n in filtered_news if n.get('isFeatured', False) == is_featured]
+        
+        # Search filter
+        if search:
+            filtered_news = [n for n in filtered_news 
+                           if search in n.get('title', '').lower() 
+                           or search in n.get('excerpt', '').lower()
+                           or search in n.get('content', '').lower()]
+        
+        # Sort by date (newest first)
+        filtered_news.sort(key=lambda x: x.get('createdAt', ''), reverse=True)
+        
+        # Apply limit
+        if limit:
+            filtered_news = filtered_news[:limit]
+        
+        return jsonify({
+            'success': True,
+            'message': f'Lấy {len(filtered_news)} tin tức thành công',
+            'data': filtered_news,
+            'total': len(news_list)
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi lấy tin tức: {str(e)}',
+            'data': []
+        }), 500
+
+@app.route('/api/news/<int:news_id>', methods=['GET'])
+def get_news_by_id(news_id):
+    """Lấy tin tức theo ID"""
+    try:
+        data = safe_json_read(NEWS_FILE)
+        news_list = data.get('news', [])
+        
+        # Tìm tin tức theo ID
+        news_item = None
+        for news in news_list:
+            if news.get('id') == news_id:
+                news_item = news
+                break
+        
+        if not news_item:
+            return jsonify({
+                'success': False,
+                'message': f'Không tìm thấy tin tức với ID: {news_id}',
+                'data': None
+            }), 404
+        
+        # Tăng view count
+        news_item['views'] = news_item.get('views', 0) + 1
+        
+        # Lưu lại dữ liệu
+        if safe_json_write(NEWS_FILE, data):
+            return jsonify({
+                'success': True,
+                'message': 'Lấy tin tức thành công',
+                'data': news_item
+            })
+        else:
+            # Vẫn trả về dữ liệu ngay cả khi không lưu được view count
+            return jsonify({
+                'success': True,
+                'message': 'Lấy tin tức thành công (không cập nhật được view)',
+                'data': news_item
+            })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi lấy tin tức: {str(e)}',
+            'data': None
+        }), 500
+
+@app.route('/api/news', methods=['POST'])
+def create_news():
+    """Tạo tin tức mới"""
+    try:
+        request_data = request.get_json()
+        
+        # Validate dữ liệu bắt buộc
+        if not request_data.get('title'):
+            return jsonify({
+                'success': False,
+                'message': 'Thiếu tiêu đề tin tức'
+            }), 400
+        
+        if not request_data.get('content'):
+            return jsonify({
+                'success': False,
+                'message': 'Thiếu nội dung tin tức'
+            }), 400
+        
+        # Đọc dữ liệu hiện tại
+        data = safe_json_read(NEWS_FILE, {
+            "news": [],
+            "categories": [
+                "Tất cả", "Kiến thức chăm sóc", "Công nghệ mới", 
+                "Hướng dẫn sử dụng", "Tin tức ngành", 
+                "Phòng chống dịch bệnh", "Dinh dưỡng", 
+                "Môi trường chăn nuôi"
+            ]
+        })
+        
+        # Tạo tin tức mới
+        current_time = datetime.now(timezone.utc).isoformat()
+        new_news = {
+            'id': generate_news_id(),
+            'title': request_data.get('title', ''),
+            'excerpt': request_data.get('excerpt', ''),
+            'content': request_data.get('content', ''),
+            'date': request_data.get('date', format_vietnamese_date()),
+            'author': request_data.get('author', 'Admin HALIFE'),
+            'category': request_data.get('category', 'Tin tức ngành'),
+            'isPublished': request_data.get('isPublished', True),
+            'isFeatured': request_data.get('isFeatured', False),
+            'readTime': request_data.get('readTime', calculate_read_time(request_data.get('content', ''))),
+            'views': 0,
+            'likes': 0,
+            'comments': 0,
+            'shares': 0,
+            'bookmarks': 0,
+            'image': request_data.get('image', ''),
+            'tags': request_data.get('tags', []),
+            'createdAt': current_time,
+            'updatedAt': current_time
+        }
+        
+        # Thêm vào đầu danh sách (tin mới nhất)
+        data['news'].insert(0, new_news)
+        
+        # Lưu dữ liệu
+        if safe_json_write(NEWS_FILE, data):
+            return jsonify({
+                'success': True,
+                'message': f'Đã tạo tin tức "{new_news["title"]}" thành công',
+                'data': new_news
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Lỗi lưu dữ liệu'
+            }), 500
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi tạo tin tức: {str(e)}'
+        }), 500
+
+@app.route('/api/news/<int:news_id>', methods=['PUT'])
+def update_news(news_id):
+    """Cập nhật tin tức"""
+    try:
+        request_data = request.get_json()
+        
+        # Đọc dữ liệu hiện tại
+        data = safe_json_read(NEWS_FILE)
+        news_list = data.get('news', [])
+        
+        # Tìm tin tức cần cập nhật
+        news_index = -1
+        for i, news in enumerate(news_list):
+            if news.get('id') == news_id:
+                news_index = i
+                break
+        
+        if news_index == -1:
+            return jsonify({
+                'success': False,
+                'message': f'Không tìm thấy tin tức với ID: {news_id}'
+            }), 404
+        
+        # Cập nhật dữ liệu
+        existing_news = news_list[news_index]
+        
+        # Chỉ cập nhật các field được gửi lên
+        updatable_fields = [
+            'title', 'excerpt', 'content', 'author', 'category', 
+            'isPublished', 'isFeatured', 'image', 'tags'
+        ]
+        
+        for field in updatable_fields:
+            if field in request_data:
+                existing_news[field] = request_data[field]
+        
+        # Cập nhật readTime nếu content thay đổi
+        if 'content' in request_data:
+            existing_news['readTime'] = calculate_read_time(request_data['content'])
+        
+        # Cập nhật timestamp
+        existing_news['updatedAt'] = datetime.now(timezone.utc).isoformat()
+        
+        # Lưu dữ liệu
+        if safe_json_write(NEWS_FILE, data):
+            return jsonify({
+                'success': True,
+                'message': f'Đã cập nhật tin tức "{existing_news["title"]}" thành công',
+                'data': existing_news
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Lỗi lưu dữ liệu'
+            }), 500
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi cập nhật tin tức: {str(e)}'
+        }), 500
+
+@app.route('/api/news/<int:news_id>', methods=['DELETE'])
+def delete_news(news_id):
+    """Xóa tin tức"""
+    try:
+        # Đọc dữ liệu hiện tại
+        data = safe_json_read(NEWS_FILE)
+        news_list = data.get('news', [])
+        
+        # Tìm tin tức cần xóa
+        news_to_delete = None
+        filtered_news = []
+        
+        for news in news_list:
+            if news.get('id') == news_id:
+                news_to_delete = news
+            else:
+                filtered_news.append(news)
+        
+        if not news_to_delete:
+            return jsonify({
+                'success': False,
+                'message': f'Không tìm thấy tin tức với ID: {news_id}'
+            }), 404
+        
+        # Cập nhật danh sách
+        data['news'] = filtered_news
+        
+        # Lưu dữ liệu
+        if safe_json_write(NEWS_FILE, data):
+            return jsonify({
+                'success': True,
+                'message': f'Đã xóa tin tức "{news_to_delete["title"]}" thành công',
+                'data': {
+                    'id': news_id,
+                    'title': news_to_delete['title']
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Lỗi lưu dữ liệu'
+            }), 500
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi xóa tin tức: {str(e)}'
+        }), 500
+
+@app.route('/api/news/categories', methods=['GET'])
+def get_news_categories():
+    """Lấy danh sách categories"""
+    try:
+        data = safe_json_read(NEWS_FILE)
+        categories = data.get('categories', [])
+        
+        # Thống kê số lượng tin tức theo category
+        news_list = data.get('news', [])
+        category_stats = {}
+        
+        for category in categories:
+            if category == 'Tất cả':
+                count = len([n for n in news_list if n.get('isPublished', False)])
+            else:
+                count = len([n for n in news_list if n.get('category') == category and n.get('isPublished', False)])
+            category_stats[category] = count
+        
+        return jsonify({
+            'success': True,
+            'message': f'Lấy {len(categories)} danh mục thành công',
+            'data': categories,
+            'stats': category_stats
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi lấy danh mục: {str(e)}',
+            'data': []
+        }), 500
+
+@app.route('/api/news/stats', methods=['GET'])
+def get_news_stats():
+    """Lấy thống kê tin tức"""
+    try:
+        data = safe_json_read(NEWS_FILE)
+        news_list = data.get('news', [])
+        
+        stats = {
+            'totalNews': len(news_list),
+            'publishedNews': len([n for n in news_list if n.get('isPublished', False)]),
+            'featuredNews': len([n for n in news_list if n.get('isFeatured', False) and n.get('isPublished', False)]),
+            'totalViews': sum(n.get('views', 0) for n in news_list),
+            'totalLikes': sum(n.get('likes', 0) for n in news_list),
+            'isLoaded': True
+        }
+        
+        # Thống kê theo category
+        category_stats = {}
+        categories = data.get('categories', [])
+        for category in categories:
+            if category != 'Tất cả':
+                count = len([n for n in news_list if n.get('category') == category and n.get('isPublished', False)])
+                category_stats[category] = count
+        
+        stats['categoryStats'] = category_stats
+        
+        # Top 5 tin tức được xem nhiều nhất
+        top_viewed = sorted(
+            [n for n in news_list if n.get('isPublished', False)],
+            key=lambda x: x.get('views', 0),
+            reverse=True
+        )[:5]
+        
+        stats['topViewed'] = [{
+            'id': n.get('id'),
+            'title': n.get('title'),
+            'views': n.get('views', 0),
+            'category': n.get('category')
+        } for n in top_viewed]
+        
+        return jsonify({
+            'success': True,
+            'message': 'Lấy thống kê thành công',
+            'data': stats
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi lấy thống kê: {str(e)}',
+            'data': {
+                'totalNews': 0,
+                'publishedNews': 0,
+                'featuredNews': 0,
+                'totalViews': 0,
+                'totalLikes': 0,
+                'isLoaded': False
+            }
+        }), 500
+
+@app.route('/api/news/search', methods=['GET'])
+def search_news():
+    """Tìm kiếm tin tức"""
+    try:
+        query = request.args.get('q', '').lower()
+        category = request.args.get('category')
+        limit = request.args.get('limit', 10, type=int)
+        
+        if not query:
+            return jsonify({
+                'success': False,
+                'message': 'Thiếu từ khóa tìm kiếm',
+                'data': []
+            }), 400
+        
+        data = safe_json_read(NEWS_FILE)
+        news_list = data.get('news', [])
+        
+        # Lọc tin tức published
+        published_news = [n for n in news_list if n.get('isPublished', False)]
+        
+        # Tìm kiếm theo từ khóa
+        search_results = []
+        for news in published_news:
+            score = 0
+            
+            # Tìm trong title (điểm cao nhất)
+            if query in news.get('title', '').lower():
+                score += 10
+            
+            # Tìm trong excerpt
+            if query in news.get('excerpt', '').lower():
+                score += 5
+            
+            # Tìm trong content
+            if query in news.get('content', '').lower():
+                score += 3
+            
+            # Tìm trong tags
+            for tag in news.get('tags', []):
+                if query in tag.lower():
+                    score += 2
+            
+            # Tìm trong category
+            if query in news.get('category', '').lower():
+                score += 1
+            
+            if score > 0:
+                news_copy = news.copy()
+                news_copy['searchScore'] = score
+                search_results.append(news_copy)
+        
+        # Sắp xếp theo điểm
+        search_results.sort(key=lambda x: x['searchScore'], reverse=True)
+        
+        # Lọc theo category nếu có
+        if category and category != 'Tất cả':
+            search_results = [n for n in search_results if n.get('category') == category]
+        
+        # Giới hạn kết quả
+        search_results = search_results[:limit]
+        
+        # Loại bỏ searchScore khỏi response
+        for result in search_results:
+            result.pop('searchScore', None)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Tìm thấy {len(search_results)} kết quả cho "{query}"',
+            'data': search_results,
+            'query': query,
+            'total': len(search_results)
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi tìm kiếm: {str(e)}',
+            'data': []
+        }), 500
+
+@app.route('/api/news/<int:news_id>/like', methods=['POST'])
+def like_news(news_id):
+    """Like/Unlike tin tức"""
+    try:
+        data = safe_json_read(NEWS_FILE)
+        news_list = data.get('news', [])
+        
+        # Tìm tin tức
+        news_item = None
+        for news in news_list:
+            if news.get('id') == news_id:
+                news_item = news
+                break
+        
+        if not news_item:
+            return jsonify({
+                'success': False,
+                'message': f'Không tìm thấy tin tức với ID: {news_id}'
+            }), 404
+        
+        # Tăng like count
+        news_item['likes'] = news_item.get('likes', 0) + 1
+        news_item['updatedAt'] = datetime.now(timezone.utc).isoformat()
+        
+        # Lưu dữ liệu
+        if safe_json_write(NEWS_FILE, data):
+            return jsonify({
+                'success': True,
+                'message': 'Đã like tin tức',
+                'data': {
+                    'id': news_id,
+                    'likes': news_item['likes']
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Lỗi lưu dữ liệu'
+            }), 500
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi like tin tức: {str(e)}'
+        }), 500
+
+@app.route('/api/news/<int:news_id>/bookmark', methods=['POST'])
+def bookmark_news(news_id):
+    """Bookmark/Unbookmark tin tức"""
+    try:
+        data = safe_json_read(NEWS_FILE)
+        news_list = data.get('news', [])
+        
+        # Tìm tin tức
+        news_item = None
+        for news in news_list:
+            if news.get('id') == news_id:
+                news_item = news
+                break
+        
+        if not news_item:
+            return jsonify({
+                'success': False,
+                'message': f'Không tìm thấy tin tức với ID: {news_id}'
+            }), 404
+        
+        # Tăng bookmark count
+        news_item['bookmarks'] = news_item.get('bookmarks', 0) + 1
+        news_item['updatedAt'] = datetime.now(timezone.utc).isoformat()
+        
+        # Lưu dữ liệu
+        if safe_json_write(NEWS_FILE, data):
+            return jsonify({
+                'success': True,
+                'message': 'Đã bookmark tin tức',
+                'data': {
+                    'id': news_id,
+                    'bookmarks': news_item['bookmarks']
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Lỗi lưu dữ liệu'
+            }), 500
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi bookmark tin tức: {str(e)}'
+        }), 500
+
+@app.route('/api/news/backup', methods=['POST'])
+def backup_news():
+    """Backup dữ liệu tin tức"""
+    try:
+        if not os.path.exists(NEWS_FILE):
+            return jsonify({
+                'success': False,
+                'message': 'File tin tức không tồn tại'
+            }), 404
+        
+        # Tạo backup với timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_filename = f'news_backup_{timestamp}.json'
+        backup_path = os.path.join(os.path.dirname(NEWS_FILE), backup_filename)
+        
+        # Copy file
+        shutil.copy2(NEWS_FILE, backup_path)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Đã backup dữ liệu tin tức thành công',
+            'data': {
+                'backup_file': backup_filename,
+                'backup_path': backup_path,
+                'timestamp': timestamp
+            }
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi backup: {str(e)}'
+        }), 500
+
+@app.route('/api/news/restore', methods=['POST'])
+def restore_news():
+    """Restore dữ liệu tin tức từ backup"""
+    try:
+        request_data = request.get_json()
+        backup_file = request_data.get('backup_file')
+        
+        if not backup_file:
+            return jsonify({
+                'success': False,
+                'message': 'Thiếu tên file backup'
+            }), 400
+        
+        backup_path = os.path.join(os.path.dirname(NEWS_FILE), backup_file)
+        
+        if not os.path.exists(backup_path):
+            return jsonify({
+                'success': False,
+                'message': f'File backup không tồn tại: {backup_file}'
+            }), 404
+        
+        # Backup file hiện tại trước khi restore
+        current_backup = NEWS_FILE + '.before_restore'
+        if os.path.exists(NEWS_FILE):
+            shutil.copy2(NEWS_FILE, current_backup)
+        
+        # Restore từ backup
+        shutil.copy2(backup_path, NEWS_FILE)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Đã restore dữ liệu từ {backup_file} thành công',
+            'data': {
+                'restored_from': backup_file,
+                'current_backup': current_backup
+            }
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi restore: {str(e)}'
+        }), 500
+
+# ==============================================
+# UTILITY ENDPOINT FOR MIGRATION
+# ==============================================
+
+@app.route('/api/news/migrate-from-js', methods=['POST'])
+def migrate_from_js():
+    """Migrate dữ liệu từ news.js sang news.json (chỉ dùng 1 lần)"""
+    try:
+        # Endpoint này để migrate dữ liệu từ file JS sang JSON
+        # Bạn có thể gọi endpoint này 1 lần để chuyển đổi data
+        
+        request_data = request.get_json()
+        news_data = request_data.get('newsData', [])
+        
+        if not news_data:
+            return jsonify({
+                'success': False,
+                'message': 'Không có dữ liệu để migrate'
+            }), 400
+        
+        # Chuẩn bị dữ liệu
+        migrated_data = {
+            "news": [],
+            "categories": [
+                "Tất cả", "Kiến thức chăm sóc", "Công nghệ mới", 
+                "Hướng dẫn sử dụng", "Tin tức ngành", 
+                "Phòng chống dịch bệnh", "Dinh dưỡng", 
+                "Môi trường chăn nuôi"
+            ]
+        }
+        
+        # Chuyển đổi từng tin tức
+        for news in news_data:
+            migrated_news = {
+                'id': news.get('id', generate_news_id()),
+                'title': news.get('title', ''),
+                'excerpt': news.get('excerpt', ''),
+                'content': news.get('content', ''),
+                'date': news.get('date', format_vietnamese_date()),
+                'author': news.get('author', 'Admin HALIFE'),
+                'category': news.get('category', 'Tin tức ngành'),
+                'isPublished': news.get('isPublished', True),
+                'isFeatured': news.get('isFeatured', False),
+                'readTime': news.get('readTime', '5 phút'),
+                'views': news.get('views', 0),
+                'likes': news.get('likes', 0),
+                'comments': news.get('comments', 0),
+                'shares': news.get('shares', 0),
+                'bookmarks': news.get('bookmarks', 0),
+                'image': news.get('image', ''),
+                'tags': news.get('tags', []),
+                'createdAt': datetime.now(timezone.utc).isoformat(),
+                'updatedAt': datetime.now(timezone.utc).isoformat()
+            }
+            migrated_data['news'].append(migrated_news)
+        
+        # Lưu dữ liệu
+        if safe_json_write(NEWS_FILE, migrated_data):
+            return jsonify({
+                'success': True,
+                'message': f'Đã migrate {len(migrated_data["news"])} tin tức thành công',
+                'data': {
+                    'migrated_count': len(migrated_data["news"]),
+                    'file_path': NEWS_FILE
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Lỗi lưu dữ liệu sau khi migrate'
+            }), 500
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi migrate: {str(e)}'
+        }), 500
 
 if __name__ == '__main__':
     print("🚀 Starting HALIFE Excel API...")
