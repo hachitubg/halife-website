@@ -1,5 +1,13 @@
+# Core Flask dependencies
 flask==3.0.0
 flask-cors==4.0.0
-numpy==1.26.4
+
+# Data processing (for Excel operations)
 pandas==2.1.4
 openpyxl==3.1.2
+
+# Production server
+gunicorn==21.2.0
+
+# File operations and utilities
+werkzeug==3.0.1
