@@ -8,8 +8,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    environment:
+      - BASE_DIR=/app
     volumes:
-      - ./public:/app/public
+      - ./public/data:/app/public/data
+      - ./public/images:/app/public/images
     restart: unless-stopped
     container_name: halife-backend
 

@@ -14,13 +14,13 @@ from datetime import datetime, timezone
 app = Flask(__name__)
 CORS(app)
 
-# Đường dẫn file Excel và thư mục upload
-EXCEL_FILE = '../public/data/halife_products.xlsx'
-UPLOAD_FOLDER = '../public/images'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+# Đường dẫn file 
+BASE_DIR = os.getenv('BASE_DIR', '.')  # Default là current directory
+EXCEL_FILE = os.path.join(BASE_DIR, 'public/data/halife_products.xlsx')
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'public/images')
+NEWS_FILE = os.path.join(BASE_DIR, 'public/data/news.json')
 
-# Đường dẫn file news JSON
-NEWS_FILE = '../public/data/news.json'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 # Tạo thư mục upload nếu chưa có
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
