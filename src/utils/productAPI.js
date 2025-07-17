@@ -8,7 +8,7 @@ export class ProductAPI {
    */
   static async makeRequest(endpoint, options = {}) {
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
         headers: {
           'Content-Type': 'application/json',
           ...options.headers
@@ -33,7 +33,7 @@ export class ProductAPI {
    */
   static async getAllProducts() {
     try {
-      const response = await this.makeRequest('/products');
+      const response = await this.makeRequest('/api/products');
       return response.data;
     } catch (error) {
       throw new Error(`Lỗi lấy danh sách sản phẩm: ${error.message}`);
@@ -45,7 +45,7 @@ export class ProductAPI {
    */
   static async getAllCategories() {
     try {
-      const response = await this.makeRequest('/categories');
+      const response = await this.makeRequest('/api/categories');
       return response.data;
     } catch (error) {
       throw new Error(`Lỗi lấy danh sách danh mục: ${error.message}`);
@@ -57,7 +57,7 @@ export class ProductAPI {
    */
   static async getStats() {
     try {
-      const response = await this.makeRequest('/stats');
+      const response = await this.makeRequest('/api/stats');
       return response.data;
     } catch (error) {
       throw new Error(`Lỗi lấy thống kê: ${error.message}`);
@@ -105,7 +105,7 @@ export class ProductAPI {
         storageConditions: productData.storageConditions || ''
       };
 
-      const response = await this.makeRequest('/products', {
+      const response = await this.makeRequest('/api/products', {
         method: 'POST',
         body: JSON.stringify(newProductData)
       });
@@ -162,7 +162,7 @@ export class ProductAPI {
         storageConditions: productData.storageConditions || ''
       };
 
-      const response = await this.makeRequest(`/products/${productId}`, {
+      const response = await this.makeRequest(`/api/products/${productId}`, {
         method: 'PUT',
         body: JSON.stringify(updateData)
       });
@@ -182,7 +182,7 @@ export class ProductAPI {
    */
   static async deleteProduct(productId) {
     try {
-      const response = await this.makeRequest(`/products/${productId}`, {
+      const response = await this.makeRequest(`/api/products/${productId}`, {
         method: 'DELETE'
       });
 
@@ -212,7 +212,7 @@ export class ProductAPI {
       formData.append('file', file);
 
       // Gọi API upload
-      const response = await fetch(`${API_BASE_URL}/upload-image`, {
+      const response = await fetch(`${API_BASE}/api/upload-image`, {
         method: 'POST',
         body: formData
       });
@@ -239,7 +239,7 @@ export class ProductAPI {
    */
   static async deleteProductImage(imageUrl) {
     try {
-      const response = await this.makeRequest('/delete-image', {
+      const response = await this.makeRequest('/api/delete-image', {
         method: 'POST',
         body: JSON.stringify({ imageUrl: imageUrl })
       });

@@ -1,6 +1,27 @@
 {
   "news": [
     {
+      "id": 1752764749446,
+      "title": "1",
+      "excerpt": "1",
+      "content": "1",
+      "date": "17/7/2025",
+      "author": "Admin HALIFE",
+      "category": "Tin tức ngành",
+      "isPublished": true,
+      "isFeatured": false,
+      "readTime": "1 phút",
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "shares": 0,
+      "bookmarks": 0,
+      "image": "https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=400&h=250&fit=crop",
+      "tags": [],
+      "createdAt": "2025-07-17T15:05:49.446669+00:00",
+      "updatedAt": "2025-07-17T15:05:49.446669+00:00"
+    },
+    {
       "id": 1752421469619,
       "title": "Best Phage từ Nhật Bản – tiêu diệt 99% bệnh đường ruột – đập tan nỗi lo kháng kháng sinh trong chăn nuôi",
       "excerpt": "\"Gần 100 ổ dịch và hơn 120.000 gia súc, gia cầm chết mỗi năm nguyên nhân là do vi khuẩn kháng kháng sinh gây ra\".   Trong bối cảnh các bệnh dịch ngày càng phức tạp và sự lạm dụng kháng sinh...",
@@ -31,13 +52,13 @@
       "id": 1752422744258,
       "title": "BEST PHAGE - GIẢI PHÁP CHĂN NUÔI KHÔNG KHÁNG SINH TIÊN PHONG, VƯỢT SÁNG GÓP MẶT TRONG TOP 10 THƯƠNG HIỆU NÔNG NGHIỆP DẪN ĐẦU",
       "excerpt": "Sáng ngày 13/04/2025, tại Lễ công bố \"Thương Hiệu Dẫn Đầu Việt Nam – Vietnam Leading Brands 2025\" lần thứ XII. Sự kiện long trọng này được tổ chức tại Nhà hát Bến Thành, TP. Hồ Chí Minh, truyền hình T...",
-      "content": "<h3>Sáng ngày 13/04/2025, tại Lễ công bố \"Thương Hiệu Dẫn Đầu Việt Nam – Vietnam Leading Brands 2025\" lần thứ XII.</h3><div><div><div><div><em>Sự kiện long trọng này được tổ chức tại Nhà hát Bến Thành, TP. Hồ Chí Minh, truyền hình Trực Tiếp trên kênh HTV1, Công Ty TNHH</em><em> Công Nghệ Sinh Học Halife </em><em>đã được vinh danh hạng mục Top 10 Thương Hiệu Ngành</em><em> Nông Nghiệp Dẫn Đầu Việt Nam 2025</em><em>.</em> <em>Đây là giải thưởng đánh dấu sự phát triển bền vững của thương hiệu Halife</em> <em>trong và ngoài nước, đồng thời đánh dấu một cột mốc quan trọng trong hành trình phát triển của Halife.</em><br> </div></div></div></div>",
+      "content": "<h3>Sáng ngày 13/04/2025, tại Lễ công bố \"Thương Hiệu Dẫn Đầu Việt Nam – Vietnam Leading Brands 2025\" lần thứ XII.</h3><div><div><div><div><em>Sự kiện long trọng này được tổ chức tại Nhà hát Bến Thành, TP. Hồ Chí Minh, truyền hình Trực Tiếp trên kênh HTV1, Công Ty TNHH</em><em> Công Nghệ Sinh Học Halife </em><em>đã được vinh danh hạng mục Top 10 Thương Hiệu Ngành</em><em> Nông Nghiệp Dẫn Đầu Việt Nam 2025</em><em>.</em> <em>Đây là giải thưởng đánh dấu sự phát triển bền vững của thương hiệu Halife</em> <em>trong và ngoài nước, đồng thời đánh dấu một cột mốc quan trọng trong hành trình phát triển của Halife.</em></div></div></div></div>",
       "date": "13/7/2025",
       "author": "Admin HALIFE",
       "category": "Tin tức ngành",
       "isPublished": true,
       "isFeatured": false,
-      "readTime": "7 phút",
+      "readTime": "1 phút",
       "views": 283,
       "likes": 0,
       "comments": 0,
@@ -45,20 +66,20 @@
       "bookmarks": 0,
       "image": "https://danhgiadoanhnghiep.vn/uploads/noidung/images/hal01.jpg",
       "tags": [
-        "nbsp",
-        "phage",
-        "best",
+        "2025",
+        "halife",
         "sinh",
-        "nghi"
+        "nghi",
+        "best"
       ],
       "createdAt": "2025-07-13T11:15:00Z",
-      "updatedAt": "2025-07-13T11:15:00Z"
+      "updatedAt": "2025-07-17T15:05:44.877352+00:00"
     },
     {
       "id": 1,
       "title": "Hướng Dẫn Chăm Sóc Gia Súc Trong Mùa Khô",
       "excerpt": "Những thách thức trong mùa khô Mùa khô mang đến nhiều thách thức cho người chăn nuôi. Thời tiết khô hanh, bụi bặm nhiều tạo điều kiện thuận lợi cho các bệnh về đường hô hấp phát triển. Các biện pháp p...",
-      "content": "<h2>Những thách thức trong mùa khô</h2><p>Mùa khô mang đến nhiều thách thức cho người chăn nuôi. Thời tiết khô hanh, bụi bặm nhiều tạo điều kiện thuận lợi cho các bệnh về đường hô hấp phát triển.</p><h3>Các biện pháp phòng ngừa:</h3><ul><li>Đảm bảo nguồn nước sạch, đủ cho gia súc</li><li>Tăng cường thông gió cho chuồng trại</li><li>Bổ sung vitamin C và các chất chống oxy hóa</li><li>Thường xuyên vệ sinh chuồng trại</li></ul><h3>Chế độ dinh dưỡng phù hợp:</h3><p>Trong mùa khô, cần điều chỉnh chế độ ăn cho gia súc với nhiều thức ăn giàu nước, vitamin và khoáng chất.</p><p><br></p><p>HÀ CHÍ TÚ TEST UPDATE TIN TỨC</p>",
+      "content": "<h2>Những thách thức trong mùa khô</h2><p>Mùa khô mang đến nhiều thách thức cho người chăn nuôi. Thời tiết khô hanh, bụi bặm nhiều tạo điều kiện thuận lợi cho các bệnh về đường hô hấp phát triển.</p><h3>Các biện pháp phòng ngừa:</h3><ul><li>Đảm bảo nguồn nước sạch, đủ cho gia súc</li><li>Tăng cường thông gió cho chuồng trại</li><li>Bổ sung vitamin C và các chất chống oxy hóa</li><li>Thường xuyên vệ sinh chuồng trại</li></ul><h3>Chế độ dinh dưỡng phù hợp:</h3><p>Trong mùa khô, cần điều chỉnh chế độ ăn cho gia súc với nhiều thức ăn giàu nước, vitamin và khoáng chất.</p>",
       "date": "15 Tháng 12, 2024",
       "author": "BS Nguyễn Văn A",
       "category": "Kiến thức chăm sóc",
@@ -79,7 +100,7 @@
         "sinh"
       ],
       "createdAt": "2024-12-15T10:00:00Z",
-      "updatedAt": "2025-07-16T15:32:24.657191+00:00"
+      "updatedAt": "2025-07-16T15:32:34.383194+00:00"
     },
     {
       "id": 2,
