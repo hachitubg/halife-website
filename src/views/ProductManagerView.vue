@@ -1272,10 +1272,6 @@ export default {
           this.showMessage(`File ${file.name} không phải là hình ảnh`, 'error');
           return false;
         }
-        if (file.size > 5 * 1024 * 1024) {
-          this.showMessage(`File ${file.name} quá lớn (>5MB)`, 'error');
-          return false;
-        }
         return true;
       });
 
