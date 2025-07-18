@@ -448,6 +448,29 @@ input:focus {
   animation: pulse 2s infinite;
 }
 
+header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Animation cho notification badge */
+.bg-red-500 {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Smooth transition */
+.transition-colors {
+  transition: all 0.3s ease;
+}
+
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
@@ -478,33 +501,10 @@ input:focus {
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-* {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Animation cho notification badge */
-.bg-red-500 {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-/* Smooth transition */
-.transition-colors {
-  transition: all 0.3s ease;
+  * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
 }
 </style>

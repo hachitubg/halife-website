@@ -15,8 +15,26 @@ app = Flask(__name__)
 CORS(app)
 
 # Đường dẫn file 
-# BASE_DIR = os.getenv('BASE_DIR', '.')
-BASE_DIR = '../'
+def get_base_dir():
+    """Auto-detect BASE_DIR cho cả local và Docker"""
+    
+    # 1. Check current directory có public không (Docker case)
+    if os.path.exists('./public'):
+        return '.'
+    
+    # 2. Check parent directory có public không (Local case)
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if os.path.exists(os.path.join(parent_dir, 'public')):
+        return parent_dir
+    
+    # 3. Check VPS absolute path
+    if os.path.exists('/var/www/halife-website/public'):
+        return '/var/www/halife-website'
+    
+    # 4. Fallback to environment variable
+    return os.getenv('BASE_DIR', '.')
+
+BASE_DIR = get_base_dir()
 
 EXCEL_FILE = os.path.join(BASE_DIR, 'public/data/halife_products.xlsx')
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'public/images')
