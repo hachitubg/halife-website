@@ -92,7 +92,7 @@
                 </span>
               </div>
               <div v-if="product.discount > 0" class="text-sm text-green-600 font-medium">
-                Tiết kiệm {{ calculateSavings(product.originalPrice, product.price) }}₫ ({{ product.discount }}%)
+                Tiết kiệm {{ formatPrice(calculateSavings(product.originalPrice, product.price)) }} VNĐ ({{ product.discount }}%)
               </div>
             </div>
 
@@ -227,39 +227,6 @@
                 <i class="fas fa-shopping-cart mr-2"></i>
                 {{ product.inStock ? 'Thêm vào giỏ hàng' : 'Hết hàng' }}
               </button>
-              <button 
-                @click="buyNow"
-                :disabled="!product.inStock"
-                class="w-full py-3 px-6 rounded-lg font-semibold transition-colors"
-                :class="product.inStock 
-                  ? 'bg-red-500 hover:bg-red-600 text-white' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
-              >
-                MUA NGAY
-              </button>
-              <div class="grid grid-cols-3 gap-2">
-                <button 
-                  @click="addToWishlist"
-                  class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center"
-                >
-                  <i class="fas fa-heart mr-1"></i>
-                  Yêu thích
-                </button>
-                <button 
-                  @click="compareProduct"
-                  class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center"
-                >
-                  <i class="fas fa-balance-scale mr-1"></i>
-                  So sánh
-                </button>
-                <button 
-                  @click="shareProduct"
-                  class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center"
-                >
-                  <i class="fas fa-share-alt mr-1"></i>
-                  Chia sẻ
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -518,6 +485,7 @@
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import { sidebarCategories, products, getProductById, getProductsByCategory } from '@/data/products.js'
+import { useCart } from '@/scripts/cartManager.js'
 
 export default {
   name: 'ProductDetailView',
@@ -597,7 +565,6 @@ export default {
   },
   
   methods: {
-
     handleMainImageError(event) {
       event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y5ZmFmYiI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2Y5ZmFmYiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOWNhM2FmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+SW1hZ2U8L3RleHQ+PC9zdmc+'
     },
@@ -723,58 +690,37 @@ export default {
     
     addToCart() {
       if (!this.product.inStock) return
+      const { addToCart, openCart } = useCart()
       
-      const cartItem = {
-        product: this.product,
-        weight: this.selectedWeight,
-        quantity: this.quantity
-      }
-      console.log('Thêm vào giỏ hàng:', cartItem)
-      alert(`Đã thêm ${this.quantity} ${this.selectedWeight} "${this.product.name}" vào giỏ hàng`)
-    },
-    
-    buyNow() {
-      if (!this.product.inStock) return
+      // Thêm sản phẩm vào giỏ với số lượng từ biến quantity có sẵn
+      addToCart(this.product, this.quantity)
       
-      console.log('Mua ngay:', {
-        product: this.product,
-        weight: this.selectedWeight,
-        quantity: this.quantity
-      })
-      alert(`Đang chuyển đến trang thanh toán cho sản phẩm "${this.product.name}"`)
-    },
-    
-    addToWishlist() {
-      console.log('Thêm vào yêu thích:', this.product.name)
-      alert(`Đã thêm "${this.product.name}" vào danh sách yêu thích`)
-    },
-    
-    compareProduct() {
-      console.log('Thêm vào so sánh:', this.product.name)
-      alert(`Đã thêm "${this.product.name}" vào danh sách so sánh`)
-    },
-    
-    shareProduct() {
-      console.log('Chia sẻ sản phẩm:', this.product.name)
-      if (navigator.share) {
-        navigator.share({
-          title: this.product.name,
-          text: this.product.description,
-          url: window.location.href
-        })
-      } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(window.location.href).then(() => {
-          alert('Đã copy link sản phẩm vào clipboard')
-        }).catch(() => {
-          alert('Không thể chia sẻ. Vui lòng copy link thủ công.')
-        })
-      }
+      // Hiển thị thông báo
+      alert(`Đã thêm ${this.quantity} sản phẩm "${this.product.name}" vào giỏ hàng!`)
+      
+      // Mở giỏ hàng
+      setTimeout(() => {
+        openCart()
+      }, 500)
     },
     
     viewProduct(productId) {
       // Navigate to another product detail page
       this.$router.push(`/product/${productId}`)
+    },
+    
+    calculateSavings(originalPrice, currentPrice) {
+      let original = typeof originalPrice === 'string' 
+        ? parseInt(originalPrice.replace(/[,đ₫]/g, '')) 
+        : originalPrice
+      let current = typeof currentPrice === 'string' 
+        ? parseInt(currentPrice.replace(/[,đ₫]/g, '')) 
+        : currentPrice
+      
+      if (original < 1000) original = original * 1000
+      if (current < 1000) current = current * 1000
+      
+      return original - current
     }
   },
   

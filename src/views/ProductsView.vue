@@ -217,9 +217,6 @@
                 :show-quick-actions="true"
                 @add-to-cart="addToCart"
                 @quick-view="showProductQuickView"
-                @add-to-wishlist="addToWishlist"
-                @compare="addToCompare"
-                @share="shareProduct"
               />
             </div>
 
@@ -490,29 +487,6 @@ export default {
     showProductQuickView(product) {
       console.log('Xem nhanh sản phẩm:', product.name)
       alert(`Xem nhanh: ${product.name}`)
-    },
-    
-    addToWishlist(product) {
-      console.log('Thêm vào yêu thích:', product.name)
-      alert(`Đã thêm "${product.name}" vào danh sách yêu thích`)
-    },
-    
-    addToCompare(product) {
-      console.log('Thêm vào so sánh:', product.name)
-      alert(`Đã thêm "${product.name}" vào danh sách so sánh`)
-    },
-    
-    shareProduct(product) {
-      console.log('Chia sẻ sản phẩm:', product.name)
-      if (navigator.share) {
-        navigator.share({
-          title: product.name,
-          text: product.description,
-          url: window.location.href
-        })
-      } else {
-        alert('Đã copy link sản phẩm')
-      }
     }
   },
   

@@ -7,7 +7,7 @@
     />
 
     <!-- Hero Section -->
-    <div class="relative bg-gradient-to-r from-blue-600 to-blue-800 py-16 md:py-24">
+    <div class="relative bg-gradient-to-r from-primary-500 to-primary-700 py-16 md:py-24">
       <!-- Background overlay -->
       <div class="absolute inset-0 bg-black opacity-50"></div>
       <div 
@@ -30,7 +30,7 @@
           <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
             Công ty cổ phần thuốc thú y HALIFE Việt Nhật
           </h2>
-          <div class="w-24 h-1 bg-blue-500 mx-auto mb-6"></div>
+          <div class="w-24 h-1 bg-primary-500 mx-auto mb-6"></div>
           <p class="text-lg text-gray-600 leading-relaxed">
             Công ty Cổ phần Thuốc Thú y HALIFE Việt Nhật (HALIFE Animal Health) là đơn vị tiên phong trong việc phát triển và ứng dụng giải pháp thú y công nghệ cao, mang tầm quốc tế, được chuyển giao trực tiếp từ Nhật Bản. Chúng tôi tập trung nghiên cứu, sản xuất và phân phối các sản phẩm sinh học – đặc biệt là dòng Best Phage độc quyền – nhằm thay thế kháng sinh truyền thống, hướng tới chăn nuôi an toàn, sạch và bền vững
           </p>
@@ -49,7 +49,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
           <div class="text-center">
             <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-calendar-alt text-2xl text-blue-600"></i>
+              <i class="fas fa-calendar-alt text-2xl text-primary-500"></i>
             </div>
             <h3 class="text-2xl font-bold text-gray-800">15+</h3>
             <p class="text-gray-600">Năm kinh nghiệm</p>
@@ -87,7 +87,7 @@
           <!-- Vision -->
           <div>
             <div class="flex items-center mb-6">
-              <div class="bg-blue-500 rounded-full p-3 mr-4">
+              <div class="bg-primary-500 rounded-full p-3 mr-4">
                 <i class="fas fa-eye text-white text-xl"></i>
               </div>
               <h3 class="text-2xl font-bold text-gray-800">Tầm nhìn</h3>
@@ -116,13 +116,13 @@
       <div class="mb-16">
         <div class="text-center mb-12">
           <h2 class="text-3xl font-bold text-gray-800 mb-4">Giá trị cốt lõi</h2>
-          <div class="w-24 h-1 bg-blue-500 mx-auto"></div>
+          <div class="w-24 h-1 bg-primary-500 mx-auto"></div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div class="text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <div class="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-award text-2xl text-blue-600"></i>
+              <i class="fas fa-award text-2xl text-primary-500"></i>
             </div>
             <h4 class="text-lg font-semibold text-gray-800 mb-3">Chất lượng</h4>
             <p class="text-gray-600 text-sm">
@@ -203,7 +203,7 @@
       <div class="bg-white rounded-lg shadow-lg p-8 md:p-12">
         <div class="text-center mb-8">
           <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Thông tin liên hệ</h3>
-          <div class="w-24 h-1 bg-blue-500 mx-auto"></div>
+          <div class="w-24 h-1 bg-primary-500 mx-auto"></div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -211,7 +211,7 @@
           <div class="space-y-6">
             <div class="flex items-center">
               <div class="bg-blue-100 rounded-full p-3 mr-4">
-                <i class="fas fa-building text-blue-600"></i>
+                <i class="fas fa-building text-primary-500"></i>
               </div>
               <div>
                 <h4 class="font-semibold text-gray-800">Tên công ty</h4>
@@ -236,7 +236,7 @@
               <div>
                 <h4 class="font-semibold text-gray-800">Hotline</h4>
                 <p class="text-gray-600">
-                  <a href="tel:0866583223" class="text-blue-600 hover:text-blue-800">0866.583.223</a>
+                  <a href="tel:0866583223" class="text-primary-500 hover:text-blue-800">0866.583.223</a>
                 </p>
               </div>
             </div>
@@ -248,7 +248,7 @@
               <div>
                 <h4 class="font-semibold text-gray-800">Website</h4>
                 <p class="text-gray-600">
-                  <a href="https://halife.vn" target="_blank" class="text-blue-600 hover:text-blue-800">halife.vn</a>
+                  <a href="https://halife.vn" target="_blank" class="text-primary-500 hover:text-blue-800">halife.vn</a>
                 </p>
               </div>
             </div>
@@ -299,7 +299,7 @@
       </div>
 
       <!-- Call to Action -->
-      <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg text-white p-8 md:p-12 mt-16 text-center">
+      <div class="bg-gradient-to-r from-primary-500 to-primary-700 rounded-lg text-white p-8 md:p-12 mt-16 text-center">
         <h3 class="text-2xl md:text-3xl font-bold mb-4">
           Sẵn sàng trải nghiệm sản phẩm chất lượng?
         </h3>

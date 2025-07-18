@@ -75,7 +75,7 @@
           <span v-if="product.originalPrice !== product.price" class="text-gray-400 text-xs md:text-sm line-through">{{ formatPrice(product.originalPrice) }}₫</span>
         </div>
         <div v-if="product.discount > 0" class="text-xs text-green-600 font-medium">
-          Tiết kiệm {{ calculateSavings(product.originalPrice, product.price) }}₫
+          Tiết kiệm {{ formatPrice(calculateSavings(product.originalPrice, product.price)) }} VNĐ ({{ product.discount }}%)
         </div>
       </div>
       
@@ -108,28 +108,18 @@
         {{ product.inStock ? 'Thêm vào giỏ' : 'Hết hàng' }}
       </button>
       
-      <!-- Quick Actions -->
-      <div v-if="showQuickActions" class="flex space-x-1">
+      <!-- Add to Cart -->
+      <div class="mt-2">
         <button 
-          @click.stop="$emit('add-to-wishlist', product)"
-          class="flex-1 bg-gray-100 text-gray-600 py-1.5 rounded-lg text-xs hover:bg-gray-200 transition-colors"
-          title="Thêm vào yêu thích"
+          @click.stop="handleAddToCart"
+          :disabled="!product.inStock"
+          class="w-full py-2 md:py-2.5 rounded-lg font-medium text-xs md:text-sm transition-all duration-300"
+          :class="product.inStock 
+            ? 'bg-primary-500 text-white hover:bg-primary-600 hover:shadow-md' 
+            : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
         >
-          <i class="fas fa-heart"></i>
-        </button>
-        <button 
-          @click.stop="$emit('compare', product)"
-          class="flex-1 bg-gray-100 text-gray-600 py-1.5 rounded-lg text-xs hover:bg-gray-200 transition-colors"
-          title="So sánh"
-        >
-          <i class="fas fa-balance-scale"></i>
-        </button>
-        <button 
-          @click.stop="$emit('share', product)"
-          class="flex-1 bg-gray-100 text-gray-600 py-1.5 rounded-lg text-xs hover:bg-gray-200 transition-colors"
-          title="Chia sẻ"
-        >
-          <i class="fas fa-share-alt"></i>
+          <i class="fas fa-cart-plus mr-1 md:mr-2"></i>
+          {{ product.inStock ? 'Thêm vào giỏ' : 'Hết hàng' }}
         </button>
       </div>
     </div>
@@ -137,6 +127,8 @@
 </template>
 
 <script>
+import { useCart } from '@/scripts/cartManager.js'
+
 export default {
   name: 'ProductCard',
   props: {
@@ -193,6 +185,32 @@ export default {
         ? parseInt(currentPrice.replace(/,/g, '')) 
         : currentPrice
       return new Intl.NumberFormat('vi-VN').format(original - current)
+    },
+
+    formatPrice(price) {
+      let numPrice = typeof price === 'string' 
+        ? parseInt(price.replace(/[,đ₫]/g, '')) 
+        : price
+      
+      if (numPrice < 1000) {
+        numPrice = numPrice * 1000
+      }
+      
+      return new Intl.NumberFormat('vi-VN').format(numPrice)
+    },
+    
+    calculateSavings(originalPrice, currentPrice) {
+      let original = typeof originalPrice === 'string' 
+        ? parseInt(originalPrice.replace(/[,đ₫]/g, '')) 
+        : originalPrice
+      let current = typeof currentPrice === 'string' 
+        ? parseInt(currentPrice.replace(/[,đ₫]/g, '')) 
+        : currentPrice
+      
+      if (original < 1000) original = original * 1000
+      if (current < 1000) current = current * 1000
+      
+      return original - current
     }
   }
 }

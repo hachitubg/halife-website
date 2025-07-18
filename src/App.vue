@@ -2,12 +2,26 @@
   <div id="app">
     <!-- Router View - Hiển thị các trang như HomeView, AboutView, etc. -->
     <router-view />
+    <ContactPopup ref="contactPopup" />
+    <CartDrawer ref="cartDrawer"/>
   </div>
 </template>
 
 <script>
+import ContactPopup from '@/components/ContactPopup.vue'
+import CartDrawer from '@/components/CartDrawer.vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    ContactPopup,
+    CartDrawer
+  },
+  methods: {
+    openContactPopup() {
+      this.$refs.contactPopup.openPopup()
+    }
+  }
 }
 </script>
 
@@ -99,9 +113,17 @@ export default {
   --tw-gradient-to: #ef4444;
 }
 
-.from-blue-400 {
-  --tw-gradient-from: #60a5fa;
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(96, 165, 250, 0));
+.from-primary-500 {
+  --tw-gradient-from: #002391;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(0, 35, 145, 0));
+}
+
+.to-primary-600 {
+  --tw-gradient-to: #001f7a;
+}
+
+.to-primary-700 {
+  --tw-gradient-to: #001b63;
 }
 
 .to-cyan-400 {

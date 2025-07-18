@@ -7,10 +7,10 @@
     />
 
     <!-- Mobile Hero Banner -->
-    <div class="md:hidden bg-gradient-to-r from-blue-400 to-cyan-400 p-4">
+    <div class="md:hidden bg-gradient-to-r from-primary-500 to-primary-600 p-4">
       <div class="bg-white bg-opacity-20 rounded-lg p-4 text-white text-center">
         <div class="flex items-center justify-center mb-2">
-          <img src="/public/images/logo_black.png" alt="HALIFE" class="h-12 w-12 rounded-full mr-3">
+          <img src="/public/images/logo_white.png" alt="HALIFE" class="h-12 w-12 rounded-full mr-3">
           <div>
             <h2 class="text-xl font-bold">THUỐC THÚ Y</h2>
             <h3 class="text-lg font-bold">CHẤT LƯỢNG CAO</h3>
@@ -18,7 +18,7 @@
         </div>
         <div class="text-sm mb-2">GIẢM ĐẾN</div>
         <div class="text-4xl font-bold mb-3">30%</div>
-        <button @click="$router.push('/products')" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold">
+        <button @click="$router.push('/products')" class="bg-primary-500 text-white px-6 py-2 rounded-lg font-semibold">
           MUA NGAY ▶
         </button>
       </div>
@@ -30,17 +30,17 @@
       <div class="hidden md:block container mx-auto px-4 py-6">
         <div class="flex gap-6">
           <!-- Hero Banner -->
-          <div class="flex-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-lg p-8 text-white relative overflow-hidden">
+          <div class="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg p-8 text-white relative overflow-hidden">
             <div class="relative z-10">
               <h2 class="text-4xl font-bold mb-4">
-                <span class="text-blue-100">THUỐC THÚ Y</span><br>
+                <span class="text-primary-100">THUỐC THÚ Y</span><br>
                 <span class="text-white">CHẤT LƯỢNG CAO</span>
               </h2>
               <p class="text-xl mb-2">CÔNG NGHỆ NHẬT BẢN</p>
               <p class="text-lg mb-6">GIẢM ĐẾN</p>
               <div class="text-6xl font-bold mb-6">30%</div>
               <div class="flex space-x-4">
-                <button @click="$router.push('/products')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                <button @click="$router.push('/products')" class="bg-primary-500 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
                   MUA NGAY ▶
                 </button>
                 <button @click="scrollToProducts" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
@@ -110,11 +110,9 @@
                     :key="product.id"
                     :product="product"
                     :show-quick-actions="true"
-                    @add-to-cart="addToCart"
+                    :show-description="true"
+                    @add-to-cart="handleAddToCart"
                     @quick-view="showProductQuickView"
-                    @add-to-wishlist="addToWishlist"
-                    @compare="addToCompare"
-                    @share="shareProduct"
                   />
                 </div>
               </div>
@@ -205,11 +203,9 @@
                       :key="product.id"
                       :product="product"
                       :show-quick-actions="true"
-                      @add-to-cart="addToCart"
+                      :show-description="true"
+                      @add-to-cart="handleAddToCart"
                       @quick-view="showProductQuickView"
-                      @add-to-wishlist="addToWishlist"
-                      @compare="addToCompare"
-                      @share="shareProduct"
                     />
                   </div>
                 </div>
@@ -313,6 +309,8 @@ import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import NewsCard from '@/components/NewsCard.vue'
+import { useCart } from '@/scripts/cartManager.js'
+
 import { 
   products, 
   productCategories, 
@@ -372,6 +370,15 @@ export default {
   },
 
   methods: {
+    handleAddToCart(product) {
+      const { addToCart, openCart } = useCart()
+      addToCart(product, 1)
+      alert(`Đã thêm "${product.name}" vào giỏ hàng!`)
+      setTimeout(() => {
+        openCart()
+      }, 500)
+    },
+
     async loadData() {
       try {
         this.allProducts = [...products]
@@ -484,32 +491,8 @@ export default {
       this.categorySlides[index] = slideIndex
     },
 
-    addToCart(product) {
-      alert(`Đã thêm "${product.name}" vào giỏ hàng`)
-    },
-
     showProductQuickView(product) {
       alert(`Xem nhanh: ${product.name}`)
-    },
-
-    addToWishlist(product) {
-      alert(`Đã thêm "${product.name}" vào danh sách yêu thích`)
-    },
-
-    addToCompare(product) {
-      alert(`Đã thêm "${product.name}" vào danh sách so sánh`)
-    },
-
-    shareProduct(product) {
-      if (navigator.share) {
-        navigator.share({
-          title: product.name,
-          text: product.description,
-          url: window.location.href
-        })
-      } else {
-        alert('Đã copy link sản phẩm')
-      }
     },
 
     readArticle(article) {

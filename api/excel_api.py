@@ -15,8 +15,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Đường dẫn file 
-BASE_DIR = os.getenv('BASE_DIR', '.')
-# BASE_DIR = '../'
+# BASE_DIR = os.getenv('BASE_DIR', '.')
+BASE_DIR = '../'
 
 EXCEL_FILE = os.path.join(BASE_DIR, 'public/data/halife_products.xlsx')
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'public/images')

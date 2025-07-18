@@ -10,20 +10,22 @@
         
         <!-- Mobile Logo -->
         <router-link to="/" class="flex items-center">
-          <img src="/public/images/logo_black.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
+          <img src="/public/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
           <div>
-            <h1 class="text-lg font-bold text-blue-600">HALIFE ANIMALS</h1>
+            <h1 class="text-lg font-bold text-primary-500">HALIFE ANIMALS</h1>
           </div>
         </router-link>
 
         <!-- Mobile Actions -->
         <div class="flex items-center gap-2">
           <button class="p-2 bg-blue-100 rounded-full">
-            <i class="fas fa-user text-blue-600"></i>
+            <i class="fas fa-user text-primary-500"></i>
           </button>
-          <button class="p-2 bg-blue-100 rounded-full relative">
-            <i class="fas fa-shopping-cart text-blue-600"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartCount }}</span>
+          <button @click="openCart" class="p-2 bg-primary-100 rounded-full relative">
+            <i class="fas fa-shopping-cart text-primary-600"></i>
+            <span v-if="cartCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+              {{ cartCount > 99 ? '99+' : cartCount }}
+            </span>
           </button>
         </div>
       </div>
@@ -34,9 +36,9 @@
       <div class="flex items-center justify-between gap-4">
         <!-- Logo -->
         <router-link to="/" class="flex items-center hover:opacity-90 transition-opacity">
-          <img src="/public/images/logo_black.png" alt="HALIFE" class="h-12 w-12 mr-3 rounded-full">
+          <img src="/public/images/logo_white.png" alt="HALIFE" class="h-12 w-12 mr-3 rounded-full">
           <div>
-            <h1 class="text-xl font-bold text-blue-600">HALIFE ANIMALS</h1>
+            <h1 class="text-xl font-bold text-primary-500">HALIFE ANIMALS</h1>
             <p class="text-xs text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
           </div>
         </router-link>
@@ -53,7 +55,7 @@
             >
             <button 
               @click="performSearch"
-              class="absolute right-0 top-0 h-full px-4 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition-colors"
+              class="absolute right-0 top-0 h-full px-4 bg-blue-500 text-white rounded-r-lg hover:bg-primary-500 transition-colors"
             >
               <i class="fas fa-search"></i>
             </button>
@@ -64,15 +66,17 @@
         <div class="flex items-center gap-4">
           <div class="text-right">
             <p class="text-sm text-gray-600">Hỗ trợ khách hàng</p>
-            <p class="font-semibold text-blue-600">
+            <p class="font-semibold text-primary-500">
               <a href="tel:0866583223" class="hover:text-blue-800">0866.583.223</a>
             </p>
           </div>
           <div class="flex gap-2">
-            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm relative transition-colors">
+            <button @click="openCart" class="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 text-sm relative transition-colors">
               <i class="fas fa-shopping-cart mr-2"></i>
               GIỎ HÀNG
-              <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ cartCount }}</span>
+              <span v-if="cartCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                {{ cartCount > 99 ? '99+' : cartCount }}
+              </span>
             </button>
             <button class="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition-colors">
               <i class="fas fa-user"></i>
@@ -89,8 +93,8 @@
           <!-- Mobile Menu Header -->
           <div class="flex items-center justify-between p-4 border-b">
             <router-link to="/" class="flex items-center" @click="mobileMenuOpen = false">
-              <img src="/public/images/logo_black.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
-              <h2 class="font-bold text-blue-600">HALIFE ANIMALS</h2>
+              <img src="/public/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
+              <h2 class="font-bold text-primary-500">HALIFE ANIMALS</h2>
             </router-link>
             <button @click="mobileMenuOpen = false" class="p-2">
               <i class="fas fa-times text-xl text-gray-600"></i>
@@ -109,7 +113,7 @@
               >
               <button 
                 @click="performSearch"
-                class="absolute right-2 top-2 p-1 text-blue-500"
+                class="absolute right-2 top-2 p-1 text-primary-500"
               >
                 <i class="fas fa-search"></i>
               </button>
@@ -121,50 +125,50 @@
             <router-link 
               to="/" 
               class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-blue-600 border-r-2 border-blue-600': $route.name === 'home' }"
+              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'home' }"
               @click="mobileMenuOpen = false"
             >
-              <i class="fas fa-home mr-3 text-blue-500"></i>
+              <i class="fas fa-home mr-3 text-primary-500"></i>
               <span>TRANG CHỦ</span>
             </router-link>
             
             <router-link 
               to="/about" 
               class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-blue-600 border-r-2 border-blue-600': $route.name === 'about' }"
+              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'about' }"
               @click="mobileMenuOpen = false"
             >
-              <i class="fas fa-info-circle mr-3 text-blue-500"></i>
+              <i class="fas fa-info-circle mr-3 text-primary-500"></i>
               <span>GIỚI THIỆU</span>
             </router-link>
             
             <router-link 
               to="/products" 
               class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-blue-600 border-r-2 border-blue-600': $route.name === 'products' }"
+              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'products' }"
               @click="mobileMenuOpen = false"
             >
-              <i class="fas fa-pills mr-3 text-blue-500"></i>
+              <i class="fas fa-pills mr-3 text-primary-500"></i>
               <span>SẢN PHẨM</span>
             </router-link>
             
             <router-link 
               to="/news" 
               class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-blue-600 border-r-2 border-blue-600': $route.name === 'news' }"
+              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'news' }"
               @click="mobileMenuOpen = false"
             >
-              <i class="fas fa-newspaper mr-3 text-blue-500"></i>
+              <i class="fas fa-newspaper mr-3 text-primary-500"></i>
               <span>TIN TỨC</span>
             </router-link>
             
             <router-link 
               to="/contact" 
               class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-blue-600 border-r-2 border-blue-600': $route.name === 'contact' }"
+              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'contact' }"
               @click="mobileMenuOpen = false"
             >
-              <i class="fas fa-phone mr-3 text-blue-500"></i>
+              <i class="fas fa-phone mr-3 text-primary-500"></i>
               <span>LIÊN HỆ</span>
             </router-link>
 
@@ -186,7 +190,7 @@
                 class="flex items-center px-4 py-2 hover:bg-gray-50 text-sm transition-colors" 
                 @click="mobileMenuOpen = false"
               >
-                <i :class="category.icon + ' mr-3 text-blue-500'"></i>
+                <i :class="category.icon + ' mr-3 text-primary-500'"></i>
                 <span>{{ category.name }}</span>
               </router-link>
             </div>
@@ -196,10 +200,10 @@
           <div class="border-t p-4 bg-gray-50">
             <div class="text-center text-sm text-gray-600 space-y-2">
               <p class="font-semibold">
-                <a href="tel:0866583223" class="text-blue-600">Hotline: 0866.583.223</a>
+                <a href="tel:0866583223" class="text-primary-500">Hotline: 0866.583.223</a>
               </p>
               <p>
-                <a href="mailto:info@halife.vn" class="text-blue-600">info@halife.vn</a>
+                <a href="mailto:info@halife.vn" class="text-primary-500">info@halife.vn</a>
               </p>
               <p class="text-xs">HALIFE ANIMALS - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
             </div>
@@ -214,7 +218,7 @@
         <div class="flex items-center">
           <!-- Category Dropdown -->
           <div class="relative group">
-            <button class="flex items-center px-4 py-3 hover:bg-blue-700 transition-colors">
+            <button class="flex items-center px-4 py-3 hover:bg-primary-600 transition-colors">
               <i class="fas fa-bars mr-2"></i>
               Danh mục sản phẩm
               <i class="fas fa-chevron-down ml-2"></i>
@@ -229,7 +233,7 @@
                   :to="`/products?category=${encodeURIComponent(category.name)}`"
                   class="flex items-center px-4 py-3 hover:bg-blue-50 transition-colors"
                 >
-                  <i :class="category.icon + ' mr-3 text-blue-500'"></i>
+                  <i :class="category.icon + ' mr-3 text-primary-500'"></i>
                   <span>{{ category.name }}</span>
                 </router-link>
               </div>
@@ -240,40 +244,40 @@
           <div class="flex space-x-8 ml-8">
             <router-link 
               to="/" 
-              class="py-3 hover:bg-blue-600 px-4 rounded transition-colors"
-              :class="{ 'bg-blue-600': $route.name === 'home' }"
+              class="py-3 hover:bg-primary-500 px-4 rounded transition-colors"
+              :class="{ 'bg-primary-500': $route.name === 'home' }"
             >
               TRANG CHỦ
             </router-link>
             
             <router-link 
               to="/about" 
-              class="py-3 hover:bg-blue-600 px-4 rounded transition-colors"
-              :class="{ 'bg-blue-600': $route.name === 'about' }"
+              class="py-3 hover:bg-primary-500 px-4 rounded transition-colors"
+              :class="{ 'bg-primary-500': $route.name === 'about' }"
             >
               GIỚI THIỆU
             </router-link>
             
             <router-link 
               to="/products" 
-              class="py-3 hover:bg-blue-600 px-4 rounded transition-colors"
-              :class="{ 'bg-blue-600': $route.name === 'products' }"
+              class="py-3 hover:bg-primary-500 px-4 rounded transition-colors"
+              :class="{ 'bg-primary-500': $route.name === 'products' }"
             >
               SẢN PHẨM
             </router-link>
             
             <router-link 
               to="/news" 
-              class="py-3 hover:bg-blue-600 px-4 rounded transition-colors"
-              :class="{ 'bg-blue-600': $route.name === 'news' }"
+              class="py-3 hover:bg-primary-500 px-4 rounded transition-colors"
+              :class="{ 'bg-primary-500': $route.name === 'news' }"
             >
               TIN TỨC
             </router-link>
             
             <router-link 
               to="/contact" 
-              class="py-3 hover:bg-blue-600 px-4 rounded transition-colors"
-              :class="{ 'bg-blue-600': $route.name === 'contact' }"
+              class="py-3 hover:bg-primary-500 px-4 rounded transition-colors"
+              :class="{ 'bg-primary-500': $route.name === 'contact' }"
             >
               LIÊN HỆ
             </router-link>
@@ -285,6 +289,8 @@
 </template>
 
 <script>
+import { useCart } from '@/scripts/cartManager.js'
+
 export default {
   name: 'Header',
   emits: ['search'],
@@ -302,7 +308,17 @@ export default {
       showBanner: true
     }
   },
+  computed: {
+    cartCount() {
+      const { cartCount } = useCart()
+      return cartCount.value || 0 
+    }
+  },
   methods: {
+    openCart() {
+      const { openCart } = useCart()
+      openCart()
+    },
     performSearch() {
       if (this.searchQuery.trim()) {
         this.$emit('search', this.searchQuery.trim())
@@ -455,7 +471,7 @@ input:focus {
     background-color: #1e40af;
   }
   
-  .text-blue-600 {
+  .text-primary-500 {
     color: #1d4ed8;
   }
 }
@@ -467,5 +483,28 @@ input:focus {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Animation cho notification badge */
+.bg-red-500 {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Smooth transition */
+.transition-colors {
+  transition: all 0.3s ease;
 }
 </style>
