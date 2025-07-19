@@ -215,6 +215,17 @@ docker ps && docker-compose logs --tail=5
 
 ---
 
+---
+
+## 📋 Github
+
+```bash
+git reset --hard HEAD
+git clean -d -f
+```
+
+---
+
 ## 🌐 URLs
 
 - **Website**: http://14.225.212.44
