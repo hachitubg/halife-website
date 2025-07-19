@@ -32,6 +32,11 @@ const routes = [
     }
   },
   {
+    path: '/admin/banners',
+    name: 'BannerManager', 
+    component: () => import('@/views/BannerManagerView.vue')
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('../views/AboutView.vue'),

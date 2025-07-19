@@ -71,16 +71,21 @@
             <div>
               <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">{{ product.name }}</h1>
               <div class="flex items-center space-x-4 text-sm text-gray-600">
-                <span>SKU: THY{{ String(product.id).padStart(3, '0') }}</span>
-                <span v-if="product.rating > 0" class="flex items-center">
+                <span>Mã sản phẩm: {{ String(product.id).padStart(3, '0') }}</span>
+                <!-- <span v-if="product.rating > 0" class="flex items-center">
                   <i class="fas fa-star text-yellow-400 mr-1"></i>
                   {{ product.rating }} ({{ product.reviewCount || 0 }} đánh giá)
-                </span>
+                </span> -->
                 <span :class="product.inStock ? 'text-green-600' : 'text-red-600'">
                   <i :class="product.inStock ? 'fas fa-check-circle' : 'fas fa-times-circle'" class="mr-1"></i>
                   {{ product.inStock ? 'Còn hàng' : 'Hết hàng' }}
                 </span>
               </div>
+            </div>
+
+            <!-- Product Detail -->
+            <div v-if="product.description" class="border-l-4 border-blue-500 pl-4">
+              <p class="text-gray-700 text-sm leading-relaxed">{{ product.description }}</p>
             </div>
 
             <!-- Price -->
@@ -97,7 +102,7 @@
             </div>
 
             <!-- Product Details -->
-            <div class="space-y-3">
+            <!-- <div class="space-y-3">
               <div class="flex">
                 <span class="font-medium text-gray-700 w-32">Danh mục:</span>
                 <span class="text-blue-600 font-medium">{{ product.category }}</span>
@@ -131,10 +136,10 @@
                 <span class="font-medium text-gray-700 w-32">Nhà sản xuất:</span>
                 <span>{{ product.manufacturer }}</span>
               </div>
-            </div>
+            </div> -->
 
             <!-- Promotion Banner (cho sản phẩm nổi bật) -->
-            <div v-if="product.isFeatured" class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <!-- <div v-if="product.isFeatured" class="bg-red-50 border border-red-200 rounded-lg p-4">
               <div class="flex items-start space-x-3">
                 <div class="bg-red-500 text-white rounded-full p-2">
                   <i class="fas fa-gift"></i>
@@ -157,7 +162,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <!-- Weight/Size Selection -->
             <div v-if="weightOptions.length > 1">
@@ -176,9 +181,6 @@
                   {{ weight }}
                 </button>
               </div>
-            </div>
-            <div v-else-if="product.packageSize" class="text-sm text-gray-600">
-              <span class="font-medium">Quy cách:</span> {{ product.packageSize }}
             </div>
 
             <!-- Quantity Selection -->
@@ -219,7 +221,7 @@
               <button 
                 @click="addToCart"
                 :disabled="!product.inStock"
-                class="w-full py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                class="py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
                 :class="product.inStock 
                   ? 'bg-blue-500 hover:bg-blue-600 text-white' 
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
@@ -484,8 +486,12 @@
 <script>
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
-import { sidebarCategories, products, getProductById, getProductsByCategory } from '@/data/products.js'
 import { useCart } from '@/scripts/cartManager.js'
+
+import { 
+  sidebarCategories
+} from '@/data/products.js'
+import { ProductAPI } from '@/utils/productAPI.js'
 
 export default {
   name: 'ProductDetailView',
@@ -498,14 +504,15 @@ export default {
       categories: sidebarCategories,
       product: null,
       productNotFound: false,
+      loading: true,
       currentImage: '',
       selectedWeight: '',
       quantity: 1,
       activeTab: 'description',
       tabs: [
         { id: 'description', name: 'Mô tả sản phẩm' },
-        { id: 'specifications', name: 'Thông số kỹ thuật' },
-        { id: 'reviews', name: 'Đánh giá' }
+        { id: 'specifications', name: 'Thông số kỹ thuật' }
+        // { id: 'reviews', name: 'Đánh giá' }
       ],
       relatedProducts: [],
       weightOptions: []
@@ -580,42 +587,24 @@ export default {
       })
     },
     
-    loadProduct() {
-      // Load product from products.js data
-      this.product = getProductById(this.productId)
-      
-      if (this.product) {
-        this.currentImage = this.product.image
+    async loadProduct() {
+      try {
+        const productId = this.$route.params.id
+        this.product = await ProductAPI.getProductById(productId)
         
-        // Set up weight options based on product data
+        if (!this.product) {
+          this.productNotFound = true
+          return
+        }
+        
+        // Setup data sau khi load product
+        this.currentImage = this.productImages[0] || this.product.image
         this.setupWeightOptions()
+        await this.loadRelatedProducts()
         
-        this.loadRelatedProducts()
-        this.productNotFound = false
-        
-        // Update page title
-        document.title = `${this.product.name} - HALIFE Animals`
-        
-        // Set meta description
-        const metaDescription = document.querySelector('meta[name="description"]')
-        if (metaDescription) {
-          const description = this.product.metaDescription || this.product.description || this.product.name
-          metaDescription.setAttribute('content', description)
-        }
-
-        // Set meta keywords if available
-        if (this.product.seoKeywords && this.product.seoKeywords.length > 0) {
-          let metaKeywords = document.querySelector('meta[name="keywords"]')
-          if (!metaKeywords) {
-            metaKeywords = document.createElement('meta')
-            metaKeywords.setAttribute('name', 'keywords')
-            document.head.appendChild(metaKeywords)
-          }
-          metaKeywords.setAttribute('content', this.product.seoKeywords.join(', '))
-        }
-      } else {
+      } catch (error) {
+        console.error('Error loading product:', error)
         this.productNotFound = true
-        document.title = 'Không tìm thấy sản phẩm - HALIFE Animals'
       }
     },
     
@@ -631,12 +620,19 @@ export default {
       }
     },
     
-    loadRelatedProducts() {
-      // Get related products from the same category
-      const categoryProducts = getProductsByCategory(this.product.category)
-      this.relatedProducts = categoryProducts
-        .filter(p => p.id !== this.productId)
-        .slice(0, 5)
+    async loadRelatedProducts() {
+      try {
+        // Lấy tất cả sản phẩm từ API thay vì static
+        const allProducts = await ProductAPI.getAllProducts()
+        
+        // Filter sản phẩm cùng category, loại trừ sản phẩm hiện tại
+        this.relatedProducts = allProducts
+          .filter(p => p.category === this.product.category && p.id !== this.productId)
+          .slice(0, 5)
+      } catch (error) {
+        console.error('Error loading related products:', error)
+        this.relatedProducts = []
+      }
     },
     
     formatPrice(price) {
@@ -727,6 +723,8 @@ export default {
   watch: {
     // Watch for route changes to load new product
     '$route'() {
+      this.product = null
+      this.productNotFound = false
       this.loadProduct()
     }
   },

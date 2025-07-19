@@ -61,12 +61,12 @@
       </p>
       
       <!-- Rating (if available) -->
-      <div v-if="product.rating" class="flex items-center mb-2">
+      <!-- <div v-if="product.rating" class="flex items-center mb-2">
         <div class="flex text-yellow-400 text-xs">
           <i v-for="i in 5" :key="i" :class="i <= product.rating ? 'fas fa-star' : 'far fa-star'"></i>
         </div>
         <span class="text-xs text-gray-500 ml-1">({{ product.reviewCount || 0 }})</span>
-      </div>
+      </div> -->
       
       <!-- Price Section -->
       <div class="flex flex-col space-y-0.5 md:space-y-1 mb-2 md:mb-3">
@@ -74,13 +74,13 @@
           <span class="text-orange-500 font-bold text-sm md:text-lg">{{ formatPrice(product.price) }}₫</span>
           <span v-if="product.originalPrice !== product.price" class="text-gray-400 text-xs md:text-sm line-through">{{ formatPrice(product.originalPrice) }}₫</span>
         </div>
-        <div v-if="product.discount > 0" class="text-xs text-green-600 font-medium">
+        <!-- <div v-if="product.discount > 0" class="text-xs text-green-600 font-medium">
           Tiết kiệm {{ formatPrice(calculateSavings(product.originalPrice, product.price)) }} VNĐ ({{ product.discount }}%)
-        </div>
+        </div> -->
       </div>
       
       <!-- Stock Indicator -->
-      <div class="mb-2">
+      <!-- <div class="mb-2">
         <div v-if="product.inStock" class="flex items-center text-xs text-green-600">
           <i class="fas fa-check-circle mr-1"></i>
           Còn hàng
@@ -89,7 +89,7 @@
           <i class="fas fa-times-circle mr-1"></i>
           Hết hàng
         </div>
-      </div>
+      </div> -->
     </div>
     
     <!-- Action Buttons -->

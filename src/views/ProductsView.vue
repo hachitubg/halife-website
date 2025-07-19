@@ -311,12 +311,10 @@ import Footer from '@/components/Footer.vue'
 import ProductCard from '@/components/ProductCard.vue'
 
 import { 
-  products, 
   productCategories, 
-  sidebarCategories, 
-  getProductsByCategory,
-  searchProducts 
+  sidebarCategories
 } from '@/data/products.js'
+import { ProductAPI } from '@/utils/productAPI.js'
 
 export default {
   name: 'ProductsView',
@@ -330,7 +328,8 @@ export default {
       // Data
       categories: sidebarCategories,
       productCategories: productCategories,
-      products: products,
+      products: [],
+      dataLoaded: false,
       
       // Filters
       selectedCategory: 'Tất cả',
@@ -364,7 +363,9 @@ export default {
   
   computed: {
     filteredProducts() {
-      let result = this.searchResults || getProductsByCategory(this.selectedCategory)
+      let result = this.searchResults || this.products.filter(product => 
+        this.selectedCategory === 'Tất cả' ? true : product.category === this.selectedCategory
+      )
       
       // Filter by price range
       if (this.selectedPriceRange && this.selectedPriceRange.label !== 'Tất cả') {
@@ -411,6 +412,17 @@ export default {
   },
   
   methods: {
+    async loadData() {
+      try {
+        this.products = await ProductAPI.getAllProducts();
+        this.dataLoaded = true;
+      } catch (error) {
+        console.error('Error loading products:', error);
+        this.products = [];
+        this.dataLoaded = true;
+      }
+    },
+
     handleNavigate(view) {
       if (view === 'home') {
         this.$router.push('/')
@@ -444,8 +456,8 @@ export default {
     },
     
     getProductCountByCategory(category) {
-      if (category === 'Tất cả') return products.length
-      return products.filter(product => product.category === category).length
+      if (category === 'Tất cả') return this.products.length
+      return this.products.filter(product => product.category === category).length
     },
     
     sortProducts(products) {
@@ -512,7 +524,9 @@ export default {
     }
   },
   
-  mounted() {
+  async mounted() {
+    await this.loadData();
+
     // Set default price range
     this.selectedPriceRange = this.priceRanges[0]
     

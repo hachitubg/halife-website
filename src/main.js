@@ -2,7 +2,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import { dataAPI } from '@/data/products.js'
 import './assets/main.css'
 
 const app = createApp(App)
@@ -46,7 +45,7 @@ function showGlobalLoading() {
           margin: 0;
           color: #6b7280;
           font-size: 14px;
-        ">Đang tải dữ liệu sản phẩm...</p>
+        ">Đang khởi tạo ứng dụng...</p>
       </div>
     </div>
     <style>
@@ -73,18 +72,9 @@ app.config.errorHandler = (err, vm, info) => {
   hideGlobalLoading()
 }
 
-async function initializeApp() {
-  try {
-    await dataAPI.initialize('/data/halife_products.xlsx')
-    app.mount('#app')
-    setTimeout(hideGlobalLoading, 500)
-    
-  } catch (error) {
-    console.error('Lỗi khởi tạo:', error)
-    app.mount('#app')
-    hideGlobalLoading()
-  }
-}
+// Đơn giản hóa - không cần dataAPI.initialize
+app.mount('#app')
+setTimeout(hideGlobalLoading, 1000)
 
 // Service Worker
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
@@ -92,5 +82,3 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     navigator.serviceWorker.register('/sw.js').catch(() => {})
   })
 }
-
-initializeApp()

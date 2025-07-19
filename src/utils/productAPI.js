@@ -378,4 +378,19 @@ export class ProductAPI {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
+
+  /**
+   * Lấy sản phẩm theo ID
+   */
+  static async getProductById(id) {
+    try {
+      const products = await this.getAllProducts();
+      const product = products.find(p => 
+        p.id == id || p.id === parseInt(id) || p.id === String(id)
+      );
+      return product;
+    } catch (error) {
+      throw new Error(`Lỗi lấy sản phẩm: ${error.message}`);
+    }
+  }
 }

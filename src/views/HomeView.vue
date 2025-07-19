@@ -6,57 +6,13 @@
       :categories="categories"
     />
 
-    <!-- Mobile Hero Banner -->
-    <div class="md:hidden bg-gradient-to-r from-primary-500 to-primary-600 p-4">
-      <div class="bg-white bg-opacity-20 rounded-lg p-4 text-white text-center">
-        <div class="flex items-center justify-center mb-2">
-          <img src="/public/images/logo_white.png" alt="HALIFE" class="h-12 w-12 rounded-full mr-3">
-          <div>
-            <h2 class="text-xl font-bold">THUỐC THÚ Y</h2>
-            <h3 class="text-lg font-bold">CHẤT LƯỢNG CAO</h3>
-          </div>
-        </div>
-        <div class="text-sm mb-2">GIẢM ĐẾN</div>
-        <div class="text-4xl font-bold mb-3">30%</div>
-        <button @click="$router.push('/products')" class="bg-primary-500 text-white px-6 py-2 rounded-lg font-semibold">
-          MUA NGAY ▶
-        </button>
-      </div>
-    </div>
-
     <!-- Main Content -->
     <main>
-      <!-- Desktop Category Sidebar & Hero Banner -->
-      <div class="hidden md:block container mx-auto px-4 py-6">
-        <div class="flex gap-6">
-          <!-- Hero Banner -->
-          <div class="flex-1 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg p-8 text-white relative overflow-hidden">
-            <div class="relative z-10">
-              <h2 class="text-4xl font-bold mb-4">
-                <span class="text-primary-100">THUỐC THÚ Y</span><br>
-                <span class="text-white">CHẤT LƯỢNG CAO</span>
-              </h2>
-              <p class="text-xl mb-2">CÔNG NGHỆ NHẬT BẢN</p>
-              <p class="text-lg mb-6">GIẢM ĐẾN</p>
-              <div class="text-6xl font-bold mb-6">30%</div>
-              <div class="flex space-x-4">
-                <button @click="$router.push('/products')" class="bg-primary-500 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
-                  MUA NGAY ▶
-                </button>
-                <button @click="scrollToProducts" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                  XEM SẢN PHẨM
-                </button>
-              </div>
-            </div>
-            <div class="absolute top-10 right-10 opacity-20">
-              <i class="fas fa-pills text-6xl"></i>
-            </div>
-            <div class="absolute bottom-10 right-20 opacity-10">
-              <i class="fas fa-heartbeat text-8xl"></i>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Hero Banner Slider -->
+      <BannerHero 
+        @view-products="$router.push('/products')"
+        @contact="scrollToProducts"
+      />
 
       <!-- Featured Products -->
       <div id="products" class="container mx-auto px-4 py-8 md:py-12">
@@ -310,19 +266,18 @@ import Footer from '@/components/Footer.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import NewsCard from '@/components/NewsCard.vue'
 import { useCart } from '@/scripts/cartManager.js'
+import BannerHero from '@/components/BannerHero.vue'
 
-import { 
-  products, 
-  productCategories, 
-  sidebarCategories, 
-  getFeaturedProducts, 
-  getProductsByCategory,
-  dataAPI
-} from '@/data/products.js'
 import { 
   getLatestNews,
   newsService 
 } from '@/data/news.js'
+
+import { 
+  productCategories, 
+  sidebarCategories
+} from '@/data/products.js'
+import { ProductAPI } from '@/utils/productAPI.js'
 
 export default {
   name: 'HomeView',
@@ -330,7 +285,8 @@ export default {
     Header,
     Footer,
     ProductCard,
-    NewsCard
+    NewsCard,
+    BannerHero
   },
   data() {
     return {
@@ -347,7 +303,7 @@ export default {
 
   computed: {
     featuredProducts() {
-      return this.dataLoaded ? getFeaturedProducts() : []
+      return this.dataLoaded ? this.allProducts.filter(product => product.isFeatured) : []
     },
 
     latestNews() {
@@ -381,29 +337,27 @@ export default {
 
     async loadData() {
       try {
-        // Force reload từ API thay vì cache
-        const response = await fetch('/api/products')
-        if (response.ok) {
-          const result = await response.json()
-          this.allProducts = result.data || []
-        } else {
-          // Fallback về static data
-          this.allProducts = [...products]
-        }
-        
-        this.dataLoaded = true
-        this.initializeCategorySlides()
+        // Dùng ProductAPI giống ProductManager
+        const [products, categories] = await Promise.all([
+          ProductAPI.getAllProducts(),
+          ProductAPI.getAllCategories()
+        ]);
+
+        this.allProducts = products || [];
+        this.categories = categories || sidebarCategories;
+        this.dataLoaded = true;
+        this.initializeCategorySlides();
         
         if (!this.newsLoaded) {
-          await newsService.getAllNews()
-          this.newsLoaded = true
+          await newsService.getAllNews();
+          this.newsLoaded = true;
         }
       } catch (error) {
-        console.error('Error loading data:', error)
-        // Fallback về static data
-        this.allProducts = [...products]
-        this.dataLoaded = true
-        this.newsLoaded = true
+        console.error('Error loading data:', error);
+        // Fallback về static data nếu API fail
+        this.allProducts = [];
+        this.dataLoaded = true;
+        this.newsLoaded = true;
       }
     },
 
@@ -429,7 +383,9 @@ export default {
     
     getProductCountByCategory(category) {
       if (!this.dataLoaded) return 0
-      return getProductsByCategory(category).length
+      return this.allProducts.filter(product => 
+        category === 'Tất cả' ? true : product.category === category
+      ).length
     },
 
     getCategoryIcon(categoryName) {
@@ -464,7 +420,9 @@ export default {
 
     getCategoryProducts(category) {
       if (!this.dataLoaded) return []
-      return getProductsByCategory(category)
+      return this.allProducts.filter(product => 
+        category === 'Tất cả' ? true : product.category === category
+      )
     },
 
     getCategorySlides(category) {
@@ -539,10 +497,6 @@ export default {
     window.addEventListener('reloadExcelData', async () => {
       await this.loadData() 
     })
-  },
-
-  beforeUnmount() {
-    dataAPI.offDataLoaded(this.loadData)
   }
 }
 </script>
