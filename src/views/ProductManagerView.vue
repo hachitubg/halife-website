@@ -1043,6 +1043,7 @@ export default {
         this.showMessage(result.message, 'success');
         await this.loadData();
         this.closeModal();
+        window.dispatchEvent(new CustomEvent('reloadExcelData'));
       } catch (error) {
         this.showMessage('Lỗi lưu sản phẩm: ' + error.message, 'error');
       } finally {

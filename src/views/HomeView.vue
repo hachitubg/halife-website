@@ -524,8 +524,10 @@ export default {
 
   async mounted() {
     await this.loadData()
-    dataAPI.onDataLoaded(() => {
-      this.loadData()
+    window.addEventListener('reloadExcelData', async () => {
+      await dataAPI.reload('/data/halife_products.xlsx')
+      this.allProducts = [...products]
+      this.$forceUpdate()
     })
   },
 
