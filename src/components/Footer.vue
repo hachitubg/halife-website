@@ -1,40 +1,5 @@
 <template>
-  <div>
-    <!-- Newsletter Section -->
-    <div class="bg-gray-700 text-white py-8 md:py-12">
-      <div class="container mx-auto px-4 text-center">
-        <div class="flex flex-col md:flex-row items-center justify-center mb-6">
-          <div class="bg-green-500 rounded-full p-3 md:p-4 mb-4 md:mb-0 md:mr-4">
-            <i class="fas fa-envelope text-xl md:text-2xl"></i>
-          </div>
-          <div>
-            <h3 class="text-xl md:text-2xl font-bold">NHẬN KHUYẾN MÃI MỚI</h3>
-            <p class="text-yellow-400 text-lg md:text-xl font-semibold">Ngay hôm nay!</p>
-          </div>
-        </div>
-        
-        <div class="max-w-md mx-auto">
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input 
-              type="email" 
-              placeholder="Địa chỉ email (*)" 
-              class="flex-1 px-4 py-3 text-gray-900 rounded-lg sm:rounded-r-none focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              v-model="email"
-              @keyup.enter="subscribeNewsletter"
-            >
-            <button 
-              @click="subscribeNewsletter"
-              class="bg-yellow-500 hover:bg-yellow-600 px-6 py-3 rounded-lg sm:rounded-l-none font-semibold text-gray-900 transition-colors"
-            >
-              Đăng ký
-            </button>
-          </div>
-          <p class="text-xs text-gray-300 mt-2">
-            * Chúng tôi cam kết bảo mật thông tin cá nhân của bạn
-          </p>
-        </div>
-      </div>
-    </div>
+  <div> 
 
     <!-- Main Footer -->
     <footer class="bg-gray-100 py-8 md:py-12">
@@ -80,7 +45,7 @@
             <!-- Company Info -->
             <div class="lg:col-span-1">
               <div class="flex items-center mb-4">
-                <img src="/public/images/logo_white.png" alt="HALIFE" class="h-10 w-10 mr-3 rounded-full">
+                <img src="/images/logo_white.png" alt="HALIFE" class="h-10 w-10 mr-3 rounded-full">
                 <div>
                   <h4 class="font-bold text-blue-600">HALIFE ANIMALS</h4>
                   <p class="text-sm text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>

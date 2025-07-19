@@ -6,14 +6,11 @@
       :categories="categories"
     />
 
+    <!-- Hero Banner Slider -->
+    <BannerHero />
+
     <!-- Main Content -->
     <main>
-      <!-- Hero Banner Slider -->
-      <BannerHero 
-        @view-products="$router.push('/products')"
-        @contact="scrollToProducts"
-      />
-
       <!-- Featured Products -->
       <div id="products" class="container mx-auto px-4 py-8 md:py-12">
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
@@ -107,7 +104,7 @@
       </div>
 
       <!-- Products by Categories -->
-      <div class="container mx-auto px-4 py-8 md:py-12">
+      <div v-if="selectedCategories.length > 0" class="container mx-auto px-4 py-8 md:py-12">
         <div v-for="(category, index) in selectedCategories" :key="category" class="mb-12">
           <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
             <div class="flex items-center justify-between mb-6">
@@ -200,6 +197,32 @@
         </div>
       </div>
 
+      <!-- Debug Section (temporary) -->
+      <div v-if="!dataLoaded" class="container mx-auto px-4 py-8">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p class="text-yellow-800">Đang tải dữ liệu sản phẩm...</p>
+        </div>
+      </div>
+
+      <div v-else-if="allProducts.length === 0" class="container mx-auto px-4 py-8">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p class="text-red-800">Không có sản phẩm nào được tải. Kiểm tra API hoặc dữ liệu.</p>
+        </div>
+      </div>
+
+      <!-- Debug Section (temporary) - Xóa sau khi fix -->
+      <!-- <div v-if="!dataLoaded" class="container mx-auto px-4 py-8">
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p class="text-yellow-800">Đang tải dữ liệu sản phẩm...</p>
+        </div>
+      </div>
+
+      <div v-else-if="allProducts.length === 0" class="container mx-auto px-4 py-8">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p class="text-red-800">Không có sản phẩm nào được tải. Kiểm tra API hoặc dữ liệu.</p>
+        </div>
+      </div> -->
+
       <!-- Latest News -->
       <div class="container mx-auto px-4 py-8 md:py-12">
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
@@ -265,8 +288,8 @@ import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import NewsCard from '@/components/NewsCard.vue'
-import { useCart } from '@/scripts/cartManager.js'
 import BannerHero from '@/components/BannerHero.vue'
+import { useCart } from '@/scripts/cartManager.js'
 
 import { 
   getLatestNews,
@@ -312,7 +335,19 @@ export default {
     },
 
     selectedCategories() {
-      return this.dataLoaded ? this.productCategories.filter(cat => cat !== 'Tất cả').slice(0, 3) : []
+      if (!this.dataLoaded || !this.allProducts.length) return []
+      
+      // Lấy các danh mục từ sản phẩm thực tế
+      const categorySet = new Set()
+      this.allProducts.forEach(product => {
+        if (product.category && product.category !== 'Tất cả') {
+          categorySet.add(product.category)
+        }
+      })
+      
+      const categories = Array.from(categorySet).slice(0, 3)
+      console.log('🏷️ Dynamic categories:', categories)
+      return categories
     },
 
     featuredSlides() {
@@ -337,23 +372,36 @@ export default {
 
     async loadData() {
       try {
+        console.log('🔄 Loading data...')
+        
         // Dùng ProductAPI giống ProductManager
         const [products, categories] = await Promise.all([
           ProductAPI.getAllProducts(),
           ProductAPI.getAllCategories()
         ]);
 
+        console.log('📦 Products loaded:', products?.length || 0)
+        console.log('📂 Categories loaded:', categories?.length || 0)
+        console.log('🔍 Sample product:', products?.[0])
+
         this.allProducts = products || [];
         this.categories = categories || sidebarCategories;
         this.dataLoaded = true;
         this.initializeCategorySlides();
+        
+        // Debug computed properties
+        this.$nextTick(() => {
+          console.log('✨ Featured products:', this.featuredProducts.length)
+          console.log('📂 Selected categories:', this.selectedCategories)
+          console.log('🎯 Featured slides:', this.featuredSlides.length)
+        })
         
         if (!this.newsLoaded) {
           await newsService.getAllNews();
           this.newsLoaded = true;
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('❌ Error loading data:', error);
         // Fallback về static data nếu API fail
         this.allProducts = [];
         this.dataLoaded = true;

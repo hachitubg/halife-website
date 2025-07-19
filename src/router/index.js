@@ -12,7 +12,7 @@ const routes = [
     }
   },
   {
-    path: '/product-manager',
+    path: '/admin/products',
     name: 'product-manage',
     component: () => import('../views/ProductManagerView.vue'),
     meta: {
@@ -22,7 +22,7 @@ const routes = [
     }
   },
   {
-    path: '/news-editor',
+    path: '/admin/news',
     name: 'news-editor',
     component: () => import('../views/NewsEditorView.vue'),
     meta: {
@@ -33,8 +33,13 @@ const routes = [
   },
   {
     path: '/admin/banners',
-    name: 'BannerManager', 
-    component: () => import('@/views/BannerManagerView.vue')
+    name: 'banner-manager',
+    component: () => import('../views/BannerManagerView.vue'),
+    meta: {
+      title: 'Banner Editor - HALIFE Admin',
+      description: 'Thêm và chỉnh sửa banner cho HALIFE Animals',
+      requiresAuth: true // Có thể thêm authentication sau
+    }
   },
   {
     path: '/about',

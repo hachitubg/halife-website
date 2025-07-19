@@ -18,10 +18,10 @@
       <i class="fas fa-star mr-1"></i>Hot
     </div>
     
-    <!-- Product Image - FIXED -->
+    <!-- Product Image -->
     <div class="product-image-container">
       <img 
-        :src="product.image" 
+        :src="getImageSrc(product)" 
         :alt="product.name" 
         class="product-image"
         :class="{ 'opacity-60': !product.inStock }"
@@ -60,46 +60,21 @@
         {{ product.description }}
       </p>
       
-      <!-- Rating (if available) -->
-      <!-- <div v-if="product.rating" class="flex items-center mb-2">
-        <div class="flex text-yellow-400 text-xs">
-          <i v-for="i in 5" :key="i" :class="i <= product.rating ? 'fas fa-star' : 'far fa-star'"></i>
-        </div>
-        <span class="text-xs text-gray-500 ml-1">({{ product.reviewCount || 0 }})</span>
-      </div> -->
-      
       <!-- Price Section -->
       <div class="flex flex-col space-y-0.5 md:space-y-1 mb-2 md:mb-3">
         <div class="flex items-center space-x-2">
           <span class="text-orange-500 font-bold text-sm md:text-lg">{{ formatPrice(product.price) }}₫</span>
           <span v-if="product.originalPrice !== product.price" class="text-gray-400 text-xs md:text-sm line-through">{{ formatPrice(product.originalPrice) }}₫</span>
         </div>
-        <!-- <div v-if="product.discount > 0" class="text-xs text-green-600 font-medium">
-          Tiết kiệm {{ formatPrice(calculateSavings(product.originalPrice, product.price)) }} VNĐ ({{ product.discount }}%)
-        </div> -->
       </div>
-      
-      <!-- Stock Indicator -->
-      <!-- <div class="mb-2">
-        <div v-if="product.inStock" class="flex items-center text-xs text-green-600">
-          <i class="fas fa-check-circle mr-1"></i>
-          Còn hàng
-        </div>
-        <div v-else class="flex items-center text-xs text-red-600">
-          <i class="fas fa-times-circle mr-1"></i>
-          Hết hàng
-        </div>
-      </div> -->
     </div>
     
     <!-- Action Buttons -->
-    <div class="flex flex-col space-y-2">
-      <!-- Add to Cart Button (only for detailed view) -->
+    <div class="mt-2">
       <button 
-        v-if="showAddToCart" 
         @click.stop="handleAddToCart"
         :disabled="!product.inStock"
-        class="w-full py-1.5 md:py-2 rounded-lg font-medium text-xs md:text-sm transition-all duration-300"
+        class="w-full py-2 md:py-2.5 rounded-lg font-medium text-xs md:text-sm transition-all duration-300"
         :class="product.inStock 
           ? 'bg-blue-500 text-white hover:bg-blue-600 hover:shadow-md' 
           : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
@@ -107,21 +82,6 @@
         <i class="fas fa-cart-plus mr-1 md:mr-2"></i>
         {{ product.inStock ? 'Thêm vào giỏ' : 'Hết hàng' }}
       </button>
-      
-      <!-- Add to Cart -->
-      <div class="mt-2">
-        <button 
-          @click.stop="handleAddToCart"
-          :disabled="!product.inStock"
-          class="w-full py-2 md:py-2.5 rounded-lg font-medium text-xs md:text-sm transition-all duration-300"
-          :class="product.inStock 
-            ? 'bg-primary-500 text-white hover:bg-primary-600 hover:shadow-md' 
-            : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
-        >
-          <i class="fas fa-cart-plus mr-1 md:mr-2"></i>
-          {{ product.inStock ? 'Thêm vào giỏ' : 'Hết hàng' }}
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -156,6 +116,19 @@ export default {
   methods: {
     handleAddToCart() {
       if (this.product.inStock) {
+        // Sử dụng useCart giống HomeView
+        const { addToCart, openCart } = useCart()
+        addToCart(this.product, 1)
+        
+        // Hiển thị thông báo
+        alert(`Đã thêm "${this.product.name}" vào giỏ hàng!`)
+        
+        // Mở giỏ hàng sau 500ms
+        setTimeout(() => {
+          openCart()
+        }, 500)
+        
+        // Emit event cho parent component (nếu cần)
         this.$emit('add-to-cart', this.product)
       }
     },
@@ -167,57 +140,37 @@ export default {
     
     handleImageError(event) {
       // Fallback image when image fails to load
-      event.target.src = '/images/placeholder-product.png'
+      event.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik02MCA2MEgxNDBWMTQwSDYwVjYwWiIgc3Ryb2tlPSIjOUIzOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iMTAiIHN0cm9rZT0iIzlCOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTcwIDExMEwxMDAgODBMMTMwIDExMCIgc3Ryb2tlPSIjOUIzOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHRleHQgeD0iMTAwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzlCMzNENiI+S2jDtG5nIGPDsyDhuKNuaDwvdGV4dD4KPC9zdmc+'
     },
     
-    formatPrice(price) {
-      if (typeof price === 'string') {
-        return price.replace(/,/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    getImageSrc(product) {
+      if (!product.image || product.image.trim() === '' || product.image === 'nan') {
+        return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik02MCA2MEgxNDBWMTQwSDYwVjYwWiIgc3Ryb2tlPSIjOUIzOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iMTAiIHN0cm9rZT0iIzlCOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTcwIDExMEwxMDAgODBMMTMwIDExMCIgc3Ryb2tlPSIjOUIzOEQ2IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHRleHQgeD0iMTAwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzlCMzNENiI+S2jDtG5nIGPDsyDhuKNuaDwvdGV4dD4KPC9zdmc+'
       }
-      return new Intl.NumberFormat('vi-VN').format(price)
+      return product.image
     },
     
-    calculateSavings(originalPrice, currentPrice) {
-      const original = typeof originalPrice === 'string' 
-        ? parseInt(originalPrice.replace(/,/g, '')) 
-        : originalPrice
-      const current = typeof currentPrice === 'string' 
-        ? parseInt(currentPrice.replace(/,/g, '')) 
-        : currentPrice
-      return new Intl.NumberFormat('vi-VN').format(original - current)
-    },
-
     formatPrice(price) {
+      if (!price) return '0'
+      
+      // Convert string to number if needed
       let numPrice = typeof price === 'string' 
         ? parseInt(price.replace(/[,đ₫]/g, '')) 
         : price
       
+      // If price is less than 1000, assume it's in thousands
       if (numPrice < 1000) {
         numPrice = numPrice * 1000
       }
       
       return new Intl.NumberFormat('vi-VN').format(numPrice)
-    },
-    
-    calculateSavings(originalPrice, currentPrice) {
-      let original = typeof originalPrice === 'string' 
-        ? parseInt(originalPrice.replace(/[,đ₫]/g, '')) 
-        : originalPrice
-      let current = typeof currentPrice === 'string' 
-        ? parseInt(currentPrice.replace(/[,đ₫]/g, '')) 
-        : currentPrice
-      
-      if (original < 1000) original = original * 1000
-      if (current < 1000) current = current * 1000
-      
-      return original - current
     }
   }
 }
 </script>
 
 <style scoped>
-/* FIXED: Product Image Container */
+/* Product Image Container */
 .product-image-container {
   position: relative;
   width: 100%;
@@ -234,19 +187,14 @@ export default {
   }
 }
 
-/* FIXED: Product Image */
+/* Product Image */
 .product-image {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Hiển thị toàn bộ ảnh trong container */
+  object-fit: contain; /* Show full image within container */
   object-position: center;
   transition: transform 0.3s ease;
   background-color: white;
-}
-
-/* Alternative: Use cover for crop effect */
-.product-image.cover-mode {
-  object-fit: cover; /* Cắt ảnh để fill container */
 }
 
 /* Hover effect */
@@ -305,23 +253,6 @@ export default {
   transition: all 0.3s ease;
 }
 
-/* Ensure consistent card heights */
-.min-h-card {
-  min-height: 320px;
-}
-
-@media (min-width: 768px) {
-  .min-h-card {
-    min-height: 380px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .min-h-card {
-    min-height: 420px;
-  }
-}
-
 /* Button hover effects */
 button:not(:disabled):hover {
   transform: translateY(-1px);
@@ -331,21 +262,8 @@ button:disabled {
   transform: none;
 }
 
-/* Star rating animation */
-.fa-star {
-  transition: color 0.2s ease;
-}
-
 /* Card hover effect */
 .cursor-pointer:hover {
   transform: translateY(-2px);
-}
-
-/* Loading state for images */
-.product-image[src=""] {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 2rem;
 }
 </style>

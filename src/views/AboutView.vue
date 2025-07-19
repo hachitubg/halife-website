@@ -39,7 +39,7 @@
         <!-- Featured Image -->
         <div class="mb-12">
           <img 
-            src="/public/images/Halife_anh_bia.jpg" 
+            src="/images/Halife_anh_bia.jpg" 
             alt="HALIFE" 
             class="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
           />
@@ -450,7 +450,7 @@ img:not([src]) {
 /* Print styles */
 @media print {
   .about-view {
-    color-adjust: exact;
+    print-color-adjust: exact
   }
   
   .bg-gradient-to-r {

@@ -10,7 +10,7 @@
         
         <!-- Mobile Logo -->
         <router-link to="/" class="flex items-center">
-          <img src="/public/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
+          <img src="/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
           <div>
             <h1 class="text-lg font-bold text-primary-500">HALIFE ANIMALS</h1>
           </div>
@@ -36,7 +36,7 @@
       <div class="flex items-center justify-between gap-4">
         <!-- Logo -->
         <router-link to="/" class="flex items-center hover:opacity-90 transition-opacity">
-          <img src="/public/images/logo_white.png" alt="HALIFE" class="h-12 w-12 mr-3 rounded-full">
+          <img src="/images/logo_white.png" alt="HALIFE" class="h-12 w-12 mr-3 rounded-full">
           <div>
             <h1 class="text-xl font-bold text-primary-500">HALIFE ANIMALS</h1>
             <p class="text-xs text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
@@ -93,7 +93,7 @@
           <!-- Mobile Menu Header -->
           <div class="flex items-center justify-between p-4 border-b">
             <router-link to="/" class="flex items-center" @click="mobileMenuOpen = false">
-              <img src="/public/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
+              <img src="/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
               <h2 class="font-bold text-primary-500">HALIFE ANIMALS</h2>
             </router-link>
             <button @click="mobileMenuOpen = false" class="p-2">

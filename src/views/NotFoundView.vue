@@ -395,7 +395,7 @@ input:focus {
 /* Print styles */
 @media print {
   .not-found-view {
-    color-adjust: exact;
+    print-color-adjust: exact
   }
   
   .animate-bounce,
