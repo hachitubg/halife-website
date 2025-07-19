@@ -14,11 +14,10 @@ COPY package*.json ./
 # Install ALL dependencies (including devDependencies for build)
 RUN npm ci --silent
 
-# Copy source code
+# Copy source code and environment files
 COPY . .
 
-# Set environment variables for build
-ENV VITE_API_URL=http://14.225.212.44:8000
+# Build sẽ tự động đọc .env.production
 ENV NODE_ENV=production
 
 # Build the application
