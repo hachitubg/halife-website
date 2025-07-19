@@ -381,15 +381,27 @@ export default {
 
     async loadData() {
       try {
-        // Force reload from API instead of cached data
-        await dataAPI.reload('/data/halife_products.xlsx')
-        this.allProducts = [...products]
+        // Force reload từ API thay vì cache
+        const response = await fetch('/api/products')
+        if (response.ok) {
+          const result = await response.json()
+          this.allProducts = result.data || []
+        } else {
+          // Fallback về static data
+          this.allProducts = [...products]
+        }
+        
         this.dataLoaded = true
         this.initializeCategorySlides()
         
-        await newsService.getAllNews()
-        this.newsLoaded = true
+        if (!this.newsLoaded) {
+          await newsService.getAllNews()
+          this.newsLoaded = true
+        }
       } catch (error) {
+        console.error('Error loading data:', error)
+        // Fallback về static data
+        this.allProducts = [...products]
         this.dataLoaded = true
         this.newsLoaded = true
       }
@@ -525,9 +537,7 @@ export default {
   async mounted() {
     await this.loadData()
     window.addEventListener('reloadExcelData', async () => {
-      await dataAPI.reload('/data/halife_products.xlsx')
-      this.allProducts = [...products]
-      this.$forceUpdate()
+      await this.loadData() 
     })
   },
 
