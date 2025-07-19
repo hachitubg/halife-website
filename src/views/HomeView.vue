@@ -381,6 +381,8 @@ export default {
 
     async loadData() {
       try {
+        // Force reload from API instead of cached data
+        await dataAPI.reload('/data/halife_products.xlsx')
         this.allProducts = [...products]
         this.dataLoaded = true
         this.initializeCategorySlides()
