@@ -42,6 +42,9 @@ NEWS_FILE = os.path.join(BASE_DIR, 'public/data/news.json')
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
+# Banner file path
+BANNER_CONFIG_FILE = 'data/banners.json'
+
 # Tạo thư mục upload nếu chưa có
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -1574,6 +1577,252 @@ def migrate_from_js():
         return jsonify({
             'success': False,
             'message': f'Lỗi migrate: {str(e)}'
+        }), 500
+    
+def ensure_banner_file():
+    """Đảm bảo file banner config tồn tại"""
+    if not os.path.exists(BANNER_CONFIG_FILE):
+        os.makedirs(os.path.dirname(BANNER_CONFIG_FILE), exist_ok=True)
+        default_banners = [
+            '/images/cover1.jpg',
+            '/images/cover2.jpg', 
+            '/images/cover3.jpg'
+        ]
+        with open(BANNER_CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(default_banners, f, ensure_ascii=False, indent=2)
+
+def load_banners():
+    """Đọc danh sách banner"""
+    ensure_banner_file()
+    try:
+        with open(BANNER_CONFIG_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return ['/images/cover1.jpg', '/images/cover2.jpg', '/images/cover3.jpg']
+
+def save_banners(banners):
+    """Lưu danh sách banner"""
+    ensure_banner_file()
+    with open(BANNER_CONFIG_FILE, 'w', encoding='utf-8') as f:
+        json.dump(banners, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/banners', methods=['GET'])
+def get_banners():
+    """Lấy danh sách banner"""
+    try:
+        banners = load_banners()
+        return jsonify({
+            'success': True,
+            'data': banners
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi lấy banner: {str(e)}'
+        }), 500
+
+@app.route('/api/banners/upload', methods=['POST'])
+def upload_banner():
+    """Upload banner mới"""
+    try:
+        if 'banner' not in request.files:
+            return jsonify({
+                'success': False,
+                'message': 'Không có file banner'
+            }), 400
+
+        file = request.files['banner']
+        
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'message': 'Không có file được chọn'
+            }), 400
+
+        # Kiểm tra định dạng file
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
+        
+        if file_extension not in allowed_extensions:
+            return jsonify({
+                'success': False,
+                'message': 'Định dạng file không được hỗ trợ. Chỉ chấp nhận: png, jpg, jpeg, gif, webp'
+            }), 400
+
+        # Tạo tên file unique cho banner
+        unique_filename = f"banner-{uuid.uuid4().hex[:8]}-{int(datetime.now().timestamp())}.{file_extension}"
+        
+        # Đường dẫn lưu file
+        file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+        
+        # Lưu file
+        file.save(file_path)
+        
+        # URL để truy cập banner
+        banner_url = f"/images/{unique_filename}"
+        
+        return jsonify({
+            'success': True,
+            'message': 'Upload banner thành công',
+            'data': {
+                'url': banner_url,
+                'filename': unique_filename
+            }
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi upload banner: {str(e)}'
+        }), 500
+
+@app.route('/api/banners', methods=['POST'])
+def add_banner():
+    """Thêm banner mới"""
+    try:
+        data = request.get_json()
+        banner_url = data.get('url', '')
+        
+        if not banner_url:
+            return jsonify({
+                'success': False,
+                'message': 'Không có URL banner'
+            }), 400
+        
+        banners = load_banners()
+        
+        # Kiểm tra giới hạn 3 banner
+        if len(banners) >= 3:
+            return jsonify({
+                'success': False,
+                'message': 'Chỉ được phép tối đa 3 banner'
+            }), 400
+        
+        banners.append(banner_url)
+        save_banners(banners)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Đã thêm banner mới',
+            'data': banners
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi thêm banner: {str(e)}'
+        }), 500
+
+@app.route('/api/banners/<int:index>', methods=['PUT'])
+def replace_banner(index):
+    """Thay thế banner tại vị trí index"""
+    try:
+        data = request.get_json()
+        banner_url = data.get('url', '')
+        
+        if not banner_url:
+            return jsonify({
+                'success': False,
+                'message': 'Không có URL banner'
+            }), 400
+        
+        banners = load_banners()
+        
+        if index < 0 or index >= len(banners):
+            return jsonify({
+                'success': False,
+                'message': 'Vị trí banner không hợp lệ'
+            }), 400
+        
+        # Xóa file cũ nếu có
+        old_url = banners[index]
+        if old_url.startswith('/images/'):
+            old_filename = old_url.replace('/images/', '')
+            old_file_path = os.path.join(UPLOAD_FOLDER, old_filename)
+            if os.path.exists(old_file_path):
+                try:
+                    os.remove(old_file_path)
+                except:
+                    pass
+        
+        banners[index] = banner_url
+        save_banners(banners)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Đã thay thế banner {index + 1}',
+            'data': banners
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi thay thế banner: {str(e)}'
+        }), 500
+
+@app.route('/api/banners/<int:index>', methods=['DELETE'])
+def delete_banner(index):
+    """Xóa banner tại vị trí index"""
+    try:
+        banners = load_banners()
+        
+        if index < 0 or index >= len(banners):
+            return jsonify({
+                'success': False,
+                'message': 'Vị trí banner không hợp lệ'
+            }), 400
+        
+        # Xóa file
+        banner_url = banners[index]
+        if banner_url.startswith('/images/'):
+            filename = banner_url.replace('/images/', '')
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except:
+                    pass
+        
+        banners.pop(index)
+        save_banners(banners)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Đã xóa banner {index + 1}',
+            'data': banners
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi xóa banner: {str(e)}'
+        }), 500
+
+@app.route('/api/banners/reorder', methods=['PUT'])
+def reorder_banners():
+    """Sắp xếp lại thứ tự banner"""
+    try:
+        data = request.get_json()
+        banners = data.get('banners', [])
+        
+        if not banners or len(banners) > 3:
+            return jsonify({
+                'success': False,
+                'message': 'Danh sách banner không hợp lệ'
+            }), 400
+        
+        save_banners(banners)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Đã cập nhật thứ tự banner',
+            'data': banners
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi sắp xếp banner: {str(e)}'
         }), 500
 
 if __name__ == '__main__':

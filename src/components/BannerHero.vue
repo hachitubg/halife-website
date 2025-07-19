@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import { BannerAPI } from '@/utils/bannerAPI.js'
+
 export default {
   name: 'BannerHero',
   data() {
@@ -39,32 +41,28 @@ export default {
       bannerImages: []
     }
   },
-  mounted() {
-    this.loadBanners()
+  async mounted() {
+    await this.loadBanners()
     this.startAutoSlide()
     
-    // Listen for banner updates
-    window.addEventListener('bannersUpdated', this.handleBannersUpdate)
+    // Poll for banner updates every 30 seconds
+    setInterval(() => {
+      this.loadBanners()
+    }, 30000)
   },
   beforeUnmount() {
     this.stopAutoSlide()
-    window.removeEventListener('bannersUpdated', this.handleBannersUpdate)
   },
   methods: {
-    loadBanners() {
-      const saved = localStorage.getItem('halife-banners')
-      if (saved) {
-        try {
-          const banners = JSON.parse(saved)
-          this.bannerImages = banners.map((src, index) => ({
-            src: src,
-            alt: `HALIFE Banner ${index + 1}`
-          }))
-        } catch (error) {
-          console.error('Error loading banners:', error)
-          this.setDefaultBanners()
-        }
-      } else {
+    async loadBanners() {
+      try {
+        const banners = await BannerAPI.getBanners()
+        this.bannerImages = banners.map((src, index) => ({
+          src: src,
+          alt: `HALIFE Banner ${index + 1}`
+        }))
+      } catch (error) {
+        console.error('Error loading banners:', error)
         this.setDefaultBanners()
       }
     },
@@ -75,15 +73,6 @@ export default {
         { src: '/images/cover2.jpg', alt: 'HALIFE Cover 2' },
         { src: '/images/cover3.jpg', alt: 'HALIFE Cover 3' }
       ]
-    },
-    
-    handleBannersUpdate(event) {
-      const banners = event.detail
-      this.bannerImages = banners.map((src, index) => ({
-        src: src,
-        alt: `HALIFE Banner ${index + 1}`
-      }))
-      this.currentSlide = 0
     },
     startAutoSlide() {
       this.autoSlideInterval = setInterval(() => {

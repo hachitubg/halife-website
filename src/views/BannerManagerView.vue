@@ -197,6 +197,7 @@
 <script>
 import Header from '@/components/Header.vue'
 import { sidebarCategories } from '@/data/products.js'
+import { BannerAPI } from '@/utils/bannerAPI.js'
 
 export default {
   name: 'BannerManagerView',
@@ -206,11 +207,7 @@ export default {
   data() {
     return {
       categories: sidebarCategories,
-      banners: [
-        '/images/cover1.jpg',
-        '/images/cover2.jpg',
-        '/images/cover3.jpg'
-      ],
+      banners: [],
       showUploadModal: false,
       selectedFile: null,
       filePreview: null,
@@ -221,7 +218,7 @@ export default {
       replaceIndex: null
     }
   },
-  mounted() {
+  async mounted() {
     // Auto preview rotation
     setInterval(() => {
       if (this.banners.length > 1) {
@@ -229,8 +226,8 @@ export default {
       }
     }, 3000)
     
-    // Load banners from localStorage
-    this.loadBanners()
+    // Load banners from server
+    await this.loadBanners()
   },
   methods: {
     handleSearch(query) {
@@ -240,23 +237,21 @@ export default {
       })
     },
     
-    loadBanners() {
-      const saved = localStorage.getItem('halife-banners')
-      if (saved) {
-        try {
-          this.banners = JSON.parse(saved)
-        } catch (error) {
-          console.error('Error loading banners:', error)
-        }
+    async loadBanners() {
+      try {
+        this.loading = true
+        this.loadingMessage = 'Đang tải banner...'
+        this.banners = await BannerAPI.getBanners()
+      } catch (error) {
+        this.showMessage('Lỗi tải banner: ' + error.message, 'error')
+      } finally {
+        this.loading = false
       }
     },
     
     saveBanners() {
-      localStorage.setItem('halife-banners', JSON.stringify(this.banners))
-      // Trigger update event for other components
-      window.dispatchEvent(new CustomEvent('bannersUpdated', { 
-        detail: this.banners 
-      }))
+      // Không cần nữa vì đã lưu trên server
+      // Server sẽ tự động broadcast tới tất cả client
     },
     
     openUploadModal() {
@@ -269,16 +264,25 @@ export default {
       this.clearFile()
     },
     
-    replaceBanner(index) {
+    async replaceBanner(index) {
       this.replaceIndex = index
       this.showUploadModal = true
     },
     
-    deleteBanner(index) {
+    async deleteBanner(index) {
       if (confirm('Bạn có chắc muốn xóa banner này?')) {
-        this.banners.splice(index, 1)
-        this.saveBanners()
-        this.showMessage('Đã xóa banner', 'success')
+        try {
+          this.loading = true
+          this.loadingMessage = 'Đang xóa banner...'
+          
+          const result = await BannerAPI.deleteBanner(index)
+          this.banners = result.banners
+          this.showMessage(result.message, 'success')
+        } catch (error) {
+          this.showMessage('Lỗi xóa banner: ' + error.message, 'error')
+        } finally {
+          this.loading = false
+        }
       }
     },
     
@@ -323,28 +327,26 @@ export default {
       this.uploading = true
       
       try {
-        // Simulate upload delay
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Create object URL for the image
-        const imageUrl = URL.createObjectURL(this.selectedFile)
+        let result
         
         if (this.replaceIndex !== null) {
           // Replace existing banner
-          this.banners[this.replaceIndex] = imageUrl
+          this.loadingMessage = 'Đang thay thế banner...'
+          result = await BannerAPI.replaceBanner(this.replaceIndex, this.selectedFile)
           this.showMessage('Đã thay thế banner', 'success')
         } else {
           // Add new banner
-          if (this.banners.length < 3) {
-            this.banners.push(imageUrl)
-            this.showMessage('Đã thêm banner mới', 'success')
-          } else {
+          if (this.banners.length >= 3) {
             this.showMessage('Chỉ được phép tối đa 3 banner', 'error')
             return
           }
+          this.loadingMessage = 'Đang thêm banner mới...'
+          result = await BannerAPI.addBanner(this.selectedFile)
+          this.showMessage('Đã thêm banner mới', 'success')
         }
         
-        this.saveBanners()
+        // Update local banners list
+        this.banners = result.banners
         this.closeUploadModal()
         
       } catch (error) {
