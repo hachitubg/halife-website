@@ -182,15 +182,19 @@ export default {
   methods: {
     async loadPopupBanner() {
       try {
-        // Get popup banner from API (assuming you add this endpoint)
+        // Get popup banner from API
         const response = await fetch('/api/popup-banner')
         if (response.ok) {
           const data = await response.json()
           this.popupBanner = data.banner || '/images/popup-banner.jpg'
+        } else {
+          // Fallback to default
+          this.popupBanner = '/images/popup-banner.jpg'
         }
       } catch (error) {
         console.error('Error loading popup banner:', error)
         // Keep default banner
+        this.popupBanner = '/images/popup-banner.jpg'
       }
     },
     

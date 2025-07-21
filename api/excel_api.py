@@ -44,6 +44,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 # Banner file path
 BANNER_CONFIG_FILE = 'data/banners.json'
+POPUP_BANNER_CONFIG_FILE = 'data/popup_banner.json'
 
 # Tạo thư mục upload nếu chưa có
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -1823,6 +1824,195 @@ def reorder_banners():
         return jsonify({
             'success': False,
             'message': f'Lỗi sắp xếp banner: {str(e)}'
+        }), 500
+    
+def ensure_popup_banner_file():
+    """Đảm bảo file popup banner config tồn tại"""
+    if not os.path.exists(POPUP_BANNER_CONFIG_FILE):
+        os.makedirs(os.path.dirname(POPUP_BANNER_CONFIG_FILE), exist_ok=True)
+        default_popup_banner = {
+            'banner': '/images/popup-banner-default.jpg',
+            'updated_at': datetime.now().isoformat()
+        }
+        with open(POPUP_BANNER_CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(default_popup_banner, f, ensure_ascii=False, indent=2)
+
+def load_popup_banner():
+    """Đọc popup banner"""
+    ensure_popup_banner_file()
+    try:
+        with open(POPUP_BANNER_CONFIG_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data.get('banner')
+    except:
+        return '/images/popup-banner-default.jpg'
+
+def save_popup_banner(banner_url):
+    """Lưu popup banner"""
+    ensure_popup_banner_file()
+    data = {
+        'banner': banner_url,
+        'updated_at': datetime.now().isoformat()
+    }
+    with open(POPUP_BANNER_CONFIG_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+@app.route('/api/popup-banner', methods=['GET'])
+def get_popup_banner():
+    """Lấy popup banner hiện tại"""
+    try:
+        banner_url = load_popup_banner()
+        return jsonify({
+            'success': True,
+            'banner': banner_url
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi lấy popup banner: {str(e)}',
+            'banner': '/images/popup-banner-default.jpg'
+        }), 500
+
+@app.route('/api/popup-banner', methods=['POST'])
+def upload_popup_banner():
+    """Upload popup banner mới"""
+    try:
+        if 'popup-banner' not in request.files:
+            return jsonify({
+                'success': False,
+                'message': 'Không có file popup banner'
+            }), 400
+
+        file = request.files['popup-banner']
+        
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'message': 'Không có file được chọn'
+            }), 400
+
+        # Kiểm tra định dạng file
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
+        
+        if file_extension not in allowed_extensions:
+            return jsonify({
+                'success': False,
+                'message': 'Định dạng file không được hỗ trợ. Chỉ chấp nhận: png, jpg, jpeg, gif, webp'
+            }), 400
+
+        # Kiểm tra kích thước file (5MB)
+        file.seek(0, os.SEEK_END)
+        file_size = file.tell()
+        file.seek(0)
+        
+        if file_size > 5 * 1024 * 1024:  # 5MB
+            return jsonify({
+                'success': False,
+                'message': 'File quá lớn. Kích thước tối đa 5MB'
+            }), 400
+
+        # Xóa popup banner cũ nếu có
+        old_banner = load_popup_banner()
+        if old_banner and old_banner.startswith('/images/'):
+            old_filename = old_banner.replace('/images/', '')
+            old_file_path = os.path.join(UPLOAD_FOLDER, old_filename)
+            if os.path.exists(old_file_path):
+                try:
+                    os.remove(old_file_path)
+                except:
+                    pass
+
+        # Tạo tên file unique cho popup banner
+        unique_filename = f"popup-banner-{uuid.uuid4().hex[:8]}-{int(datetime.now().timestamp())}.{file_extension}"
+        
+        # Đường dẫn lưu file
+        file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+        
+        # Lưu file
+        file.save(file_path)
+        
+        # URL để truy cập popup banner
+        banner_url = f"/images/{unique_filename}"
+        
+        # Lưu vào config
+        save_popup_banner(banner_url)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Upload popup banner thành công',
+            'banner': banner_url,
+            'data': {
+                'url': banner_url,
+                'filename': unique_filename,
+                'size': file_size
+            }
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi upload popup banner: {str(e)}'
+        }), 500
+
+@app.route('/api/popup-banner', methods=['PUT'])
+def update_popup_banner():
+    """Cập nhật popup banner bằng URL"""
+    try:
+        data = request.get_json()
+        banner_url = data.get('banner', '')
+        
+        if not banner_url:
+            return jsonify({
+                'success': False,
+                'message': 'Không có URL banner'
+            }), 400
+        
+        # Lưu popup banner mới
+        save_popup_banner(banner_url)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Đã cập nhật popup banner',
+            'banner': banner_url
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi cập nhật popup banner: {str(e)}'
+        }), 500
+
+@app.route('/api/popup-banner', methods=['DELETE'])
+def delete_popup_banner():
+    """Xóa popup banner"""
+    try:
+        # Lấy popup banner hiện tại
+        banner_url = load_popup_banner()
+        
+        # Xóa file nếu có
+        if banner_url and banner_url.startswith('/images/'):
+            filename = banner_url.replace('/images/', '')
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except:
+                    pass
+        
+        # Reset về default
+        save_popup_banner('/images/popup-banner-default.jpg')
+        
+        return jsonify({
+            'success': True,
+            'message': 'Đã xóa popup banner',
+            'banner': None
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi xóa popup banner: {str(e)}'
         }), 500
 
 if __name__ == '__main__':
