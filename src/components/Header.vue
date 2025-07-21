@@ -304,7 +304,6 @@ export default {
     return {
       searchQuery: '',
       mobileMenuOpen: false,
-      cartCount: 0,
       showBanner: true
     }
   },

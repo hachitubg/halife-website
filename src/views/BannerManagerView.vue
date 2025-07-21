@@ -522,21 +522,13 @@ export default {
         this.loading = true
         this.loadingMessage = 'Đang tải banner...'
         
-        // Load homepage banners
-        this.homepageBanners = await BannerAPI.getBanners()
+        // Sử dụng BannerAPI method mới
+        const bannerData = await BannerAPI.loadAllBannerData()
+        this.homepageBanners = bannerData.homepageBanners
+        this.popupBanner = bannerData.popupBanner
         
-        // Load popup banner
-        try {
-          const popupResponse = await fetch('/api/popup-banner')
-          if (popupResponse.ok) {
-            const data = await popupResponse.json()
-            this.popupBanner = data.banner
-          }
-        } catch (error) {
-          console.log('No popup banner found')
-        }
       } catch (error) {
-        this.showMessage('Lỗi tải banner: ' + error.message, 'error')
+        BannerAPI.showMessage('Lỗi tải banner: ' + error.message, 'error')
       } finally {
         this.loading = false
       }
@@ -567,9 +559,9 @@ export default {
           
           const result = await BannerAPI.deleteBanner(index)
           this.homepageBanners = result.banners
-          this.showMessage(result.message, 'success')
+          BannerAPI.showMessage(result.message, 'success')
         } catch (error) {
-          this.showMessage('Lỗi xóa banner: ' + error.message, 'error')
+          BannerAPI.showMessage('Lỗi xóa banner: ' + error.message, 'error')
         } finally {
           this.loading = false
         }
@@ -587,14 +579,11 @@ export default {
           this.loading = true
           this.loadingMessage = 'Đang xóa banner popup...'
           
-          // Call API to delete popup banner
-          const response = await fetch('/api/popup-banner', { method: 'DELETE' })
-          if (response.ok) {
-            this.popupBanner = null
-            this.showMessage('Đã xóa banner popup', 'success')
-          }
+          await BannerAPI.deletePopupBanner()
+          this.popupBanner = null
+          BannerAPI.showMessage('Đã xóa banner popup', 'success')
         } catch (error) {
-          this.showMessage('Lỗi xóa banner popup: ' + error.message, 'error')
+          BannerAPI.showMessage('Lỗi xóa banner popup: ' + error.message, 'error')
         } finally {
           this.loading = false
         }
@@ -605,15 +594,11 @@ export default {
       const file = event.target.files[0]
       if (!file) return
       
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        this.showMessage('Vui lòng chọn file hình ảnh', 'error')
-        return
-      }
+      // Sử dụng BannerAPI validate
+      const validation = BannerAPI.validateFile(file, 5)
       
-      // Validate file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.showMessage('File quá lớn. Vui lòng chọn file dưới 5MB', 'error')
+      if (!validation.isValid) {
+        BannerAPI.showMessage(validation.errors.join(', '), 'error')
         return
       }
       
@@ -651,16 +636,16 @@ export default {
             // Replace existing banner
             this.loadingMessage = 'Đang thay thế banner...'
             result = await BannerAPI.replaceBanner(this.replaceIndex, this.selectedFile)
-            this.showMessage('Đã thay thế banner', 'success')
+            BannerAPI.showMessage('Đã thay thế banner', 'success')
           } else {
             // Add new banner
             if (this.homepageBanners.length >= 3) {
-              this.showMessage('Chỉ được phép tối đa 3 banner trang chủ', 'error')
+              BannerAPI.showMessage('Chỉ được phép tối đa 3 banner trang chủ', 'error')
               return
             }
             this.loadingMessage = 'Đang thêm banner mới...'
             result = await BannerAPI.addBanner(this.selectedFile)
-            this.showMessage('Đã thêm banner mới', 'success')
+            BannerAPI.showMessage('Đã thêm banner mới', 'success')
           }
           
           // Update homepage banners
@@ -670,39 +655,21 @@ export default {
           // Handle popup banner upload
           this.loadingMessage = 'Đang upload banner popup...'
           
-          // Upload to server
-          const formData = new FormData()
-          formData.append('popup-banner', this.selectedFile)
-          
-          const response = await fetch('/api/popup-banner', {
-            method: 'POST',
-            body: formData
-          })
-          
-          if (response.ok) {
-            const data = await response.json()
-            this.popupBanner = data.banner || URL.createObjectURL(this.selectedFile)
-            this.showMessage('Đã cập nhật banner popup', 'success')
-          } else {
-            // Fallback: use local URL
-            this.popupBanner = URL.createObjectURL(this.selectedFile)
-            this.showMessage('Đã cập nhật banner popup (local)', 'success')
-          }
+          const result = await BannerAPI.replacePopupBanner(this.selectedFile)
+          this.popupBanner = result.banner
+          BannerAPI.showMessage('Đã cập nhật banner popup', 'success')
         }
         
         this.closeUploadModal()
         
       } catch (error) {
-        this.showMessage('Lỗi upload banner: ' + error.message, 'error')
+        BannerAPI.showMessage('Lỗi upload banner: ' + error.message, 'error')
       } finally {
         this.uploading = false
       }
     },
     
-    showMessage(message, type = 'info') {
-      const icons = { success: '✅', error: '❌', info: 'ℹ️' }
-      alert(`${icons[type]} ${message}`)
-    }
+    // Không cần showMessage method nữa vì đã có trong BannerAPI
   }
 }
 </script>

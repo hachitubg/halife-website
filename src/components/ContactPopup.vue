@@ -161,7 +161,8 @@ export default {
       showPopup: false,
       submitting: false,
       showSuccess: false,
-      popupBanner: '/images/popup-banner.jpg', // Default banner
+      popupBanner: '/images/popup-banner-default.jpg',
+      cleanupListener: null,
       form: {
         name: '',
         phone: '',
@@ -171,43 +172,49 @@ export default {
     }
   },
   async mounted() {
-    // Load popup banner from server
-    await this.loadPopupBanner()
+    console.log('🔄 ContactPopup mounted - initializing...')
     
-    // Show popup after 2 seconds on every page load
+    try {
+      // Load popup banner using BannerAPI
+      this.popupBanner = await BannerAPI.initializePopupBanner(this)
+      console.log('✅ Popup banner loaded:', this.popupBanner)
+      
+      // Setup event listener
+      this.cleanupListener = BannerAPI.setupPopupBannerListener(this)
+      console.log('✅ Event listener setup complete')
+      
+    } catch (error) {
+      console.error('❌ Error initializing ContactPopup:', error)
+      this.popupBanner = '/images/popup-banner-default.jpg'
+    }
+    
+    // Show popup after 2 seconds
     setTimeout(() => {
+      console.log('⏰ Showing popup after 2 seconds')
       this.openPopup()
     }, 2000)
   },
+  beforeUnmount() {
+    console.log('🧹 ContactPopup cleanup')
+    if (this.cleanupListener) {
+      this.cleanupListener()
+    }
+  },
   methods: {
-    async loadPopupBanner() {
-      try {
-        // Get popup banner from API
-        const response = await fetch('/api/popup-banner')
-        if (response.ok) {
-          const data = await response.json()
-          this.popupBanner = data.banner || '/images/popup-banner.jpg'
-        } else {
-          // Fallback to default
-          this.popupBanner = '/images/popup-banner.jpg'
-        }
-      } catch (error) {
-        console.error('Error loading popup banner:', error)
-        // Keep default banner
-        this.popupBanner = '/images/popup-banner.jpg'
-      }
-    },
-    
     openPopup() {
       this.showPopup = true
+      console.log('📝 Popup opened')
     },
     
     closePopup() {
       this.showPopup = false
       this.showSuccess = false
+      console.log('❌ Popup closed')
     },
     
     async submitForm() {
+      console.log('📤 Submitting form:', this.form)
+      
       // Validate required fields
       if (!this.form.name.trim() || !this.form.phone.trim()) {
         alert('Vui lòng điền đầy đủ tên và số điện thoại!')
@@ -217,8 +224,9 @@ export default {
       this.submitting = true
       
       try {
-        // Simulate API call to send email
-        await this.sendEmailToAdmin()
+        // Send email using BannerAPI
+        await BannerAPI.sendContactEmail(this.form)
+        console.log('✅ Email sent successfully')
         
         // Show success message
         this.showSuccess = true
@@ -232,47 +240,10 @@ export default {
         }, 3000)
         
       } catch (error) {
-        console.error('Error submitting form:', error)
+        console.error('❌ Error submitting form:', error)
         alert('Có lỗi xảy ra, vui lòng thử lại!')
       } finally {
         this.submitting = false
-      }
-    },
-    
-    async sendEmailToAdmin() {
-      // Import EmailJS
-      const emailjs = await import('@emailjs/browser')
-      
-      // EmailJS configuration
-      const serviceId = 'service_dlzpqnu'
-      const templateId = 'template_5iugwni'
-      const publicKey = 'y2eF1NKDKicGABCFN'
-      
-      // Email template parameters
-      const templateParams = {
-        from_name: this.form.name,
-        phone: this.form.phone,
-        email: this.form.email || 'Không cung cấp',
-        location: this.form.location || 'Không chọn',
-        timestamp: new Date().toLocaleString('vi-VN'),
-        to_email: 'info@halife.vn' // Admin email
-      }
-      
-      try {
-        // Send email using EmailJS
-        const response = await emailjs.default.send(
-          serviceId,
-          templateId,
-          templateParams,
-          publicKey
-        )
-        
-        console.log('Email sent successfully:', response)
-        return response
-        
-      } catch (error) {
-        console.error('EmailJS Error:', error)
-        throw error
       }
     },
     
@@ -283,6 +254,7 @@ export default {
         email: '',
         location: ''
       }
+      console.log('🔄 Form reset')
     }
   }
 }
