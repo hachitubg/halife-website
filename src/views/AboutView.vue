@@ -18,7 +18,7 @@
       <!-- Content -->
       <div class="relative container mx-auto px-4 text-center text-white">
         <h1 class="text-3xl md:text-5xl font-bold mb-4">Trang giới thiệu</h1>
-        <p class="text-lg md:text-xl opacity-90">HALIFE ANIMALS - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
+        <p class="text-lg md:text-xl opacity-90">HALIFE ANIMAL HEALTH - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
       </div>
     </div>
 
@@ -350,7 +350,7 @@ export default {
   },
   mounted() {
     // Set page title
-    document.title = 'Giới thiệu - HALIFE Animals'
+    document.title = 'Giới thiệu - HALIFE ANIMAL HEALTH'
     
     // Set meta description
     const metaDescription = document.querySelector('meta[name="description"]')

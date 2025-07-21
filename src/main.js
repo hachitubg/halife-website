@@ -40,7 +40,7 @@ function showGlobalLoading() {
           color: #1f2937;
           font-size: 18px;
           font-weight: 600;
-        ">HALIFE Animals</h3>
+        ">HALIFE ANIMAL HEALTH</h3>
         <p style="
           margin: 0;
           color: #6b7280;

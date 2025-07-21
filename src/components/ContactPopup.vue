@@ -3,62 +3,13 @@
   <div v-if="showPopup" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" @click="closePopup">
     <!-- Popup Content -->
     <div class="bg-white rounded-2xl max-w-5xl w-full flex overflow-hidden shadow-2xl" @click.stop>
-      <!-- Left Side - Image/Promotion -->
-      <div class="hidden lg:block lg:w-1/2 bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 relative overflow-hidden">
-        <div class="absolute inset-0 flex items-center justify-center p-8">
-          <div class="text-center text-white relative z-10">
-            <!-- Logo Area -->
-            <div class="mb-6">
-              <div class="bg-white bg-opacity-20 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-paw text-4xl text-white"></i>
-              </div>
-              <h2 class="text-2xl font-bold">HALIFE ANIMALS</h2>
-              <p class="text-primary-100 text-sm">Công nghệ thú y Nhật Bản</p>
-            </div>
-            
-            <!-- Badge -->
-            <div class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-full text-sm font-bold mb-6 inline-block shadow-lg transform -rotate-3">
-              🎉 ƯU ĐÃI ĐẶC BIỆT
-            </div>
-            
-            <!-- Main offer -->
-            <div class="mb-8">
-              <div class="text-7xl font-black text-yellow-300 mb-2 drop-shadow-lg">50%</div>
-              <div class="text-xl font-bold mb-2">GIẢM GIÁ NGAY HÔM NAY</div>
-              <div class="text-lg text-primary-100">Cho 50 khách hàng đầu tiên</div>
-              <div class="text-sm text-primary-200 mt-2">Áp dụng cho tất cả sản phẩm</div>
-            </div>
-            
-            <!-- Products illustration -->
-            <div class="flex justify-center items-center space-x-3 mb-6">
-              <div class="bg-white bg-opacity-90 rounded-lg p-3 text-center min-w-[70px]">
-                <i class="fas fa-pills text-primary-600 text-lg mb-1"></i>
-                <div class="text-xs text-primary-700 font-semibold">THUỐC<br>THÚ Y</div>
-              </div>
-              <div class="bg-white bg-opacity-90 rounded-lg p-3 text-center min-w-[70px]">
-                <i class="fas fa-award text-orange-600 text-lg mb-1"></i>
-                <div class="text-xs text-orange-700 font-semibold">CHẤT<br>LƯỢNG</div>
-              </div>
-              <div class="bg-white bg-opacity-90 rounded-lg p-3 text-center min-w-[70px]">
-                <i class="fas fa-shipping-fast text-green-600 text-lg mb-1"></i>
-                <div class="text-xs text-green-700 font-semibold">GIAO<br>NHANH</div>
-              </div>
-            </div>
-            
-            <!-- Contact CTA -->
-            <div class="bg-gradient-to-r from-green-600 to-green-700 rounded-xl p-4 text-sm shadow-lg">
-              <div class="flex items-center justify-center">
-                <i class="fas fa-phone-alt mr-2 animate-pulse"></i>
-                <span class="font-semibold">LIÊN HỆ NGAY: 0866.583.223</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Decorative elements -->
-        <div class="absolute top-8 right-8 w-24 h-24 bg-yellow-300 rounded-full opacity-20 animate-float"></div>
-        <div class="absolute bottom-12 left-12 w-16 h-16 bg-green-400 rounded-full opacity-20 animate-float" style="animation-delay: 1s;"></div>
-        <div class="absolute top-1/2 right-4 w-12 h-12 bg-white rounded-full opacity-10 animate-float" style="animation-delay: 2s;"></div>
+      <!-- Left Side - Image Banner -->
+      <div class="hidden lg:block lg:w-1/2 relative overflow-hidden">
+        <img 
+          :src="popupBanner" 
+          alt="HALIFE Promotion Banner"
+          class="w-full h-full object-cover"
+        />
       </div>
       
       <!-- Right Side - Form -->
@@ -201,6 +152,8 @@
 </template>
 
 <script>
+import { BannerAPI } from '@/utils/bannerAPI.js'
+
 export default {
   name: 'ContactPopup',
   data() {
@@ -208,6 +161,7 @@ export default {
       showPopup: false,
       submitting: false,
       showSuccess: false,
+      popupBanner: '/images/popup-banner.jpg', // Default banner
       form: {
         name: '',
         phone: '',
@@ -216,7 +170,30 @@ export default {
       }
     }
   },
+  async mounted() {
+    // Load popup banner from server
+    await this.loadPopupBanner()
+    
+    // Show popup after 2 seconds on every page load
+    setTimeout(() => {
+      this.openPopup()
+    }, 2000)
+  },
   methods: {
+    async loadPopupBanner() {
+      try {
+        // Get popup banner from API (assuming you add this endpoint)
+        const response = await fetch('/api/popup-banner')
+        if (response.ok) {
+          const data = await response.json()
+          this.popupBanner = data.banner || '/images/popup-banner.jpg'
+        }
+      } catch (error) {
+        console.error('Error loading popup banner:', error)
+        // Keep default banner
+      }
+    },
+    
     openPopup() {
       this.showPopup = true
     },
@@ -303,13 +280,6 @@ export default {
         location: ''
       }
     }
-  },
-  
-  mounted() {
-    // Show popup after 2 seconds on every page load
-    setTimeout(() => {
-      this.openPopup()
-    }, 2000)
   }
 }
 </script>

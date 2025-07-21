@@ -12,7 +12,7 @@
         <router-link to="/" class="flex items-center">
           <img src="/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
           <div>
-            <h1 class="text-lg font-bold text-primary-500">HALIFE ANIMALS</h1>
+            <h1 class="text-lg font-bold text-primary-500">HALIFE ANIMAL HEALTH</h1>
           </div>
         </router-link>
 
@@ -38,7 +38,7 @@
         <router-link to="/" class="flex items-center hover:opacity-90 transition-opacity">
           <img src="/images/logo_white.png" alt="HALIFE" class="h-12 w-12 mr-3 rounded-full">
           <div>
-            <h1 class="text-xl font-bold text-primary-500">HALIFE ANIMALS</h1>
+            <h1 class="text-xl font-bold text-primary-500">HALIFE ANIMAL HEALTH</h1>
             <p class="text-xs text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
           </div>
         </router-link>
@@ -94,7 +94,7 @@
           <div class="flex items-center justify-between p-4 border-b">
             <router-link to="/" class="flex items-center" @click="mobileMenuOpen = false">
               <img src="/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
-              <h2 class="font-bold text-primary-500">HALIFE ANIMALS</h2>
+              <h2 class="font-bold text-primary-500">HALIFE ANIMAL HEALTH</h2>
             </router-link>
             <button @click="mobileMenuOpen = false" class="p-2">
               <i class="fas fa-times text-xl text-gray-600"></i>
@@ -205,7 +205,7 @@
               <p>
                 <a href="mailto:info@halife.vn" class="text-primary-500">info@halife.vn</a>
               </p>
-              <p class="text-xs">HALIFE ANIMALS - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
+              <p class="text-xs">HALIFE ANIMAL HEALTH - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
             </div>
           </div>
         </div>

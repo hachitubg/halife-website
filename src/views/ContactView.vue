@@ -353,7 +353,7 @@ export default {
 
   mounted() {
     // Set page title
-    document.title = 'Liên hệ - HALIFE Animals'
+    document.title = 'Liên hệ - HALIFE ANIMAL HEALTH'
   }
 }
 </script>

@@ -1,6 +1,6 @@
-# HALIFE Animals Website
+# HALIFE ANIMAL HEALTH Website
 
-Website chính thức của công ty HALIFE Animals - Nhà cung cấp thuốc thú y và hải sản tươi sống với công nghệ độc quyền từ Nhật Bản.
+Website chính thức của công ty HALIFE ANIMAL HEALTH - Nhà cung cấp thuốc thú y và hải sản tươi sống với công nghệ độc quyền từ Nhật Bản.
 
 ## Công nghệ sử dụng
 
@@ -103,11 +103,11 @@ public/
 ```env
 # .env.development
 VITE_API_URL=http://localhost:8000
-VITE_SITE_TITLE=HALIFE Animals
+VITE_SITE_TITLE=HALIFE ANIMAL HEALTH
 
 # .env.production
 VITE_API_URL=https://api.halife.vn
-VITE_SITE_TITLE=HALIFE Animals
+VITE_SITE_TITLE=HALIFE ANIMAL HEALTH
 ```
 
 ### Key Dependencies
@@ -171,4 +171,4 @@ npm run build
 
 ## License
 
-Copyright © 2025 HALIFE Animals. All rights reserved.
+Copyright © 2025 HALIFE ANIMAL HEALTH. All rights reserved.

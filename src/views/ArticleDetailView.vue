@@ -307,7 +307,7 @@ export default {
         this.articleNotFound = false
         
         // Update page title
-        document.title = `${this.article.title} - HALIFE Animals`
+        document.title = `${this.article.title} - HALIFE ANIMAL HEALTH`
         
         // Update meta description
         const metaDescription = document.querySelector('meta[name="description"]')
@@ -316,7 +316,7 @@ export default {
         }
       } else {
         this.articleNotFound = true
-        document.title = 'Không tìm thấy bài viết - HALIFE Animals'
+        document.title = 'Không tìm thấy bài viết - HALIFE ANIMAL HEALTH'
       }
     },
     

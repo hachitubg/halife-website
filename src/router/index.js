@@ -7,8 +7,8 @@ const routes = [
     name: 'home',
     component: HomeView,
     meta: {
-      title: 'Trang chủ - HALIFE Animals',
-      description: 'HALIFE ANIMALS - Công nghệ thú y độc quyền Nhật Bản. Cung cấp thuốc thú y chất lượng cao và hải sản tươi sống.'
+      title: 'Trang chủ - HALIFE ANIMAL HEALTH',
+      description: 'HALIFE ANIMAL HEALTH - Công nghệ thú y độc quyền Nhật Bản. Cung cấp thuốc thú y chất lượng cao và hải sản tươi sống.'
     }
   },
   {
@@ -17,7 +17,7 @@ const routes = [
     component: () => import('../views/ProductManagerView.vue'),
     meta: {
       title: 'Product Manager - HALIFE Admin',
-      description: 'Quản lý sản phẩm cho HALIFE Animals',
+      description: 'Quản lý sản phẩm cho HALIFE ANIMAL HEALTH',
       requiresAuth: true
     }
   },
@@ -27,7 +27,7 @@ const routes = [
     component: () => import('../views/NewsEditorView.vue'),
     meta: {
       title: 'News Editor - HALIFE Admin',
-      description: 'Thêm và chỉnh sửa tin tức cho HALIFE Animals',
+      description: 'Thêm và chỉnh sửa tin tức cho HALIFE ANIMAL HEALTH',
       requiresAuth: true // Có thể thêm authentication sau
     }
   },
@@ -37,7 +37,7 @@ const routes = [
     component: () => import('../views/BannerManagerView.vue'),
     meta: {
       title: 'Banner Editor - HALIFE Admin',
-      description: 'Thêm và chỉnh sửa banner cho HALIFE Animals',
+      description: 'Thêm và chỉnh sửa banner cho HALIFE ANIMAL HEALTH',
       requiresAuth: true // Có thể thêm authentication sau
     }
   },
@@ -46,7 +46,7 @@ const routes = [
     name: 'about',
     component: () => import('../views/AboutView.vue'),
     meta: {
-      title: 'Giới thiệu - HALIFE Animals',
+      title: 'Giới thiệu - HALIFE ANIMAL HEALTH',
       description: 'Công ty cổ phần thuốc thú y HALIFE Việt Nhật - Công nghệ thú y độc quyền Nhật Bản, cung cấp sản phẩm chất lượng cao.'
     }
   },
@@ -55,8 +55,8 @@ const routes = [
     name: 'products',
     component: () => import('../views/ProductsView.vue'),
     meta: {
-      title: 'Sản phẩm - HALIFE Animals',
-      description: 'Danh sách sản phẩm thuốc thú y và hải sản tươi sống chất lượng cao từ HALIFE Animals.'
+      title: 'Sản phẩm - HALIFE ANIMAL HEALTH',
+      description: 'Danh sách sản phẩm thuốc thú y và hải sản tươi sống chất lượng cao từ HALIFE ANIMAL HEALTH.'
     }
   },
   {
@@ -64,8 +64,8 @@ const routes = [
     name: 'product-detail',
     component: () => import('../views/ProductDetailView.vue'),
     meta: {
-      title: 'Chi tiết sản phẩm - HALIFE Animals',
-      description: 'Thông tin chi tiết sản phẩm thuốc thú y chất lượng cao từ HALIFE Animals.'
+      title: 'Chi tiết sản phẩm - HALIFE ANIMAL HEALTH',
+      description: 'Thông tin chi tiết sản phẩm thuốc thú y chất lượng cao từ HALIFE ANIMAL HEALTH.'
     },
     props: true
   },
@@ -74,8 +74,8 @@ const routes = [
     name: 'news',
     component: () => import('../views/NewsView.vue'),
     meta: {
-      title: 'Tin tức - HALIFE Animals',
-      description: 'Tin tức và kiến thức chuyên môn về thú y, chăn nuôi và hải sản từ HALIFE Animals.'
+      title: 'Tin tức - HALIFE ANIMAL HEALTH',
+      description: 'Tin tức và kiến thức chuyên môn về thú y, chăn nuôi và hải sản từ HALIFE ANIMAL HEALTH.'
     }
   },
   {
@@ -83,8 +83,8 @@ const routes = [
     name: 'article-detail',
     component: () => import('../views/ArticleDetailView.vue'),
     meta: {
-      title: 'Chi tiết bài viết - HALIFE Animals',
-      description: 'Đọc bài viết chi tiết về kiến thức chuyên môn thú y và chăn nuôi từ HALIFE Animals.'
+      title: 'Chi tiết bài viết - HALIFE ANIMAL HEALTH',
+      description: 'Đọc bài viết chi tiết về kiến thức chuyên môn thú y và chăn nuôi từ HALIFE ANIMAL HEALTH.'
     },
     props: true
   },
@@ -93,8 +93,8 @@ const routes = [
     name: 'contact',
     component: () => import('../views/ContactView.vue'),
     meta: {
-      title: 'Liên hệ - HALIFE Animals',
-      description: 'Thông tin liên hệ và hỗ trợ khách hàng HALIFE Animals. Hotline: 0866.583.223'
+      title: 'Liên hệ - HALIFE ANIMAL HEALTH',
+      description: 'Thông tin liên hệ và hỗ trợ khách hàng HALIFE ANIMAL HEALTH. Hotline: 0866.583.223'
     }
   },
   // Redirect old routes for SEO
@@ -125,8 +125,8 @@ const routes = [
     name: 'not-found',
     component: () => import('../views/NotFoundView.vue'),
     meta: {
-      title: 'Trang không tồn tại (404) - HALIFE Animals',
-      description: 'Trang bạn tìm kiếm không tồn tại. Quay lại trang chủ HALIFE Animals.'
+      title: 'Trang không tồn tại (404) - HALIFE ANIMAL HEALTH',
+      description: 'Trang bạn tìm kiếm không tồn tại. Quay lại trang chủ HALIFE ANIMAL HEALTH.'
     }
   }
 ]

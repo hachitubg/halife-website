@@ -47,7 +47,7 @@
               <div class="flex items-center mb-4">
                 <img src="/images/logo_white.png" alt="HALIFE" class="h-10 w-10 mr-3 rounded-full">
                 <div>
-                  <h4 class="font-bold text-blue-600">HALIFE ANIMALS</h4>
+                  <h4 class="font-bold text-blue-600">HALIFE ANIMAL HEALTH</h4>
                   <p class="text-sm text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
                 </div>
               </div>
@@ -195,7 +195,7 @@
         <div class="border-t border-gray-200 mt-8 pt-4">
           <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
             <div class="mb-2 md:mb-0 text-center md:text-left">
-              <p>&copy; 2024 HALIFE ANIMALS - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
+              <p>&copy; 2024 HALIFE ANIMAL HEALTH - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
               <p class="text-xs mt-1">Giấy phép kinh doanh số: 0123456789 do Sở KH&ĐT TP Hà Nội cấp</p>
             </div>
             <div class="flex items-center space-x-4 text-xs">

@@ -278,7 +278,7 @@ export default {
   
   mounted() {
     // Set page title
-    document.title = 'Trang không tồn tại (404) - HALIFE Animals'
+    document.title = 'Trang không tồn tại (404) - HALIFE ANIMAL HEALTH'
     
     // Log 404 error for analytics
     console.log('404 Error - Page not found:', this.$route.fullPath)
