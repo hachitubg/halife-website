@@ -18,9 +18,6 @@
 
         <!-- Mobile Actions -->
         <div class="flex items-center gap-2">
-          <button class="p-2 bg-blue-100 rounded-full">
-            <i class="fas fa-user text-primary-500"></i>
-          </button>
           <button @click="openCart" class="p-2 bg-primary-100 rounded-full relative">
             <i class="fas fa-shopping-cart text-primary-600"></i>
             <span v-if="cartCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
@@ -77,9 +74,6 @@
               <span v-if="cartCount > 0" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
                 {{ cartCount > 99 ? '99+' : cartCount }}
               </span>
-            </button>
-            <button class="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition-colors">
-              <i class="fas fa-user"></i>
             </button>
           </div>
         </div>

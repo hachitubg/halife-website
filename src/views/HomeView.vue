@@ -41,118 +41,68 @@
                   <i class="fas fa-chevron-right text-gray-600"></i>
                 </button>
               </div>
-              <button @click="$router.push('/products')" class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center">
+              <button @click="$router.push('/products')" class="hidden md:flex text-blue-500 hover:text-blue-700 text-sm font-medium items-center">
                 Xem tất cả <i class="fas fa-arrow-right ml-1 text-xs"></i>
               </button>
             </div>
           </div>
           
-          <div class="relative overflow-hidden">
+          <!-- Mobile: Single product per slide with swipe -->
+          <div class="block md:hidden">
             <div 
-              class="flex transition-transform duration-300 ease-in-out"
-              :style="{ transform: `translateX(-${currentFeaturedSlide * 100}%)` }"
+              class="relative overflow-hidden touch-pan-x"
+              @touchstart="handleFeaturedTouchStart"
+              @touchmove="handleFeaturedTouchMove"
+              @touchend="handleFeaturedTouchEnd"
             >
               <div 
-                v-for="slide in featuredSlides" 
-                :key="slide"
-                class="w-full flex-shrink-0"
+                class="flex transition-transform duration-300 ease-in-out"
+                :style="{ transform: `translateX(-${currentFeaturedSlide * 100}%)` }"
               >
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                <div 
+                  v-for="(product, index) in featuredProducts" 
+                  :key="product.id"
+                  class="w-full flex-shrink-0"
+                >
                   <ProductCard
-                    v-for="product in getFeaturedSlideProducts(slide)"
-                    :key="product.id"
                     :product="product"
                     :show-quick-actions="true"
                     :show-description="true"
                     @add-to-cart="handleAddToCart"
                     @quick-view="showProductQuickView"
+                    class="mx-auto product-card-mobile"
                   />
                 </div>
               </div>
             </div>
-          </div>
-          
-          <div v-if="featuredSlides.length > 1" class="lg:hidden mt-6 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <button 
-                @click="prevFeaturedSlide" 
-                :disabled="currentFeaturedSlide === 0"
-                class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <i class="fas fa-chevron-left text-gray-600"></i>
-              </button>
-              <button 
-                @click="nextFeaturedSlide"
-                :disabled="currentFeaturedSlide >= maxFeaturedSlide"
-                class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <i class="fas fa-chevron-right text-gray-600"></i>
-              </button>
-            </div>
             
-            <div class="flex items-center space-x-1">
+            <!-- Mobile pagination dots -->
+            <div v-if="featuredProducts.length > 1" class="mt-4 flex items-center justify-center space-x-2">
               <div 
-                v-for="n in featuredSlides.length" 
-                :key="n"
-                @click="currentFeaturedSlide = n - 1"
+                v-for="(product, index) in featuredProducts" 
+                :key="index"
+                @click="currentFeaturedSlide = index"
                 class="w-2 h-2 rounded-full transition-colors cursor-pointer"
-                :class="currentFeaturedSlide === n - 1 ? 'bg-blue-500' : 'bg-gray-300'"
+                :class="currentFeaturedSlide === index ? 'bg-blue-500' : 'bg-gray-300'"
               ></div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Products by Categories -->
-      <div v-if="selectedCategories.length > 0" class="container mx-auto px-4 py-8 md:py-12">
-        <div v-for="(category, index) in selectedCategories" :key="category" class="mb-12">
-          <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-            <div class="flex items-center justify-between mb-6">
-              <div>
-                <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
-                  <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                    <i :class="getCategoryIcon(category) + ' text-blue-500'"></i>
-                  </div>
-                  {{ category }}
-                </h3>
-                <p class="text-gray-600 text-sm">{{ getProductCountByCategory(category) }} sản phẩm có sẵn</p>
-              </div>
-              <div class="flex items-center space-x-3">
-                <div class="hidden lg:flex items-center space-x-2">
-                  <button 
-                    @click="prevCategorySlide(index)" 
-                    :disabled="getCategoryCurrentSlide(index) === 0"
-                    class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <i class="fas fa-chevron-left text-gray-600"></i>
-                  </button>
-                  <button 
-                    @click="nextCategorySlide(index)"
-                    :disabled="getCategoryCurrentSlide(index) >= getCategoryMaxSlide(category)"
-                    class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <i class="fas fa-chevron-right text-gray-600"></i>
-                  </button>
-                </div>
-                <button @click="navigateToCategory(category)" class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center">
-                  Xem tất cả <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                </button>
-              </div>
-            </div>
-            
+          
+          <!-- Desktop: 4 products per slide -->
+          <div class="hidden md:block">
             <div class="relative overflow-hidden">
               <div 
                 class="flex transition-transform duration-300 ease-in-out"
-                :style="{ transform: `translateX(-${getCategoryCurrentSlide(index) * 100}%)` }"
+                :style="{ transform: `translateX(-${currentFeaturedSlide * 100}%)` }"
               >
                 <div 
-                  v-for="slide in getCategorySlides(category)" 
+                  v-for="slide in featuredSlides" 
                   :key="slide"
                   class="w-full flex-shrink-0"
                 >
-                  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                  <div class="grid grid-cols-4 gap-4">
                     <ProductCard
-                      v-for="product in getCategorySlideProducts(category, slide)"
+                      v-for="product in getFeaturedSlideProducts(slide)"
                       :key="product.id"
                       :product="product"
                       :show-quick-actions="true"
@@ -164,33 +114,151 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products by Categories - All Products with Filter -->
+      <div class="container mx-auto px-4 py-8 md:py-12">
+        <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
+                <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                  <i class="fas fa-list text-blue-500"></i>
+                </div>
+                TẤT CẢ SẢN PHẨM
+              </h3>
+              <p class="text-gray-600 text-sm">{{ getFilteredProductCount() }} sản phẩm có sẵn</p>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div class="hidden lg:flex items-center space-x-2">
+                <button 
+                  @click="prevAllProductsSlide" 
+                  :disabled="currentAllProductsSlide === 0"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <i class="fas fa-chevron-left text-gray-600"></i>
+                </button>
+                <button 
+                  @click="nextAllProductsSlide"
+                  :disabled="currentAllProductsSlide >= maxAllProductsSlide"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <i class="fas fa-chevron-right text-gray-600"></i>
+                </button>
+              </div>
+              <button @click="$router.push('/products')" class="hidden md:flex text-blue-500 hover:text-blue-700 text-sm font-medium items-center">
+                Xem trang sản phẩm <i class="fas fa-arrow-right ml-1 text-xs"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Category Filter Buttons -->
+          <div class="mb-6">
+            <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+              <button 
+                v-for="category in availableCategories"
+                :key="category"
+                @click="selectCategoryFilter(category)"
+                class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300"
+                :class="selectedCategoryFilter === category 
+                  ? 'bg-blue-500 text-white shadow-lg' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+              >
+                {{ category }}
+              </button>
+            </div>
+          </div>
+          
+          <!-- Mobile: Single product per slide with swipe -->
+          <div class="block md:hidden">
+            <div 
+              class="relative overflow-hidden touch-pan-x"
+              @touchstart="handleTouchStart"
+              @touchmove="handleTouchMove"
+              @touchend="handleTouchEnd"
+            >
+              <div 
+                class="flex transition-transform duration-300 ease-in-out"
+                :style="{ transform: `translateX(-${currentAllProductsSlide * 100}%)` }"
+              >
+                <div 
+                  v-for="(product, index) in filteredProducts" 
+                  :key="product.id"
+                  class="w-full flex-shrink-0 px-1"
+                >
+                  <ProductCard
+                    :product="product"
+                    :show-quick-actions="true"
+                    :show-description="true"
+                    @add-to-cart="handleAddToCart"
+                    @quick-view="showProductQuickView"
+                    class="mx-auto product-card-mobile"
+                  />
+                </div>
+              </div>
+            </div>
             
-            <div v-if="getCategorySlides(category).length > 1" class="lg:hidden mt-6 flex items-center justify-between">
+            <!-- Mobile navigation buttons -->
+            <div v-if="filteredProducts.length > 1" class="mt-4 flex items-center justify-between">
               <div class="flex items-center space-x-2">
                 <button 
-                  @click="prevCategorySlide(index)" 
-                  :disabled="getCategoryCurrentSlide(index) === 0"
+                  @click="prevAllProductsSlide" 
+                  :disabled="currentAllProductsSlide === 0"
                   class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <i class="fas fa-chevron-left text-gray-600"></i>
                 </button>
                 <button 
-                  @click="nextCategorySlide(index)"
-                  :disabled="getCategoryCurrentSlide(index) >= getCategoryMaxSlide(category)"
+                  @click="nextAllProductsSlide"
+                  :disabled="currentAllProductsSlide >= maxAllProductsSlideMobile"
                   class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <i class="fas fa-chevron-right text-gray-600"></i>
                 </button>
               </div>
               
+              <!-- Mobile pagination dots -->
               <div class="flex items-center space-x-1">
                 <div 
-                  v-for="n in getCategorySlides(category).length" 
-                  :key="n"
-                  @click="setCategorySlide(index, n - 1)"
+                  v-for="(product, index) in filteredProducts.slice(0, 10)" 
+                  :key="index"
+                  @click="currentAllProductsSlide = index"
                   class="w-2 h-2 rounded-full transition-colors cursor-pointer"
-                  :class="getCategoryCurrentSlide(index) === n - 1 ? 'bg-blue-500' : 'bg-gray-300'"
+                  :class="currentAllProductsSlide === index ? 'bg-blue-500' : 'bg-gray-300'"
                 ></div>
+                <div v-if="filteredProducts.length > 10" class="text-xs text-gray-500 ml-2">
+                  +{{ filteredProducts.length - 10 }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Desktop: 4 products per slide -->
+          <div class="hidden md:block">
+            <div class="relative overflow-hidden">
+              <div 
+                class="flex transition-transform duration-300 ease-in-out"
+                :style="{ transform: `translateX(-${currentAllProductsSlide * 100}%)` }"
+              >
+                <div 
+                  v-for="slide in allProductsSlides" 
+                  :key="slide"
+                  class="w-full flex-shrink-0"
+                >
+                  <div class="grid grid-cols-4 gap-4">
+                    <ProductCard
+                      v-for="product in getAllProductsSlideProducts(slide)"
+                      :key="product.id"
+                      :product="product"
+                      :show-quick-actions="true"
+                      :show-description="true"
+                      @add-to-cart="handleAddToCart"
+                      @quick-view="showProductQuickView"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -210,19 +278,6 @@
         </div>
       </div>
 
-      <!-- Debug Section (temporary) - Xóa sau khi fix -->
-      <!-- <div v-if="!dataLoaded" class="container mx-auto px-4 py-8">
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p class="text-yellow-800">Đang tải dữ liệu sản phẩm...</p>
-        </div>
-      </div>
-
-      <div v-else-if="allProducts.length === 0" class="container mx-auto px-4 py-8">
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p class="text-red-800">Không có sản phẩm nào được tải. Kiểm tra API hoặc dữ liệu.</p>
-        </div>
-      </div> -->
-
       <!-- Latest News -->
       <div class="container mx-auto px-4 py-8 md:py-12">
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
@@ -236,7 +291,7 @@
               </h3>
               <p class="text-gray-600 text-sm">Cập nhật thông tin và kiến thức chuyên môn</p>
             </div>
-            <button @click="$router.push('/news')" class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center">
+            <button @click="$router.push('/news')" class="hidden md:flex text-blue-500 hover:text-blue-700 text-sm font-medium items-center">
               Xem tất cả <i class="fas fa-arrow-right ml-1 text-xs"></i>
             </button>
           </div>
@@ -317,10 +372,25 @@ export default {
       productCategories: productCategories,
       allProducts: [],
       currentFeaturedSlide: 0,
+      currentAllProductsSlide: 0,
       categorySlides: {},
-      itemsPerSlide: 5,
+      itemsPerSlide: 4, // Changed from 5 to 4
       dataLoaded: false,
-      newsLoaded: false
+      newsLoaded: false,
+      // New data for all products section
+      selectedCategoryFilter: 'Tất cả',
+      displayLimit: 20,
+      displayedProductCount: 20,
+      // Touch/swipe handling
+      touchStartX: 0,
+      touchStartY: 0,
+      touchEndX: 0,
+      touchEndY: 0,
+      // Featured touch handling
+      featuredTouchStartX: 0,
+      featuredTouchStartY: 0,
+      featuredTouchEndX: 0,
+      featuredTouchEndY: 0
     }
   },
 
@@ -334,20 +404,52 @@ export default {
       return getLatestNews(3)
     },
 
-    selectedCategories() {
-      if (!this.dataLoaded || !this.allProducts.length) return []
+    availableCategories() {
+      if (!this.dataLoaded || !this.allProducts.length) return ['Tất cả']
       
-      // Lấy các danh mục từ sản phẩm thực tế
-      const categorySet = new Set()
+      const categorySet = new Set(['Tất cả'])
       this.allProducts.forEach(product => {
         if (product.category && product.category !== 'Tất cả') {
           categorySet.add(product.category)
         }
       })
       
-      const categories = Array.from(categorySet).slice(0, 3)
-      console.log('🏷️ Dynamic categories:', categories)
-      return categories
+      return Array.from(categorySet)
+    },
+
+    filteredProducts() {
+      if (!this.dataLoaded) return []
+      
+      if (this.selectedCategoryFilter === 'Tất cả') {
+        return this.allProducts
+      }
+      
+      return this.allProducts.filter(product => 
+        product.category === this.selectedCategoryFilter
+      )
+    },
+
+    displayedProducts() {
+      return this.filteredProducts.slice(0, this.displayedProductCount)
+    },
+
+    hasMoreProducts() {
+      return this.filteredProducts.length > this.displayedProductCount
+    },
+
+    allProductsSlides() {
+      if (!this.filteredProducts.length) return []
+      return Array.from({ length: Math.ceil(this.filteredProducts.length / this.itemsPerSlide) }, (_, i) => i)
+    },
+
+    maxAllProductsSlide() {
+      // Desktop: slides based on itemsPerSlide
+      return Math.max(0, this.allProductsSlides.length - 1)
+    },
+
+    maxAllProductsSlideMobile() {
+      // Mobile: one product per slide
+      return Math.max(0, this.filteredProducts.length - 1)
     },
 
     featuredSlides() {
@@ -356,6 +458,11 @@ export default {
     },
 
     maxFeaturedSlide() {
+      // Mobile: one product per slide
+      if (window.innerWidth < 768) {
+        return Math.max(0, this.featuredProducts.length - 1)
+      }
+      // Desktop: slides based on itemsPerSlide
       return Math.max(0, this.featuredSlides.length - 1)
     }
   },
@@ -374,7 +481,6 @@ export default {
       try {
         console.log('🔄 Loading data...')
         
-        // Dùng ProductAPI giống ProductManager
         const [products, categories] = await Promise.all([
           ProductAPI.getAllProducts(),
           ProductAPI.getAllCategories()
@@ -382,19 +488,10 @@ export default {
 
         console.log('📦 Products loaded:', products?.length || 0)
         console.log('📂 Categories loaded:', categories?.length || 0)
-        console.log('🔍 Sample product:', products?.[0])
 
         this.allProducts = products || [];
         this.categories = categories || sidebarCategories;
         this.dataLoaded = true;
-        this.initializeCategorySlides();
-        
-        // Debug computed properties
-        this.$nextTick(() => {
-          console.log('✨ Featured products:', this.featuredProducts.length)
-          console.log('📂 Selected categories:', this.selectedCategories)
-          console.log('🎯 Featured slides:', this.featuredSlides.length)
-        })
         
         if (!this.newsLoaded) {
           await newsService.getAllNews();
@@ -402,17 +499,10 @@ export default {
         }
       } catch (error) {
         console.error('❌ Error loading data:', error);
-        // Fallback về static data nếu API fail
         this.allProducts = [];
         this.dataLoaded = true;
         this.newsLoaded = true;
       }
-    },
-
-    initializeCategorySlides() {
-      this.selectedCategories.forEach((category, index) => {
-        this.categorySlides[index] = 0
-      })
     },
 
     handleSearch(query) {
@@ -422,30 +512,121 @@ export default {
       })
     },
     
-    navigateToCategory(category) {
-      this.$router.push({
-        path: '/products',
-        query: { category: category }
-      })
-    },
-    
-    getProductCountByCategory(category) {
-      if (!this.dataLoaded) return 0
-      return this.allProducts.filter(product => 
-        category === 'Tất cả' ? true : product.category === category
-      ).length
+    getFilteredProductCount() {
+      return this.filteredProducts.length
     },
 
-    getCategoryIcon(categoryName) {
-      const category = this.categories.find(cat => cat.name === categoryName)
-      return category ? category.icon : 'fas fa-pills'
+    selectCategoryFilter(category) {
+      this.selectedCategoryFilter = category
+      this.currentAllProductsSlide = 0 // Reset slide when changing category
     },
-    
-    scrollToProducts() {
-      const element = document.getElementById('products')
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
+
+    loadMoreProducts() {
+      this.displayedProductCount += 20
+    },
+
+    // Touch/Swipe handlers for mobile (All Products)
+    handleTouchStart(e) {
+      this.touchStartX = e.touches[0].clientX
+      this.touchStartY = e.touches[0].clientY
+    },
+
+    handleTouchMove(e) {
+      // Prevent default scrolling behavior when swiping horizontally
+      const touchMoveX = e.touches[0].clientX
+      const touchMoveY = e.touches[0].clientY
+      
+      const diffX = Math.abs(touchMoveX - this.touchStartX)
+      const diffY = Math.abs(touchMoveY - this.touchStartY)
+      
+      // If horizontal swipe is dominant, prevent vertical scrolling
+      if (diffX > diffY) {
+        e.preventDefault()
       }
+    },
+
+    handleTouchEnd(e) {
+      this.touchEndX = e.changedTouches[0].clientX
+      this.touchEndY = e.changedTouches[0].clientY
+      
+      const diffX = this.touchStartX - this.touchEndX
+      const diffY = Math.abs(this.touchStartY - this.touchEndY)
+      
+      // Only process horizontal swipes (ignore vertical ones)
+      if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY) {
+        if (diffX > 0) {
+          // Swipe left - next slide
+          this.nextAllProductsSlide()
+        } else {
+          // Swipe right - previous slide
+          this.prevAllProductsSlide()
+        }
+      }
+    },
+
+    // Touch/Swipe handlers for mobile (Featured Products)
+    handleFeaturedTouchStart(e) {
+      this.featuredTouchStartX = e.touches[0].clientX
+      this.featuredTouchStartY = e.touches[0].clientY
+    },
+
+    handleFeaturedTouchMove(e) {
+      // Prevent default scrolling behavior when swiping horizontally
+      const touchMoveX = e.touches[0].clientX
+      const touchMoveY = e.touches[0].clientY
+      
+      const diffX = Math.abs(touchMoveX - this.featuredTouchStartX)
+      const diffY = Math.abs(touchMoveY - this.featuredTouchStartY)
+      
+      // If horizontal swipe is dominant, prevent vertical scrolling
+      if (diffX > diffY) {
+        e.preventDefault()
+      }
+    },
+
+    handleFeaturedTouchEnd(e) {
+      this.featuredTouchEndX = e.changedTouches[0].clientX
+      this.featuredTouchEndY = e.changedTouches[0].clientY
+      
+      const diffX = this.featuredTouchStartX - this.featuredTouchEndX
+      const diffY = Math.abs(this.featuredTouchStartY - this.featuredTouchEndY)
+      
+      console.log('Featured touch end - diffX:', diffX, 'diffY:', diffY)
+      
+      // Only process horizontal swipes (ignore vertical ones)
+      if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY) {
+        if (diffX > 0) {
+          // Swipe left - next slide
+          console.log('Featured swipe left - next slide')
+          this.nextFeaturedSlide()
+        } else {
+          // Swipe right - previous slide
+          console.log('Featured swipe right - prev slide')
+          this.prevFeaturedSlide()
+        }
+      }
+    },
+
+    // All products slide navigation
+    nextAllProductsSlide() {
+      const isMobile = window.innerWidth < 768
+      const maxSlide = isMobile ? this.maxAllProductsSlideMobile : this.maxAllProductsSlide
+      
+      if (this.currentAllProductsSlide < maxSlide) {
+        this.currentAllProductsSlide++
+      }
+    },
+
+    prevAllProductsSlide() {
+      if (this.currentAllProductsSlide > 0) {
+        this.currentAllProductsSlide--
+      }
+    },
+
+    getAllProductsSlideProducts(slideIndex) {
+      const start = slideIndex * this.itemsPerSlide
+      const end = start + this.itemsPerSlide
+      return this.filteredProducts.slice(start, end)
     },
 
     getFeaturedSlideProducts(slideIndex) {
@@ -455,7 +636,10 @@ export default {
     },
 
     nextFeaturedSlide() {
-      if (this.currentFeaturedSlide < this.maxFeaturedSlide) {
+      const isMobile = window.innerWidth < 768
+      const maxSlide = isMobile ? (this.featuredProducts.length - 1) : this.maxFeaturedSlide
+      
+      if (this.currentFeaturedSlide < maxSlide) {
         this.currentFeaturedSlide++
       }
     },
@@ -464,55 +648,6 @@ export default {
       if (this.currentFeaturedSlide > 0) {
         this.currentFeaturedSlide--
       }
-    },
-
-    getCategoryProducts(category) {
-      if (!this.dataLoaded) return []
-      return this.allProducts.filter(product => 
-        category === 'Tất cả' ? true : product.category === category
-      )
-    },
-
-    getCategorySlides(category) {
-      const products = this.getCategoryProducts(category)
-      if (!products.length) return []
-      return Array.from({ length: Math.ceil(products.length / this.itemsPerSlide) }, (_, i) => i)
-    },
-
-    getCategorySlideProducts(category, slideIndex) {
-      const products = this.getCategoryProducts(category)
-      const start = slideIndex * this.itemsPerSlide
-      const end = start + this.itemsPerSlide
-      return products.slice(start, end)
-    },
-
-    getCategoryCurrentSlide(index) {
-      return this.categorySlides[index] || 0
-    },
-
-    getCategoryMaxSlide(category) {
-      return Math.max(0, this.getCategorySlides(category).length - 1)
-    },
-
-    nextCategorySlide(index) {
-      const maxSlide = this.getCategoryMaxSlide(this.selectedCategories[index])
-      if (this.getCategoryCurrentSlide(index) < maxSlide) {
-        this.categorySlides[index] = this.getCategoryCurrentSlide(index) + 1
-      }
-    },
-
-    prevCategorySlide(index) {
-      if (this.getCategoryCurrentSlide(index) > 0) {
-        this.categorySlides[index] = this.getCategoryCurrentSlide(index) - 1
-      }
-    },
-
-    setCategorySlide(index, slideIndex) {
-      this.categorySlides[index] = slideIndex
-    },
-
-    showProductQuickView(product) {
-      alert(`Xem nhanh: ${product.name}`)
     },
 
     readArticle(article) {
@@ -567,11 +702,6 @@ export default {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.product-card:hover {
-  transform: translateY(-2px);
-  transition: all 0.3s ease;
-}
-
 .section-icon {
   transition: all 0.3s ease;
 }
@@ -600,16 +730,28 @@ export default {
   transform: scale(1.2);
 }
 
-.category-item:hover {
-  transform: translateY(-2px);
-  transition: all 0.3s ease;
+/* Mobile Product Card Styling */
+.product-card-mobile {
+  max-width: 300px;
+  min-height: 380px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.feature-card:hover {
-  transform: translateY(-3px);
-  transition: all 0.3s ease;
+/* Touch pan for horizontal scrolling only */
+.touch-pan-x {
+  touch-action: pan-x;
 }
 
+/* Swipe container */
+.swipe-container {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-x;
+}
+
+/* Mobile responsive */
 @media (max-width: 768px) {
   .container {
     padding-left: 1rem;
@@ -622,6 +764,12 @@ export default {
   
   .text-6xl {
     font-size: 3rem;
+  }
+  
+  /* Mobile product card adjustments */
+  .product-card-mobile {
+    max-width: calc(100vw - 3rem);
+    margin: 0 0.5rem;
   }
 }
 

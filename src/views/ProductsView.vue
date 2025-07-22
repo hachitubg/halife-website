@@ -203,10 +203,10 @@
 
           <!-- Products Grid -->
           <div v-if="filteredProducts.length > 0">
-            <!-- Grid View -->
+            <!-- Grid View - Mobile: 1 column, Tablet: 2 columns, Desktop: 3-4 columns -->
             <div 
               v-if="viewMode === 'grid'" 
-              class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6"
+              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6"
             >
               <ProductCard
                 v-for="product in paginatedProducts"
@@ -217,6 +217,7 @@
                 :show-quick-actions="true"
                 @add-to-cart="addToCart"
                 @quick-view="showProductQuickView"
+                class="product-card-mobile"
               />
             </div>
 
@@ -494,11 +495,6 @@ export default {
     addToCart(product) {
       console.log('Thêm vào giỏ hàng:', product.name)
       alert(`Đã thêm "${product.name}" vào giỏ hàng`)
-    },
-    
-    showProductQuickView(product) {
-      console.log('Xem nhanh sản phẩm:', product.name)
-      alert(`Xem nhanh: ${product.name}`)
     }
   },
   
@@ -558,6 +554,24 @@ export default {
   .mobile-filters-leave-to {
     opacity: 0;
     transform: translateY(-10px);
+  }
+}
+
+/* Mobile Product Card Styling */
+.product-card-mobile {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Mobile grid adjustments */
+@media (max-width: 768px) {
+  .grid {
+    gap: 1rem;
+  }
+  
+  .product-card-mobile {
+    max-width: 350px;
+    margin: 0 auto;
   }
 }
 

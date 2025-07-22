@@ -112,12 +112,6 @@
             <i v-else class="fas fa-gift mr-3"></i>
             {{ submitting ? 'ĐANG GỬI...' : 'NHẬN MÃ GIẢM GIÁ NGAY' }}
           </button>
-          
-          <!-- Security note -->
-          <div class="flex items-center justify-center text-xs text-gray-500 mt-4">
-            <i class="fas fa-shield-alt mr-2 text-green-500"></i>
-            Thông tin của bạn được bảo mật tuyệt đối
-          </div>
         </form>
         
         <!-- Success Message -->
@@ -128,22 +122,6 @@
               <div class="font-bold">Cảm ơn bạn đã đăng ký!</div>
               <div class="text-sm">Chúng tôi sẽ liên hệ trong vòng 15 phút với mã giảm giá 50%</div>
             </div>
-          </div>
-        </div>
-        
-        <!-- Trust indicators -->
-        <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-gray-500">
-          <div class="flex items-center">
-            <i class="fas fa-star text-yellow-400 mr-1"></i>
-            <span>4.9/5 đánh giá</span>
-          </div>
-          <div class="flex items-center">
-            <i class="fas fa-users text-blue-500 mr-1"></i>
-            <span>10,000+ khách hàng</span>
-          </div>
-          <div class="flex items-center">
-            <i class="fas fa-shipping-fast text-green-500 mr-1"></i>
-            <span>Giao hàng 24h</span>
           </div>
         </div>
       </div>
@@ -172,16 +150,12 @@ export default {
     }
   },
   async mounted() {
-    console.log('🔄 ContactPopup mounted - initializing...')
-    
     try {
       // Load popup banner using BannerAPI
       this.popupBanner = await BannerAPI.initializePopupBanner(this)
-      console.log('✅ Popup banner loaded:', this.popupBanner)
       
       // Setup event listener
       this.cleanupListener = BannerAPI.setupPopupBannerListener(this)
-      console.log('✅ Event listener setup complete')
       
     } catch (error) {
       console.error('❌ Error initializing ContactPopup:', error)
@@ -190,12 +164,10 @@ export default {
     
     // Show popup after 2 seconds
     setTimeout(() => {
-      console.log('⏰ Showing popup after 2 seconds')
       this.openPopup()
     }, 2000)
   },
   beforeUnmount() {
-    console.log('🧹 ContactPopup cleanup')
     if (this.cleanupListener) {
       this.cleanupListener()
     }
@@ -203,18 +175,14 @@ export default {
   methods: {
     openPopup() {
       this.showPopup = true
-      console.log('📝 Popup opened')
     },
     
     closePopup() {
       this.showPopup = false
       this.showSuccess = false
-      console.log('❌ Popup closed')
     },
     
     async submitForm() {
-      console.log('📤 Submitting form:', this.form)
-      
       // Validate required fields
       if (!this.form.name.trim() || !this.form.phone.trim()) {
         alert('Vui lòng điền đầy đủ tên và số điện thoại!')
@@ -226,7 +194,6 @@ export default {
       try {
         // Send email using BannerAPI
         await BannerAPI.sendContactEmail(this.form)
-        console.log('✅ Email sent successfully')
         
         // Show success message
         this.showSuccess = true
@@ -254,7 +221,6 @@ export default {
         email: '',
         location: ''
       }
-      console.log('🔄 Form reset')
     }
   }
 }

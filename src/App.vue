@@ -1,9 +1,26 @@
 <template>
   <div id="app">
-    <!-- Router View - Hiển thị các trang như HomeView, AboutView, etc. -->
     <router-view />
     <ContactPopup ref="contactPopup" />
     <CartDrawer ref="cartDrawer"/>
+  </div>
+
+  <!-- Nút gọi điện thoại cố định -->
+  <div class="fixed bottom-6 left-6 z-50 flex items-center">
+    <!-- Ripple animation circles -->
+    <span class="ripple-1 absolute w-16 h-16 bg-red-500 rounded-full opacity-20"></span>
+    <span class="ripple-2 absolute w-20 h-20 bg-red-500 rounded-full opacity-10"></span>
+
+    <!-- Button -->
+    <a
+      href="tel:0866583223"
+      class="relative flex items-center pl-12 pr-4 py-2 bg-red-600 text-white font-bold rounded-full shadow-lg hover:bg-red-700 transition-all duration-300"
+    >
+      <div class="absolute left-3 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+        <i class="fas fa-phone text-white text-sm"></i>
+      </div>
+      0866583223
+    </a>
   </div>
 </template>
 
@@ -301,6 +318,39 @@ textarea:focus {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Ripple animations */
+.ripple-1 {
+  animation: ripple 1.8s ease-out infinite;
+  transform-origin: center;
+}
+
+.ripple-2 {
+  animation: ripple2 2.4s ease-out infinite;
+  transform-origin: center;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes ripple2 {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
   }
 }
 </style>

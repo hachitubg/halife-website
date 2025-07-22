@@ -28,20 +28,20 @@
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div class="flex items-center mb-3">
               <i class="fas fa-image text-blue-500 text-lg mr-2"></i>
-              <h3 class="font-semibold text-blue-800">Kích thước Banner chuẩn</h3>
+              <h3 class="font-semibold text-blue-800">Kích thước các loại hình ảnh chuẩn</h3>
             </div>
             <div class="space-y-2 text-sm text-blue-700">
               <div class="flex justify-between">
-                <span>Desktop:</span>
+                <span>Banner trang chủ:</span>
                 <span class="font-mono font-semibold">2560 x 974 px</span>
               </div>
               <div class="flex justify-between">
-                <span>Tablet:</span>
-                <span class="font-mono font-semibold">1024 x 400 px</span>
+                <span>Hình ảnh sản phẩm:</span>
+                <span class="font-mono font-semibold">348 x 300 px</span>
               </div>
               <div class="flex justify-between">
-                <span>Mobile:</span>
-                <span class="font-mono font-semibold">768 x 300 px</span>
+                <span>Banner form ưu đãi:</span>
+                <span class="font-mono font-semibold">600 x 800 px</span>
               </div>
               <div class="mt-3 pt-2 border-t border-blue-200">
                 <p class="text-xs text-blue-600">
@@ -51,62 +51,7 @@
               </div>
             </div>
           </div>
-          
-          <!-- Product Image Size Info -->
-          <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-            <div class="flex items-center mb-3">
-              <i class="fas fa-box text-green-500 text-lg mr-2"></i>
-              <h3 class="font-semibold text-green-800">Kích thước ảnh sản phẩm chuẩn</h3>
-            </div>
-            <div class="space-y-2 text-sm text-green-700">
-              <div class="flex justify-between">
-                <span>Ảnh chính:</span>
-                <span class="font-mono font-semibold">800 x 800 px</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Ảnh phụ:</span>
-                <span class="font-mono font-semibold">600 x 600 px</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Thumbnail:</span>
-                <span class="font-mono font-semibold">300 x 300 px</span>
-              </div>
-              <div class="mt-3 pt-2 border-t border-green-200">
-                <p class="text-xs text-green-600">
-                  <i class="fas fa-info-circle mr-1"></i>
-                  Tỉ lệ khung hình: 1:1 (hình vuông), định dạng PNG/JPG
-                </p>
-              </div>
-            </div>
-          </div>
 
-          <!-- Popup Banner Size Info -->
-          <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <div class="flex items-center mb-3">
-              <i class="fas fa-window-restore text-purple-500 text-lg mr-2"></i>
-              <h3 class="font-semibold text-purple-800">Kích thước Banner Popup chuẩn</h3>
-            </div>
-            <div class="space-y-2 text-sm text-purple-700">
-              <div class="flex justify-between">
-                <span>Desktop:</span>
-                <span class="font-mono font-semibold">600 x 800 px</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Tablet:</span>
-                <span class="font-mono font-semibold">500 x 700 px</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Mobile:</span>
-                <span class="font-mono font-semibold">400 x 600 px</span>
-              </div>
-              <div class="mt-3 pt-2 border-t border-purple-200">
-                <p class="text-xs text-purple-600">
-                  <i class="fas fa-info-circle mr-1"></i>
-                  Tỉ lệ khung hình: 3:4 (chiều rộng : chiều cao)
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
         
         <!-- Additional Guidelines -->

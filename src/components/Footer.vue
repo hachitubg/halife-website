@@ -79,17 +79,14 @@
               <div class="mt-6">
                 <h5 class="font-semibold text-gray-800 mb-3">Theo dõi chúng tôi</h5>
                 <div class="flex space-x-3">
-                  <a href="#" class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
+                  <a href="https://www.facebook.com/CongTyThuocThuY.Halife" class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
                     <i class="fab fa-facebook-f"></i>
                   </a>
-                  <a href="#" class="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors">
+                  <a href="https://www.youtube.com/@halifevietnam" class="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors">
                     <i class="fab fa-youtube"></i>
                   </a>
-                  <a href="#" class="bg-blue-400 text-white p-2 rounded-full hover:bg-blue-500 transition-colors">
-                    <i class="fab fa-twitter"></i>
-                  </a>
-                  <a href="#" class="bg-pink-500 text-white p-2 rounded-full hover:bg-pink-600 transition-colors">
-                    <i class="fab fa-instagram"></i>
+                  <a href="https://www.tiktok.com/@bstyhalife8" class="bg-blue-400 text-white p-2 rounded-full hover:bg-blue-500 transition-colors">
+                    <i class="fab fa-tiktok"></i>
                   </a>
                 </div>
               </div>
