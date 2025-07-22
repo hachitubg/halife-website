@@ -216,7 +216,6 @@
                 :show-add-to-cart="true"
                 :show-quick-actions="true"
                 @add-to-cart="addToCart"
-                @quick-view="showProductQuickView"
                 class="product-card-mobile"
               />
             </div>

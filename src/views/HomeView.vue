@@ -69,7 +69,6 @@
                     :show-quick-actions="true"
                     :show-description="true"
                     @add-to-cart="handleAddToCart"
-                    @quick-view="showProductQuickView"
                     class="mx-auto product-card-mobile"
                   />
                 </div>
@@ -108,7 +107,6 @@
                       :show-quick-actions="true"
                       :show-description="true"
                       @add-to-cart="handleAddToCart"
-                      @quick-view="showProductQuickView"
                     />
                   </div>
                 </div>
@@ -193,7 +191,6 @@
                     :show-quick-actions="true"
                     :show-description="true"
                     @add-to-cart="handleAddToCart"
-                    @quick-view="showProductQuickView"
                     class="mx-auto product-card-mobile"
                   />
                 </div>
@@ -255,7 +252,6 @@
                       :show-quick-actions="true"
                       :show-description="true"
                       @add-to-cart="handleAddToCart"
-                      @quick-view="showProductQuickView"
                     />
                   </div>
                 </div>
@@ -305,7 +301,6 @@
               @read-more="readArticle"
               @show-comments="showComments"
               @share="shareArticle"
-              @like="likeArticle"
             />
           </div>
         </div>
@@ -479,15 +474,10 @@ export default {
 
     async loadData() {
       try {
-        console.log('🔄 Loading data...')
-        
         const [products, categories] = await Promise.all([
           ProductAPI.getAllProducts(),
           ProductAPI.getAllCategories()
         ]);
-
-        console.log('📦 Products loaded:', products?.length || 0)
-        console.log('📂 Categories loaded:', categories?.length || 0)
 
         this.allProducts = products || [];
         this.categories = categories || sidebarCategories;
@@ -498,7 +488,6 @@ export default {
           this.newsLoaded = true;
         }
       } catch (error) {
-        console.error('❌ Error loading data:', error);
         this.allProducts = [];
         this.dataLoaded = true;
         this.newsLoaded = true;
@@ -591,17 +580,13 @@ export default {
       const diffX = this.featuredTouchStartX - this.featuredTouchEndX
       const diffY = Math.abs(this.featuredTouchStartY - this.featuredTouchEndY)
       
-      console.log('Featured touch end - diffX:', diffX, 'diffY:', diffY)
-      
       // Only process horizontal swipes (ignore vertical ones)
       if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY) {
         if (diffX > 0) {
           // Swipe left - next slide
-          console.log('Featured swipe left - next slide')
           this.nextFeaturedSlide()
         } else {
           // Swipe right - previous slide
-          console.log('Featured swipe right - prev slide')
           this.prevFeaturedSlide()
         }
       }
@@ -668,10 +653,6 @@ export default {
       } else {
         alert('Đã copy link bài viết')
       }
-    },
-
-    likeArticle(article) {
-      console.log('Liked article:', article.title)
     }
   },
 
