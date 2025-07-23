@@ -12,6 +12,7 @@
     <!-- Main Content -->
     <main>
       <!-- Featured Products -->
+      <!-- Featured Products -->
       <div id="products" class="container mx-auto px-4 py-8 md:py-12">
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
           <div class="flex items-center justify-between mb-6">
@@ -50,7 +51,7 @@
           <!-- Mobile: Single product per slide with swipe -->
           <div class="block md:hidden">
             <div 
-              class="relative overflow-hidden touch-pan-x"
+              class="relative overflow-hidden swipe-container"
               @touchstart="handleFeaturedTouchStart"
               @touchmove="handleFeaturedTouchMove"
               @touchend="handleFeaturedTouchEnd"
@@ -116,7 +117,7 @@
         </div>
       </div>
 
-      <!-- Products by Categories - All Products with Filter -->
+      <!-- All Products -->
       <div class="container mx-auto px-4 py-8 md:py-12">
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
           <div class="flex items-center justify-between mb-6">
@@ -127,7 +128,7 @@
                 </div>
                 TẤT CẢ SẢN PHẨM
               </h3>
-              <p class="text-gray-600 text-sm">{{ getFilteredProductCount() }} sản phẩm có sẵn</p>
+              <p class="text-gray-600 text-sm">{{ allProducts.length }} sản phẩm có sẵn</p>
             </div>
             <div class="flex items-center space-x-3">
               <div class="hidden lg:flex items-center space-x-2">
@@ -152,27 +153,10 @@
             </div>
           </div>
           
-          <!-- Category Filter Buttons -->
-          <div class="mb-6">
-            <div class="flex flex-wrap gap-2 justify-center md:justify-start">
-              <button 
-                v-for="category in availableCategories"
-                :key="category"
-                @click="selectCategoryFilter(category)"
-                class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-300"
-                :class="selectedCategoryFilter === category 
-                  ? 'bg-blue-500 text-white shadow-lg' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-              >
-                {{ category }}
-              </button>
-            </div>
-          </div>
-          
           <!-- Mobile: Single product per slide with swipe -->
           <div class="block md:hidden">
             <div 
-              class="relative overflow-hidden touch-pan-x"
+              class="relative overflow-hidden swipe-container"
               @touchstart="handleTouchStart"
               @touchmove="handleTouchMove"
               @touchend="handleTouchEnd"
@@ -182,7 +166,7 @@
                 :style="{ transform: `translateX(-${currentAllProductsSlide * 100}%)` }"
               >
                 <div 
-                  v-for="(product, index) in filteredProducts" 
+                  v-for="(product, index) in allProducts" 
                   :key="product.id"
                   class="w-full flex-shrink-0 px-1"
                 >
@@ -198,7 +182,7 @@
             </div>
             
             <!-- Mobile navigation buttons -->
-            <div v-if="filteredProducts.length > 1" class="mt-4 flex items-center justify-between">
+            <div v-if="allProducts.length > 1" class="mt-4 flex items-center justify-between">
               <div class="flex items-center space-x-2">
                 <button 
                   @click="prevAllProductsSlide" 
@@ -219,14 +203,14 @@
               <!-- Mobile pagination dots -->
               <div class="flex items-center space-x-1">
                 <div 
-                  v-for="(product, index) in filteredProducts.slice(0, 10)" 
+                  v-for="(product, index) in allProducts.slice(0, 10)" 
                   :key="index"
                   @click="currentAllProductsSlide = index"
                   class="w-2 h-2 rounded-full transition-colors cursor-pointer"
                   :class="currentAllProductsSlide === index ? 'bg-blue-500' : 'bg-gray-300'"
                 ></div>
-                <div v-if="filteredProducts.length > 10" class="text-xs text-gray-500 ml-2">
-                  +{{ filteredProducts.length - 10 }}
+                <div v-if="allProducts.length > 10" class="text-xs text-gray-500 ml-2">
+                  +{{ allProducts.length - 10 }}
                 </div>
               </div>
             </div>
@@ -399,42 +383,9 @@ export default {
       return getLatestNews(3)
     },
 
-    availableCategories() {
-      if (!this.dataLoaded || !this.allProducts.length) return ['Tất cả']
-      
-      const categorySet = new Set(['Tất cả'])
-      this.allProducts.forEach(product => {
-        if (product.category && product.category !== 'Tất cả') {
-          categorySet.add(product.category)
-        }
-      })
-      
-      return Array.from(categorySet)
-    },
-
-    filteredProducts() {
-      if (!this.dataLoaded) return []
-      
-      if (this.selectedCategoryFilter === 'Tất cả') {
-        return this.allProducts
-      }
-      
-      return this.allProducts.filter(product => 
-        product.category === this.selectedCategoryFilter
-      )
-    },
-
-    displayedProducts() {
-      return this.filteredProducts.slice(0, this.displayedProductCount)
-    },
-
-    hasMoreProducts() {
-      return this.filteredProducts.length > this.displayedProductCount
-    },
-
     allProductsSlides() {
-      if (!this.filteredProducts.length) return []
-      return Array.from({ length: Math.ceil(this.filteredProducts.length / this.itemsPerSlide) }, (_, i) => i)
+      if (!this.allProducts.length) return []
+      return Array.from({ length: Math.ceil(this.allProducts.length / this.itemsPerSlide) }, (_, i) => i)
     },
 
     maxAllProductsSlide() {
@@ -444,7 +395,7 @@ export default {
 
     maxAllProductsSlideMobile() {
       // Mobile: one product per slide
-      return Math.max(0, this.filteredProducts.length - 1)
+      return Math.max(0, this.allProducts.length - 1)
     },
 
     featuredSlides() {
@@ -521,15 +472,14 @@ export default {
     },
 
     handleTouchMove(e) {
-      // Prevent default scrolling behavior when swiping horizontally
       const touchMoveX = e.touches[0].clientX
       const touchMoveY = e.touches[0].clientY
       
       const diffX = Math.abs(touchMoveX - this.touchStartX)
       const diffY = Math.abs(touchMoveY - this.touchStartY)
       
-      // If horizontal swipe is dominant, prevent vertical scrolling
-      if (diffX > diffY) {
+      // CHỈ preventDefault khi thực sự cần và có thể cancel được
+      if (diffX > 30 && diffX > diffY * 2 && e.cancelable) {
         e.preventDefault()
       }
     },
@@ -541,13 +491,11 @@ export default {
       const diffX = this.touchStartX - this.touchEndX
       const diffY = Math.abs(this.touchStartY - this.touchEndY)
       
-      // Only process horizontal swipes (ignore vertical ones)
-      if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY) {
+      // Chỉ xử lý swipe ngang khi rất rõ ràng
+      if (Math.abs(diffX) > 60 && Math.abs(diffX) > diffY * 1.5) {
         if (diffX > 0) {
-          // Swipe left - next slide
           this.nextAllProductsSlide()
         } else {
-          // Swipe right - previous slide
           this.prevAllProductsSlide()
         }
       }
@@ -560,15 +508,14 @@ export default {
     },
 
     handleFeaturedTouchMove(e) {
-      // Prevent default scrolling behavior when swiping horizontally
       const touchMoveX = e.touches[0].clientX
       const touchMoveY = e.touches[0].clientY
       
       const diffX = Math.abs(touchMoveX - this.featuredTouchStartX)
       const diffY = Math.abs(touchMoveY - this.featuredTouchStartY)
       
-      // If horizontal swipe is dominant, prevent vertical scrolling
-      if (diffX > diffY) {
+      // CHỈ preventDefault khi thực sự cần và có thể cancel được
+      if (diffX > 30 && diffX > diffY * 2 && e.cancelable) {
         e.preventDefault()
       }
     },
@@ -580,13 +527,11 @@ export default {
       const diffX = this.featuredTouchStartX - this.featuredTouchEndX
       const diffY = Math.abs(this.featuredTouchStartY - this.featuredTouchEndY)
       
-      // Only process horizontal swipes (ignore vertical ones)
-      if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY) {
+      // Chỉ xử lý swipe ngang khi rất rõ ràng
+      if (Math.abs(diffX) > 60 && Math.abs(diffX) > diffY * 1.5) {
         if (diffX > 0) {
-          // Swipe left - next slide
           this.nextFeaturedSlide()
         } else {
-          // Swipe right - previous slide
           this.prevFeaturedSlide()
         }
       }
@@ -611,7 +556,7 @@ export default {
     getAllProductsSlideProducts(slideIndex) {
       const start = slideIndex * this.itemsPerSlide
       const end = start + this.itemsPerSlide
-      return this.filteredProducts.slice(start, end)
+      return this.allProducts.slice(start, end)
     },
 
     getFeaturedSlideProducts(slideIndex) {
@@ -720,16 +665,11 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Touch pan for horizontal scrolling only */
-.touch-pan-x {
-  touch-action: pan-x;
-}
-
-/* Swipe container */
+/* Swipe container - CHO PHÉP SCROLL DỌC */
 .swipe-container {
   position: relative;
   overflow: hidden;
-  touch-action: pan-x;
+  touch-action: manipulation; /* Thay vì pan-x, cho phép cả scroll dọc */
 }
 
 /* Mobile responsive */
@@ -777,5 +717,155 @@ export default {
 
 .animate-slide-in {
   animation: slideInUp 0.6s ease-out;
+}
+
+/* Hiệu ứng slide smooth */
+.carousel-slide {
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Hiệu ứng cho navigation buttons */
+.nav-button {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover::before {
+  width: 100px;
+  height: 100px;
+}
+
+.nav-button:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.nav-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* Hiệu ứng cho section headers */
+.section-icon {
+  transition: all 0.4s ease;
+}
+
+.section-icon:hover {
+  transform: scale(1.15) rotate(5deg);
+}
+
+/* Hiệu ứng pagination dots */
+.slide-indicator {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.slide-indicator:hover {
+  transform: scale(1.5);
+}
+
+/* Hiệu ứng fade in cho products */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card-mobile {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Hiệu ứng cho desktop product grid */
+.grid > * {
+  transition: all 0.3s ease;
+}
+
+.grid:hover > *:not(:hover) {
+  opacity: 0.7;
+  transform: scale(0.95);
+}
+
+/* Hiệu ứng cho swipe containers */
+.swipe-container {
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+.swipe-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: left 0.5s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.swipe-container:hover::before {
+  left: 100%;
+}
+
+/* Hiệu ứng loading */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Hiệu ứng cho "Xem tất cả" button */
+.text-blue-500 {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.text-blue-500::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+.text-blue-500:hover::after {
+  width: 100%;
+}
+
+/* Responsive effects */
+@media (max-width: 768px) {
+  .carousel-slide {
+    transition: transform 0.4s ease-out;
+  }
+  
+  .nav-button:hover:not(:disabled) {
+    transform: scale(1.05);
+  }
 }
 </style>

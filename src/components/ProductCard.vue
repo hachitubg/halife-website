@@ -166,86 +166,103 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.bg-white:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .product-image-container {
   position: relative;
   width: 100%;
-  height: 250px;
+  height: 0;
+  padding-bottom: 100%;
   overflow: hidden;
   background-color: #f8fafc;
   border-radius: 0.5rem 0.5rem 0 0; 
 }
 
-@media (min-width: 768px) {
-  .product-image-container {
-    height: 300px;
-  }
-}
-
 .product-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
   background-color: white;
 }
 
 .group:hover .product-image {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .product-name {
   text-shadow: 0 1px 3px rgba(0, 35, 145, 0.1);
   font-weight: 700;
   letter-spacing: -0.025em;
+  transition: all 0.3s ease;
 }
 
 .product-name:hover {
   text-shadow: 0 2px 4px rgba(0, 35, 145, 0.15);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
-.image-overlay {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+/* Hiệu ứng cho badges */
+.absolute.top-2 {
+  animation: pulse 2s infinite;
 }
 
-.group:hover .image-overlay {
-  opacity: 1;
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
-.line-clamp-2 {
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.transition-all {
+/* Hiệu ứng cho button */
+button:not(:disabled) {
   transition: all 0.3s ease;
 }
 
 button:not(:disabled):hover {
-  transform: translateY(-1px);
-}
-
-button:disabled {
-  transform: none;
-}
-
-.cursor-pointer:hover {
   transform: translateY(-2px);
-  border-color: #002391;
+  box-shadow: 0 8px 25px rgba(0, 35, 145, 0.3);
 }
 
-.border-blue-100 {
-  border-color: #dbeafe;
+button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Hiệu ứng loading cho card */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Hiệu ứng cho price */
+.font-bold {
+  transition: all 0.3s ease;
+}
+
+.group:hover .font-bold {
+  color: #dc2626;
+  transform: scale(1.05);
+}
+
+/* Responsive hover effects */
+@media (max-width: 768px) {
+  .bg-white:hover {
+    transform: translateY(-4px);
+  }
 }
 </style>

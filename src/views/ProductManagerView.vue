@@ -103,6 +103,17 @@
               <option value="inStock">Còn hàng</option>
               <option value="outOfStock">Hết hàng</option>
             </select>
+
+            <!-- Filter Sản phẩm nổi bật -->
+            <select
+              v-model="filterFeatured"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Tất cả sản phẩm</option>
+              <option value="featured">⭐ Sản phẩm nổi bật</option>
+              <option value="non-featured">Sản phẩm thường</option>
+            </select>
+
           </div>
 
           <!-- Actions -->
@@ -841,6 +852,7 @@ export default {
       searchQuery: '',
       filterCategory: '',
       filterStock: '',
+      filterFeatured: '',
 
       // Pagination
       currentPage: 1,
@@ -896,6 +908,7 @@ export default {
   },
 
   computed: {
+    
     filteredProducts() {
       return this.products.filter(product => {
         const matchesSearch = !this.searchQuery || 
@@ -908,7 +921,12 @@ export default {
           (this.filterStock === 'inStock' && product.inStock) ||
           (this.filterStock === 'outOfStock' && !product.inStock);
 
-        return matchesSearch && matchesCategory && matchesStock;
+        // MỚI: Filter by featured status
+        const matchesFeatured = !this.filterFeatured ||
+          (this.filterFeatured === 'featured' && product.isFeatured) ||
+          (this.filterFeatured === 'non-featured' && !product.isFeatured);
+
+        return matchesSearch && matchesCategory && matchesStock && matchesFeatured;
       });
     },
 
@@ -922,10 +940,14 @@ export default {
       return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
     }
   },
-
+  
   watch: {
     filteredProducts() {
       this.currentPage = 1; // Reset pagination when filter changes
+    },
+
+    filterFeatured() {
+      this.currentPage = 1;
     }
   },
 

@@ -1,29 +1,120 @@
 <template>
   <header class="bg-white shadow-sm">
     <!-- Mobile Header -->
-    <div class="md:hidden bg-white px-4 py-3">
-      <div class="flex items-center justify-between">
+    <div class="md:hidden bg-white px-4 py-4">
+      <div class="flex items-center">
         <!-- Mobile Menu Button -->
-        <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2">
-          <i class="fas fa-bars text-xl text-gray-600"></i>
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 mr-2">
+          <i class="fas fa-bars text-2xl text-gray-700"></i>
         </button>
         
         <!-- Mobile Logo -->
-        <router-link to="/" class="flex items-center">
-          <img src="/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
-          <div>
-            <h1 class="text-lg font-bold text-primary-500">HALIFE ANIMAL HEALTH</h1>
-          </div>
+        <router-link to="/" class="flex-1 flex justify-center">
+          <img src="/images/logo_header_mobile.png" alt="HALIFE" class="object-contain" style="height: 3rem; max-width: 90vw;">
         </router-link>
 
-        <!-- Mobile Actions -->
-        <div class="flex items-center gap-2">
-          <button @click="openCart" class="p-2 bg-primary-100 rounded-full relative">
-            <i class="fas fa-shopping-cart text-primary-600"></i>
-            <span v-if="cartCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+        <!-- Spacer để cân bằng layout -->
+        <div class="w-12"></div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div v-if="mobileMenuOpen" class="md:hidden fixed inset-0 z-50 bg-black bg-opacity-50" @click="mobileMenuOpen = false"></div>
+
+    <!-- Mobile Menu Sidebar -->
+    <div v-if="mobileMenuOpen" class="md:hidden fixed top-0 left-0 w-80 h-full bg-white z-50 shadow-xl">
+      <div class="p-4 border-b">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-800">Menu</h3>
+          <button @click="mobileMenuOpen = false" class="p-2">
+            <i class="fas fa-times text-xl text-gray-600"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="flex flex-col h-full overflow-y-auto pb-20">
+        <!-- Giỏ hàng -->
+        <div class="p-4 border-b bg-blue-50">
+          <button @click="openCart(); mobileMenuOpen = false" class="w-full flex items-center justify-between p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <div class="flex items-center">
+              <i class="fas fa-shopping-cart mr-3"></i>
+              <span class="font-medium">Giỏ hàng</span>
+            </div>
+            <span v-if="cartCount > 0" class="bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
               {{ cartCount > 99 ? '99+' : cartCount }}
             </span>
           </button>
+        </div>
+
+        <!-- Search Mobile -->
+        <div class="p-4 border-b">
+          <div class="relative">
+            <input 
+              type="text" 
+              placeholder="Tìm kiếm sản phẩm..." 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              v-model="searchQuery"
+              @keyup.enter="performSearch"
+            >
+            <button 
+              @click="performSearch"
+              class="absolute right-2 top-2 p-1 text-blue-500"
+            >
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Menu Navigation -->
+        <nav class="flex-1 p-4">
+          <ul class="space-y-2">
+            <li>
+              <router-link to="/" @click="mobileMenuOpen = false" 
+                class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-home mr-3 text-blue-600"></i>
+                Trang chủ
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/products" @click="mobileMenuOpen = false"
+                class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-box mr-3 text-blue-600"></i>
+                Sản phẩm
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/news" @click="mobileMenuOpen = false"
+                class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-newspaper mr-3 text-blue-600"></i>
+                Tin tức
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/about" @click="mobileMenuOpen = false"
+                class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-info-circle mr-3 text-blue-600"></i>
+                Giới thiệu
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/contact" @click="mobileMenuOpen = false"
+                class="flex items-center p-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <i class="fas fa-phone mr-3 text-blue-600"></i>
+                Liên hệ
+              </router-link>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Contact Info -->
+        <div class="p-4 border-t bg-gray-50">
+          <div class="text-center space-y-2">
+            <a href="tel:0866583223" class="block text-green-600 font-bold text-lg">
+              <i class="fas fa-phone mr-2"></i>
+              0866.583.223
+            </a>
+            <p class="text-sm text-gray-600">Hotline hỗ trợ 24/7</p>
+          </div>
         </div>
       </div>
     </div>
@@ -79,132 +170,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Mobile Menu Overlay -->
-    <transition name="mobile-menu">
-      <div v-if="mobileMenuOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden" @click="mobileMenuOpen = false">
-        <div class="bg-white w-80 h-full shadow-lg overflow-y-auto" @click.stop>
-          <!-- Mobile Menu Header -->
-          <div class="flex items-center justify-between p-4 border-b">
-            <router-link to="/" class="flex items-center" @click="mobileMenuOpen = false">
-              <img src="/images/logo_white.png" alt="HALIFE" class="h-8 w-8 mr-2 rounded-full">
-              <h2 class="font-bold text-primary-500">HALIFE ANIMAL HEALTH</h2>
-            </router-link>
-            <button @click="mobileMenuOpen = false" class="p-2">
-              <i class="fas fa-times text-xl text-gray-600"></i>
-            </button>
-          </div>
-
-          <!-- Mobile Search -->
-          <div class="p-4 border-b">
-            <div class="relative">
-              <input 
-                type="text" 
-                placeholder="Tìm kiếm..." 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                v-model="searchQuery"
-                @keyup.enter="performSearch"
-              >
-              <button 
-                @click="performSearch"
-                class="absolute right-2 top-2 p-1 text-primary-500"
-              >
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Mobile Menu Items -->
-          <div class="py-4">
-            <router-link 
-              to="/" 
-              class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'home' }"
-              @click="mobileMenuOpen = false"
-            >
-              <i class="fas fa-home mr-3 text-primary-500"></i>
-              <span>TRANG CHỦ</span>
-            </router-link>
-            
-            <router-link 
-              to="/about" 
-              class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'about' }"
-              @click="mobileMenuOpen = false"
-            >
-              <i class="fas fa-info-circle mr-3 text-primary-500"></i>
-              <span>GIỚI THIỆU</span>
-            </router-link>
-            
-            <router-link 
-              to="/products" 
-              class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'products' }"
-              @click="mobileMenuOpen = false"
-            >
-              <i class="fas fa-pills mr-3 text-primary-500"></i>
-              <span>SẢN PHẨM</span>
-            </router-link>
-            
-            <router-link 
-              to="/news" 
-              class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'news' }"
-              @click="mobileMenuOpen = false"
-            >
-              <i class="fas fa-newspaper mr-3 text-primary-500"></i>
-              <span>TIN TỨC</span>
-            </router-link>
-            
-            <router-link 
-              to="/contact" 
-              class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-blue-50 text-primary-500 border-r-2 border-blue-600': $route.name === 'contact' }"
-              @click="mobileMenuOpen = false"
-            >
-              <i class="fas fa-phone mr-3 text-primary-500"></i>
-              <span>LIÊN HỆ</span>
-            </router-link>
-
-          </div>
-
-          <!-- Mobile Category Menu -->
-          <div class="border-t">
-            <div class="px-4 py-3 bg-gray-50">
-              <h3 class="font-semibold text-gray-800 flex items-center">
-                <i class="fas fa-list mr-2"></i>
-                DANH MỤC SẢN PHẨM
-              </h3>
-            </div>
-            <div class="py-2">
-              <router-link 
-                v-for="category in categories" 
-                :key="category.name"
-                :to="`/products?category=${encodeURIComponent(category.name)}`"
-                class="flex items-center px-4 py-2 hover:bg-gray-50 text-sm transition-colors" 
-                @click="mobileMenuOpen = false"
-              >
-                <i :class="category.icon + ' mr-3 text-primary-500'"></i>
-                <span>{{ category.name }}</span>
-              </router-link>
-            </div>
-          </div>
-
-          <!-- Mobile Menu Footer -->
-          <div class="border-t p-4 bg-gray-50">
-            <div class="text-center text-sm text-gray-600 space-y-2">
-              <p class="font-semibold">
-                <a href="tel:0866583223" class="text-primary-500">Hotline: 0866.583.223</a>
-              </p>
-              <p>
-                <a href="mailto:info@halife.vn" class="text-primary-500">info@halife.vn</a>
-              </p>
-              <p class="text-xs">HALIFE ANIMAL HEALTH - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </transition>
 
     <!-- Desktop Navigation -->
     <nav class="bg-blue-500 text-white hidden md:block">
@@ -462,15 +427,6 @@ header {
 /* Smooth transition */
 .transition-colors {
   transition: all 0.3s ease;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
 }
 
 /* Responsive adjustments */
