@@ -216,7 +216,7 @@
                 :show-add-to-cart="true"
                 :show-quick-actions="true"
                 @add-to-cart="addToCart"
-                class="product-card-mobile"
+                class="product-card-uniform"
               />
             </div>
 
@@ -542,53 +542,15 @@ export default {
 </script>
 
 <style scoped>
-/* Mobile filter animation */
-@media (max-width: 1024px) {
-  .mobile-filters-enter-active,
-  .mobile-filters-leave-active {
-    transition: all 0.3s ease;
-  }
-  
-  .mobile-filters-enter-from,
-  .mobile-filters-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-}
-
-/* Mobile Product Card Styling */
-.product-card-mobile {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-/* Mobile grid adjustments */
+/* ĐƠN GIẢN - Chỉ fix chiều cao đồng nhất */
 @media (max-width: 768px) {
-  .grid {
-    gap: 1rem;
+  .grid > * {
+    min-height: 500px !important;
   }
   
-  .product-card-mobile {
-    max-width: 350px;
-    margin: 0 auto;
+  .product-card-uniform {
+    height: 100%;
+    min-height: 500px;
   }
-}
-
-/* Ensure consistent grid item heights */
-.grid > * {
-  height: fit-content;
-}
-
-/* Custom checkbox and radio styles */
-input[type="checkbox"],
-input[type="radio"] {
-  width: 16px;
-  height: 16px;
-}
-
-/* Pagination hover effects */
-.pagination-item:hover {
-  transform: translateY(-1px);
-  transition: all 0.2s ease;
 }
 </style>
