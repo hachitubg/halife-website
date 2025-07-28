@@ -1692,13 +1692,6 @@ def add_banner():
         
         banners = load_banners()
         
-        # Kiểm tra giới hạn 3 banner
-        if len(banners) >= 3:
-            return jsonify({
-                'success': False,
-                'message': 'Chỉ được phép tối đa 3 banner'
-            }), 400
-        
         banners.append(banner_url)
         save_banners(banners)
         
