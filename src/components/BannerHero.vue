@@ -23,8 +23,8 @@
           :alt="image.alt" 
           class="w-full h-full object-cover object-center transform transition-transform duration-700 hover:scale-110"
         />
-        <!-- Overlay gradient -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        <!-- REMOVED: Overlay gradient bị loại bỏ để banner không còn tối -->
+        <!-- <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div> -->
       </div>
     </div>
 
@@ -59,8 +59,6 @@
           : 'w-2 h-2 bg-white/60 rounded-full hover:bg-white/80'"
       ></button>
     </div>
-
-
   </div>
 </template>
 
@@ -112,7 +110,8 @@ export default {
       this.bannerImages = [
         { src: '/images/cover1.jpg', alt: 'HALIFE Cover 1' },
         { src: '/images/cover2.jpg', alt: 'HALIFE Cover 2' },
-        { src: '/images/cover3.jpg', alt: 'HALIFE Cover 3' }
+        { src: '/images/cover3.jpg', alt: 'HALIFE Cover 3' },
+        { src: '/images/cover4.jpg', alt: 'HALIFE Cover 4' }
       ]
     },
 

@@ -22,74 +22,6 @@
           </button>
         </div>
         
-        <!-- Size Guidelines -->
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Banner Size Info -->
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div class="flex items-center mb-3">
-              <i class="fas fa-image text-blue-500 text-lg mr-2"></i>
-              <h3 class="font-semibold text-blue-800">Kích thước các loại hình ảnh chuẩn</h3>
-            </div>
-            <div class="space-y-2 text-sm text-blue-700">
-              <div class="flex justify-between">
-                <span>Banner trang chủ:</span>
-                <span class="font-mono font-semibold">2560 x 974 px</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Hình ảnh sản phẩm:</span>
-                <span class="font-mono font-semibold">348 x 300 px</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Banner form ưu đãi:</span>
-                <span class="font-mono font-semibold">600 x 800 px</span>
-              </div>
-              <div class="mt-3 pt-2 border-t border-blue-200">
-                <p class="text-xs text-blue-600">
-                  <i class="fas fa-info-circle mr-1"></i>
-                  Tỉ lệ khung hình: 2.63:1 (chiều rộng : chiều cao)
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        
-        <!-- Additional Guidelines -->
-        <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div class="flex items-start">
-            <i class="fas fa-lightbulb text-yellow-500 text-lg mr-3 mt-0.5"></i>
-            <div>
-              <h4 class="font-semibold text-yellow-800 mb-2">Hướng dẫn tối ưu hóa hình ảnh</h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-yellow-700">
-                <div>
-                  <strong>Banner:</strong>
-                  <ul class="mt-1 space-y-1">
-                    <li>• Kích thước tối đa: 5MB</li>
-                    <li>• Định dạng: JPG, PNG, WebP</li>
-                    <li>• DPI: 72-150</li>
-                  </ul>
-                </div>
-                <div>
-                  <strong>Sản phẩm:</strong>
-                  <ul class="mt-1 space-y-1">
-                    <li>• Kích thước tối đa: 2MB</li>
-                    <li>• Nền: Trong suốt hoặc trắng</li>
-                    <li>• Chất lượng: 80-90%</li>
-                  </ul>
-                </div>
-                <div>
-                  <strong>Khuyến nghị:</strong>
-                  <ul class="mt-1 space-y-1">
-                    <li>• Sử dụng TinyPNG để nén</li>
-                    <li>• Tránh text nhỏ trên banner</li>
-                    <li>• Kiểm tra trên nhiều thiết bị</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
         <!-- Banner Type Tabs -->
         <div class="mt-6 border-b border-gray-200">
           <nav class="flex space-x-8">
@@ -103,7 +35,7 @@
               ]"
             >
               <i class="fas fa-home mr-2"></i>
-              Banner Trang chủ ({{ homepageBanners.length }}/3)
+              Banner Trang chủ ({{ homepageBanners.length }}/4)
             </button>
             <button
               @click="activeBannerType = 'popup'"
@@ -128,10 +60,10 @@
       <div v-if="activeBannerType === 'homepage'" class="bg-white rounded-lg shadow-sm p-6">
         <h3 class="text-lg font-semibold mb-4 flex items-center">
           <i class="fas fa-home text-blue-500 mr-2"></i>
-          Banner trang chủ ({{ homepageBanners.length }}/3)
+          Banner trang chủ ({{ homepageBanners.length }}/4)
         </h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div 
             v-for="(banner, index) in homepageBanners" 
             :key="index"
@@ -170,7 +102,7 @@
           
           <!-- Add New Slot -->
           <div 
-            v-if="homepageBanners.length < 3"
+            v-if="homepageBanners.length < 4"
             @click="openUploadModal('homepage')"
             class="border-2 border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
           >
@@ -189,135 +121,41 @@
           Banner Popup ({{ popupBanner ? '1/1' : '0/1' }})
         </h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Current Popup Banner -->
-          <div v-if="popupBanner" class="relative group">
-            <div class="relative overflow-hidden rounded-lg border-2 border-purple-200">
-              <img 
-                :src="popupBanner" 
-                alt="Popup Banner"
-                class="w-full h-48 object-cover"
-              />
-              
-              <!-- Overlay Actions -->
-              <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
-                <button
-                  @click="replacePopupBanner()"
-                  class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm"
-                >
-                  <i class="fas fa-edit mr-1"></i>Thay thế
-                </button>
-                <button
-                  @click="deletePopupBanner()"
-                  class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
-                >
-                  <i class="fas fa-trash mr-1"></i>Xóa
-                </button>
-              </div>
-            </div>
+        <div v-if="popupBanner" class="relative group max-w-sm">
+          <!-- Popup Banner Preview -->
+          <div class="relative overflow-hidden rounded-lg border-2 border-gray-200">
+            <img 
+              :src="popupBanner" 
+              alt="Popup Banner"
+              class="w-full h-64 object-cover"
+            />
             
-            <div class="mt-2 text-center">
-              <p class="text-sm text-purple-600 font-medium">Banner Popup</p>
+            <!-- Overlay Actions -->
+            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+              <button
+                @click="replacePopupBanner()"
+                class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded text-sm"
+              >
+                <i class="fas fa-edit mr-1"></i>Thay thế
+              </button>
+              <button
+                @click="deletePopupBanner()"
+                class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+              >
+                <i class="fas fa-trash mr-1"></i>Xóa
+              </button>
             </div>
           </div>
-          
-          <!-- Add Popup Banner -->
+        </div>
+        
+        <div v-else>
           <div 
-            v-if="!popupBanner"
             @click="openUploadModal('popup')"
-            class="border-2 border-dashed border-purple-300 rounded-lg h-48 flex items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors"
+            class="border-2 border-dashed border-purple-300 rounded-lg h-64 max-w-sm flex items-center justify-center cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors"
           >
             <div class="text-center">
               <i class="fas fa-plus text-2xl text-purple-400 mb-2"></i>
               <p class="text-purple-500">Thêm Banner Popup</p>
-            </div>
-          </div>
-          
-          <!-- Info Card -->
-          <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
-            <h4 class="font-semibold text-purple-800 mb-2">
-              <i class="fas fa-info-circle mr-2"></i>
-              Thông tin Banner Popup
-            </h4>
-            <ul class="text-sm text-purple-700 space-y-1">
-              <li>• Hiển thị sau 2 giây khi load trang</li>
-              <li>• Kích thước khuyến nghị: 600x800px</li>
-              <li>• Dùng cho form đăng ký ưu đãi</li>
-              <li>• Chỉ hiển thị trên desktop</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Preview Section -->
-      <div class="mt-8 bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold mb-4">Xem trước Banner</h3>
-        
-        <!-- Homepage Preview -->
-        <div v-if="activeBannerType === 'homepage'" class="relative bg-gray-100 rounded-lg overflow-hidden" style="height: 300px;">
-          <div v-if="homepageBanners.length === 0" class="absolute inset-0 flex items-center justify-center text-gray-500">
-            <div class="text-center">
-              <i class="fas fa-image text-4xl mb-4"></i>
-              <p>Chưa có banner để xem trước</p>
-            </div>
-          </div>
-          
-          <div 
-            v-for="(banner, index) in homepageBanners" 
-            :key="index"
-            class="absolute inset-0 transition-opacity duration-1000"
-            :class="{ 'opacity-100': previewSlide === index, 'opacity-0': previewSlide !== index }"
-          >
-            <img 
-              :src="banner" 
-              :alt="`Preview ${index + 1}`"
-              class="w-full h-full object-cover"
-            />
-          </div>
-          
-          <!-- Preview Controls -->
-          <div v-if="homepageBanners.length > 1" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            <button
-              v-for="(banner, index) in homepageBanners"
-              :key="index"
-              @click="previewSlide = index"
-              class="w-3 h-3 rounded-full transition-all duration-300"
-              :class="previewSlide === index ? 'bg-white' : 'bg-white bg-opacity-50'"
-            ></button>
-          </div>
-        </div>
-        
-        <!-- Popup Preview -->
-        <div v-if="activeBannerType === 'popup'" class="relative bg-gray-100 rounded-lg overflow-hidden" style="height: 400px;">
-          <div v-if="!popupBanner" class="absolute inset-0 flex items-center justify-center text-gray-500">
-            <div class="text-center">
-              <i class="fas fa-image text-4xl mb-4"></i>
-              <p>Chưa có banner popup để xem trước</p>
-            </div>
-          </div>
-          
-          <div v-if="popupBanner" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg max-w-md w-full mx-4 overflow-hidden shadow-2xl">
-              <div class="flex">
-                <!-- Mini popup preview - chỉ ảnh -->
-                <div class="w-1/2">
-                  <img 
-                    :src="popupBanner" 
-                    alt="Popup Preview"
-                    class="w-full h-48 object-cover"
-                  />
-                </div>
-                <div class="w-1/2 p-3 text-xs">
-                  <h4 class="font-bold mb-2">ĐĂNG KÝ ƯU ĐÃI</h4>
-                  <div class="space-y-2">
-                    <div class="bg-gray-100 h-6 rounded"></div>
-                    <div class="bg-gray-100 h-6 rounded"></div>
-                    <div class="bg-blue-500 h-8 rounded text-white flex items-center justify-center text-xs">
-                      NHẬN MÃ GIẢM GIÁ
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -325,16 +163,9 @@
     </div>
 
     <!-- Upload Modal -->
-    <div 
-      v-if="showUploadModal" 
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      @click="closeUploadModal"
-    >
-      <div 
-        class="bg-white rounded-lg p-6 w-full max-w-md mx-4"
-        @click.stop
-      >
-        <div class="flex items-center justify-between mb-4">
+    <div v-if="showUploadModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
             {{ uploadType === 'popup' ? 'Thêm Banner Popup' : (replaceIndex !== null ? 'Thay thế Banner' : 'Thêm Banner Mới') }}
           </h3>
@@ -369,10 +200,8 @@
               <div class="text-xs text-gray-500 space-y-1">
                 <p v-if="uploadType === 'homepage'">📏 <strong>Kích thước khuyến nghị:</strong> 2560 x 974 px</p>
                 <p v-if="uploadType === 'popup'">📏 <strong>Kích thước khuyến nghị:</strong> 600 x 800 px</p>
-                <p>📊 <strong>Tỉ lệ khung hình:</strong> {{ uploadType === 'homepage' ? '2.63:1' : '3:4' }}</p>
                 <p>💾 <strong>Dung lượng:</strong> Tối đa 5MB</p>
                 <p>🖼️ <strong>Định dạng:</strong> JPG, PNG, WebP</p>
-                <p v-if="uploadType === 'popup'" class="text-purple-600">🎯 <strong>Mục đích:</strong> Hiển thị trong popup form đăng ký</p>
               </div>
             </div>
           </div>
@@ -438,19 +267,11 @@ export default {
       uploading: false,
       loading: false,
       loadingMessage: '',
-      previewSlide: 0,
       replaceIndex: null,
       uploadType: 'homepage' // Loại banner đang upload
     }
   },
   async mounted() {
-    // Auto preview rotation
-    setInterval(() => {
-      if (this.activeBannerType === 'homepage' && this.homepageBanners.length > 1) {
-        this.previewSlide = (this.previewSlide + 1) % this.homepageBanners.length
-      }
-    }, 3000)
-    
     // Load banners from server
     await this.loadBanners()
   },
@@ -583,9 +404,9 @@ export default {
             result = await BannerAPI.replaceBanner(this.replaceIndex, this.selectedFile)
             BannerAPI.showMessage('Đã thay thế banner', 'success')
           } else {
-            // Add new banner
-            if (this.homepageBanners.length >= 3) {
-              BannerAPI.showMessage('Chỉ được phép tối đa 3 banner trang chủ', 'error')
+            // Add new banner - THAY ĐỔI: cho phép tối đa 4 banner
+            if (this.homepageBanners.length >= 4) {
+              BannerAPI.showMessage('Chỉ được phép tối đa 4 banner trang chủ', 'error')
               return
             }
             this.loadingMessage = 'Đang thêm banner mới...'
@@ -612,9 +433,7 @@ export default {
       } finally {
         this.uploading = false
       }
-    },
-    
-    // Không cần showMessage method nữa vì đã có trong BannerAPI
+    }
   }
 }
 </script>
@@ -681,40 +500,12 @@ button:active {
     padding-right: 1rem;
   }
   
-  .grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   
   .space-x-8 {
     gap: 1rem;
   }
-}
-
-/* Preview animation */
-.duration-1000 {
-  transition-duration: 1s;
-}
-
-/* Upload area styling */
-.border-dashed:hover {
-  border-color: #3b82f6;
-  background-color: #eff6ff;
-}
-
-/* Success/Error message colors */
-.text-green-600 {
-  color: #16a34a;
-}
-
-.text-red-600 {
-  color: #dc2626;
-}
-
-.bg-green-50 {
-  background-color: #f0fdf4;
-}
-
-.bg-red-50 {
-  background-color: #fef2f2;
 }
 </style>

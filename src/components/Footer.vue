@@ -55,7 +55,7 @@
               <div class="space-y-3 text-sm text-gray-600">
                 <div class="flex items-start">
                   <i class="fas fa-map-marker-alt mr-3 mt-1 text-blue-500"></i>
-                  <span>82 Võ Chí Công, Phường Nghĩa Đô, Quận Cầu Giấy, Hà Nội</span>
+                  <span>TT19, Khu 31ha, Gia Lâm, Hà Nội</span>
                 </div>
                 <div class="flex items-center">
                   <i class="fas fa-envelope mr-3 text-blue-500"></i>

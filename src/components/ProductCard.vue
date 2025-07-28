@@ -32,11 +32,6 @@
     
     <!-- Product Info - Bottom section -->
     <div class="p-3 md:p-4 flex flex-col justify-between h-auto">
-      <!-- Product Category -->
-      <div class="text-xs font-medium mb-2 uppercase tracking-wide text-center" style="color: #002391;">
-        {{ product.category }}
-      </div>
-      
       <!-- Product Name -->
       <h4 
         class="product-name font-bold text-lg md:text-xl mb-3 line-clamp-2 hover:opacity-80 transition-all leading-tight text-center"

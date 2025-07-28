@@ -225,7 +225,7 @@
               </div>
               <div>
                 <h4 class="font-semibold text-gray-800">Địa chỉ</h4>
-                <p class="text-gray-600">82 Võ Chí Công, Phường Nghĩa Đô, Quận Cầu Giấy, Hà Nội</p>
+                <p class="text-gray-600">TT19, Khu 31ha, Gia Lâm, Hà Nội</p>
               </div>
             </div>
 

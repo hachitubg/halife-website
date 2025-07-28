@@ -79,11 +79,6 @@
               </div>
             </div>
 
-            <!-- Product Detail -->
-            <div v-if="product.description" class="border-l-4 border-blue-500 pl-4">
-              <p class="text-gray-700 text-sm leading-relaxed">{{ product.description }}</p>
-            </div>
-
             <!-- Price -->
             <div class="space-y-2">
               <div class="flex items-end space-x-3">
@@ -97,64 +92,38 @@
               </div>
             </div>
 
-            <!-- Weight/Size Selection -->
-            <div v-if="weightOptions.length > 1">
-              <h3 class="font-semibold text-gray-800 mb-3">Quy cách đóng gói:</h3>
-              <div class="grid grid-cols-3 gap-2">
+            <!-- Quantity Selection -->
+            <div class="flex items-center space-x-4">
+              <label class="font-semibold text-gray-800">Số lượng:</label>
+              <div class="flex items-center border border-gray-300 rounded-lg">
                 <button 
-                  v-for="weight in weightOptions" 
-                  :key="weight"
-                  class="border-2 rounded-lg py-2 px-3 text-sm font-medium transition-colors"
-                  :class="{ 
-                    'border-blue-500 bg-blue-50 text-blue-600': selectedWeight === weight,
-                    'border-gray-300 hover:border-gray-400': selectedWeight !== weight
-                  }"
-                  @click="selectedWeight = weight"
+                  @click="decreaseQuantity"
+                  class="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-l-lg"
                 >
-                  {{ weight }}
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input 
+                  v-model.number="quantity" 
+                  type="number" 
+                  min="1" 
+                  max="99"
+                  class="w-16 text-center py-2 border-0 focus:ring-0"
+                />
+                <button 
+                  @click="increaseQuantity"
+                  class="px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-r-lg"
+                >
+                  <i class="fas fa-plus"></i>
                 </button>
               </div>
             </div>
 
-            <!-- Quantity Selection -->
-            <div>
-              <h3 class="font-semibold text-gray-800 mb-3">Số lượng:</h3>
-              <div class="flex items-center space-x-3">
-                <div class="flex items-center border border-gray-300 rounded-lg">
-                  <button 
-                    @click="decreaseQuantity" 
-                    :disabled="quantity <= 1"
-                    class="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <i class="fas fa-minus"></i>
-                  </button>
-                  <input 
-                    type="number" 
-                    v-model.number="quantity" 
-                    min="1" 
-                    :max="product.stockQuantity || 999"
-                    class="w-16 text-center border-0 focus:outline-none"
-                  />
-                  <button 
-                    @click="increaseQuantity"
-                    :disabled="product.stockQuantity && quantity >= product.stockQuantity"
-                    class="p-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <i class="fas fa-plus"></i>
-                  </button>
-                </div>
-                <span v-if="product.stockQuantity" class="text-sm text-gray-600">
-                  (Còn {{ product.stockQuantity }} sản phẩm)
-                </span>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
+            <!-- Add to Cart Button -->
             <div class="space-y-3">
               <button 
                 @click="addToCart"
                 :disabled="!product.inStock"
-                class="w-full py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center text-lg"
+                class="w-full py-4 rounded-lg font-semibold text-lg transition-all duration-300"
                 :class="product.inStock 
                   ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
@@ -166,138 +135,22 @@
           </div>
         </div>
 
-        <!-- Product Tabs -->
+        <!-- MÔ TẢ SẢN PHẨM - CHỈ PHẦN NÀY -->
         <div class="mt-12">
-          <div class="border-b border-gray-200">
-            <nav class="flex space-x-8">
-              <button 
-                v-for="tab in tabs" 
-                :key="tab.id"
-                @click="activeTab = tab.id"
-                :class="[
-                  'py-3 px-1 border-b-2 font-medium text-sm transition-colors',
-                  activeTab === tab.id 
-                    ? 'border-blue-500 text-blue-600' 
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                ]"
-              >
-                {{ tab.name }}
-              </button>
-            </nav>
+          <div class="border-b border-gray-200 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 pb-4">Mô tả sản phẩm</h2>
           </div>
           
-          <div class="mt-6">
-            <div v-if="activeTab === 'description'" class="prose max-w-none">
-              <!-- Mô tả ngắn -->
-              <p class="text-gray-600 mb-4">{{ product.description }}</p>
-              
-              <!-- Mô tả chi tiết -->
-              <div v-if="product.fullDescription && product.fullDescription !== product.description" class="mb-6">
-                <h4 class="font-semibold mb-3">Mô tả chi tiết:</h4>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                  <p class="text-gray-700 leading-relaxed">{{ product.fullDescription }}</p>
-                </div>
-              </div>
-
-              <!-- Công dụng -->
-              <div v-if="product.functions && product.functions.length > 0" class="mb-6">
-                <h4 class="font-semibold mb-3">Công dụng:</h4>
-                <div class="bg-blue-50 p-4 rounded-lg">
-                  <ul class="space-y-2">
-                    <li v-for="func in product.functions" :key="func" class="flex items-start">
-                      <i class="fas fa-check-circle text-blue-500 mr-2 mt-1 flex-shrink-0"></i>
-                      <span class="text-gray-700">{{ func }}</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <!-- Thông tin bổ sung -->
-              <div class="mt-6">
-                <h4 class="font-semibold mb-3">Thông tin bổ sung:</h4>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                  <ul class="space-y-2 text-sm">
-                    <li v-if="product.activeIngredients">
-                      <strong>Thành phần hoạt chất:</strong> {{ product.activeIngredients }}
-                    </li>
-                    <li v-if="product.targetAnimal">
-                      <strong>Đối tượng sử dụng:</strong> {{ product.targetAnimal }}
-                    </li>
-                    <li v-if="product.storageConditions">
-                      <strong>Bảo quản:</strong> {{ product.storageConditions }}
-                    </li>
-                    <li v-if="product.shelfLife">
-                      <strong>Hạn sử dụng:</strong> {{ product.shelfLife }}
-                    </li>
-                    <li v-if="product.withdrawalTime">
-                      <strong>Thời gian ngưng thuốc:</strong> {{ product.withdrawalTime }}
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          <!-- Nội dung mô tả chi tiết như bài báo -->
+          <div class="prose max-w-none">
+            <div v-if="product.fullDescription" class="text-gray-700 leading-relaxed text-justify">
+              <div class="whitespace-pre-line text-base md:text-lg leading-8">{{ product.fullDescription }}</div>
             </div>
-            
-            <div v-if="activeTab === 'specifications'" class="space-y-4">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-gray-50 p-4 rounded-lg">
-                  <h4 class="font-semibold mb-3">Thông số kỹ thuật</h4>
-                  <div class="space-y-2 text-sm">
-                    <div class="flex justify-between py-1 border-b border-gray-200">
-                      <span>Mã sản phẩm:</span>
-                      <span>THY{{ String(product.id).padStart(3, '0') }}</span>
-                    </div>
-                    <div class="flex justify-between py-1 border-b border-gray-200">
-                      <span>Danh mục:</span>
-                      <span>{{ product.category }}</span>
-                    </div>
-                    <div v-if="product.subcategory" class="flex justify-between py-1 border-b border-gray-200">
-                      <span>Danh mục con:</span>
-                      <span>{{ product.subcategory }}</span>
-                    </div>
-                    <div class="flex justify-between py-1 border-b border-gray-200">
-                      <span>Quy cách:</span>
-                      <span>{{ product.packageSize || selectedWeight }}</span>
-                    </div>
-                    <div class="flex justify-between py-1 border-b border-gray-200">
-                      <span>Đơn vị:</span>
-                      <span>{{ product.unit }}</span>
-                    </div>
-                    <div v-if="product.originCountry" class="flex justify-between py-1 border-b border-gray-200">
-                      <span>Xuất xứ:</span>
-                      <span>{{ product.originCountry }}</span>
-                    </div>
-                    <div v-if="product.manufacturer" class="flex justify-between py-1 border-b border-gray-200">
-                      <span>Nhà sản xuất:</span>
-                      <span>{{ product.manufacturer }}</span>
-                    </div>
-                    <div v-if="product.registrationNumber" class="flex justify-between py-1">
-                      <span>Số đăng ký:</span>
-                      <span>{{ product.registrationNumber }}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="bg-gray-50 p-4 rounded-lg">
-                  <h4 class="font-semibold mb-3">Hướng dẫn sử dụng</h4>
-                  <div class="text-sm space-y-2">
-                    <div v-if="product.dosage">
-                      <p><strong>Liều dùng:</strong> {{ product.dosage }}</p>
-                    </div>
-                    <div v-if="product.usageInstructions">
-                      <p><strong>Cách dùng:</strong> {{ product.usageInstructions }}</p>
-                    </div>
-                    <div v-if="product.withdrawalTime">
-                      <p><strong>Thời gian ngưng thuốc:</strong> {{ product.withdrawalTime }}</p>
-                    </div>
-                    <div v-if="product.targetAnimal">
-                      <p><strong>Đối tượng sử dụng:</strong> {{ product.targetAnimal }}</p>
-                    </div>
-                    <div v-if="product.storageConditions" class="pt-2 border-t border-gray-200">
-                      <p><strong>Bảo quản:</strong> {{ product.storageConditions }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div v-else-if="product.description" class="text-gray-700 leading-relaxed text-justify">
+              <div class="whitespace-pre-line text-base md:text-lg leading-8">{{ product.description }}</div>
+            </div>
+            <div v-else class="text-gray-500 italic text-center py-8">
+              Chưa có mô tả chi tiết cho sản phẩm này.
             </div>
           </div>
         </div>
@@ -479,10 +332,7 @@
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import { useCart } from '@/scripts/cartManager.js'
-
-import { 
-  sidebarCategories
-} from '@/data/products.js'
+import { sidebarCategories } from '@/data/products.js'
 import { ProductAPI } from '@/utils/productAPI.js'
 
 export default {
@@ -498,20 +348,13 @@ export default {
       productNotFound: false,
       loading: true,
       currentImage: '',
-      selectedWeight: '',
       quantity: 1,
-      activeTab: 'description',
-      showImageModal: false, // For image modal
-      currentRelatedSlide: 0, // ADD THIS LINE
-      tabs: [
-        { id: 'description', name: 'Mô tả sản phẩm' },
-        { id: 'specifications', name: 'Thông số kỹ thuật' }
-      ],
+      showImageModal: false,
+      currentRelatedSlide: 0,
       relatedProducts: [],
-      weightOptions: [],
       // Touch handling for related products
-      relatedTouchStartX: 0, // ADD THIS LINE
-      relatedTouchStartY: 0  // ADD THIS LINE
+      relatedTouchStartX: 0,
+      relatedTouchStartY: 0
     }
   },
   
@@ -542,7 +385,6 @@ export default {
     maxRelatedSlideMobile() {
       return Math.max(0, this.relatedProducts.length - 1)
     }
-
   },
   
   methods: {
@@ -582,7 +424,6 @@ export default {
         }
         
         this.currentImage = this.productImages[0] || this.product.image
-        this.setupWeightOptions()
         await this.loadRelatedProducts()
         
       } catch (error) {
@@ -590,17 +431,7 @@ export default {
         this.productNotFound = true
       }
     },
-    
-    setupWeightOptions() {
-      if (this.product.packageSize) {
-        this.weightOptions = [this.product.packageSize]
-        this.selectedWeight = this.product.packageSize
-      } else {
-        this.weightOptions = ['1 lọ/chai', '5 lọ/thùng', '10 lọ/thùng']
-        this.selectedWeight = this.weightOptions[0]
-      }
-    },
-    
+
     async loadRelatedProducts() {
       try {
         const allProducts = await ProductAPI.getAllProducts()
@@ -641,7 +472,7 @@ export default {
     },
     
     increaseQuantity() {
-      if (!this.product.stockQuantity || this.quantity < this.product.stockQuantity) {
+      if (this.quantity < 99) {
         this.quantity++
       }
     },
@@ -677,7 +508,7 @@ export default {
       }
     },
 
-    // Touch handlers for related products - ADD THESE METHODS
+    // Touch handlers for related products
     handleRelatedTouchStart(e) {
       this.relatedTouchStartX = e.touches[0].clientX
       this.relatedTouchStartY = e.touches[0].clientY
@@ -704,13 +535,13 @@ export default {
         }
       }
     }
-
   },
   
   watch: {
     '$route'() {
       this.product = null
       this.productNotFound = false
+      this.currentRelatedSlide = 0
       this.loadProduct()
     }
   },
@@ -725,24 +556,8 @@ export default {
 }
 </script>
 
-
 <style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.transition-all {
-  transition: all 0.3s ease;
-}
-
-.transition-colors {
-  transition: color 0.3s ease;
-}
-
-/* Main Image Container - Full width on mobile */
+/* Main image container - full width on mobile */
 .main-image-container {
   position: relative;
   width: 100%;
@@ -855,14 +670,22 @@ export default {
   transform: scale(1.1);
 }
 
-/* Image Modal Styles */
-.fixed.inset-0 {
-  backdrop-filter: blur(4px);
+/* Description styling - like article content */
+.prose {
+  max-width: none;
 }
 
-.fixed.inset-0 img {
-  border-radius: 0.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+.whitespace-pre-line {
+  white-space: pre-line;
+  line-height: 1.8;
+}
+
+/* Responsive text sizing */
+@media (max-width: 768px) {
+  .whitespace-pre-line {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
 }
 
 /* Button hover effects */
@@ -885,40 +708,11 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Tab transition effects */
-.tab-content {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  
-  .text-2xl {
-    font-size: 1.5rem;
-  }
-  
-  .text-3xl {
-    font-size: 1.75rem;
-  }
-  
-  .thumbnail-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .thumbnail-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.25rem;
-  }
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

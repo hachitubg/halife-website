@@ -50,7 +50,7 @@
                   </div>
                   <div>
                     <h3 class="font-semibold text-gray-800 mb-1">Địa chỉ</h3>
-                    <p class="text-gray-600">82 Võ Chí Công, Phường Nghĩa Đô, Quận Cầu Giấy, Hà Nội</p>
+                    <p class="text-gray-600">TT19, Khu 31ha, Gia Lâm, Hà Nội</p>
                   </div>
                 </div>
 
@@ -201,7 +201,7 @@
               <i class="fas fa-map-marked-alt mr-3"></i>
               Vị trí của chúng tôi
             </h2>
-            <p class="mt-2 opacity-90">82 Võ Chí Công, Phường Nghĩa Đô, Quận Cầu Giấy, Hà Nội</p>
+            <p class="mt-2 opacity-90">TT19, Khu 31ha, Gia Lâm, Hà Nội</p>
           </div>
           
           <!-- Google Maps Embed -->
