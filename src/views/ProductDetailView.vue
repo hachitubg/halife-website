@@ -135,7 +135,7 @@
           </div>
         </div>
 
-        <!-- MÔ TẢ SẢN PHẨM - CHỈ PHẦN NÀY -->
+        <!-- MÔ TẢ SẢN PHẨM -->
         <div class="mt-12">
           <div class="border-b border-gray-200 mb-6">
             <h2 class="text-2xl font-bold text-gray-800 pb-4">Mô tả sản phẩm</h2>
@@ -143,11 +143,11 @@
           
           <!-- Nội dung mô tả chi tiết như bài báo -->
           <div class="prose max-w-none">
-            <div v-if="product.fullDescription" class="text-gray-700 leading-relaxed text-justify">
-              <div class="whitespace-pre-line text-base md:text-lg leading-8">{{ product.fullDescription }}</div>
+            <div v-if="product.fullDescription" class="text-gray-700 leading-relaxed">
+              <div v-html="product.fullDescription" class="product-description text-base md:text-lg leading-8"></div>
             </div>
-            <div v-else-if="product.description" class="text-gray-700 leading-relaxed text-justify">
-              <div class="whitespace-pre-line text-base md:text-lg leading-8">{{ product.description }}</div>
+            <div v-else-if="product.description" class="text-gray-700 leading-relaxed">
+              <div v-html="product.description" class="product-description text-base md:text-lg leading-8"></div>
             </div>
             <div v-else class="text-gray-500 italic text-center py-8">
               Chưa có mô tả chi tiết cho sản phẩm này.
@@ -711,8 +711,78 @@ input[type="number"] {
 /* Line clamp utility */
 .line-clamp-2 {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Styling cho nội dung HTML trong mô tả sản phẩm */
+:deep(.product-description) {
+  line-height: 1.8;
+}
+
+:deep(.product-description h1),
+:deep(.product-description h2) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 1.5rem 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+:deep(.product-description h3) {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 1.25rem 0 0.75rem 0;
+}
+
+:deep(.product-description p) {
+  margin: 1rem 0;
+  text-align: justify;
+}
+
+:deep(.product-description ul),
+:deep(.product-description ol) {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+:deep(.product-description li) {
+  margin: 0.5rem 0;
+}
+
+:deep(.product-description strong) {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+:deep(.product-description em) {
+  font-style: italic;
+}
+
+:deep(.product-description u) {
+  text-decoration: underline;
+}
+
+:deep(.product-description img) {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  :deep(.product-description h1),
+  :deep(.product-description h2) {
+    font-size: 1.25rem;
+  }
+  
+  :deep(.product-description h3) {
+    font-size: 1.125rem;
+  }
 }
 </style>

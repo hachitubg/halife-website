@@ -462,15 +462,102 @@
             <div v-show="activeTab === 'details'" class="space-y-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả đầy đủ</label>
-                <textarea
-                  v-model="form.fullDescription"
-                  rows="4"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Mô tả chi tiết về sản phẩm, công dụng, lợi ích..."
-                ></textarea>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">📝 Mô tả đầy đủ</label>
+                  
+                  <!-- Editor Toolbar -->
+                  <div class="border border-gray-300 rounded-t-lg bg-gray-50 p-3 flex flex-wrap items-center gap-2">
+                    <div class="flex items-center space-x-1">
+                      <button type="button" @click="formatText('bold')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                        <i class="fas fa-bold"></i>
+                      </button>
+                      <button type="button" @click="formatText('italic')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                        <i class="fas fa-italic"></i>
+                      </button>
+                      <button type="button" @click="formatText('underline')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                        <i class="fas fa-underline"></i>
+                      </button>
+                    </div>
+                    
+                    <div class="border-l pl-2 flex items-center space-x-1">
+                      <button type="button" @click="insertHeading('h2')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100 text-sm">
+                        H2
+                      </button>
+                      <button type="button" @click="insertHeading('h3')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100 text-sm">
+                        H3
+                      </button>
+                    </div>
+                    
+                    <div class="border-l pl-2 flex items-center space-x-1">
+                      <button type="button" @click="insertList('ul')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                        <i class="fas fa-list-ul"></i>
+                      </button>
+                      <button type="button" @click="insertList('ol')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                        <i class="fas fa-list-ol"></i>
+                      </button>
+                    </div>
+                    
+                    <div class="border-l pl-2 flex items-center space-x-1">
+                      <button type="button" @click="formatText('justifyLeft')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                        <i class="fas fa-align-left"></i>
+                      </button>
+                      <button type="button" @click="formatText('justifyCenter')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                        <i class="fas fa-align-center"></i>
+                      </button>
+                      <button type="button" @click="formatText('justifyRight')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                        <i class="fas fa-align-right"></i>
+                      </button>
+                    </div>
+                    
+                    <div class="border-l pl-2 flex items-center space-x-1">
+                      <button type="button" @click="toggleSourceMode" 
+                        :class="editorOptions.sourceMode ? 'bg-blue-500 text-white' : 'bg-white'"
+                        class="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
+                        <i class="fas fa-code"></i>
+                      </button>
+                      <button type="button" @click="clearContent" class="px-3 py-1 bg-white border rounded hover:bg-gray-100 text-red-600">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Editor Content -->
+                  <div class="border-l border-r border-b border-gray-300 rounded-b-lg overflow-hidden">
+                    <!-- Source Mode -->
+                    <textarea
+                      v-if="editorOptions.sourceMode"
+                      v-model="sourceContent"
+                      @input="form.fullDescription = sourceContent; updateContentStats()"
+                      class="w-full min-h-[400px] p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="<p>Nhập mã HTML...</p>"
+                    ></textarea>
+                    
+                    <!-- WYSIWYG Mode -->
+                    <div 
+                      v-else
+                      ref="contentEditor"
+                      @input="updateContent"
+                      @paste="handlePaste"
+                      contenteditable="true"
+                      class="min-h-[400px] p-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style="max-height: 600px; overflow-y: auto;"
+                      placeholder="Nhập mô tả chi tiết sản phẩm..."
+                    ></div>
+                    
+                    <!-- Editor Footer -->
+                    <div class="bg-gray-50 p-2 border-t flex items-center justify-between text-sm">
+                      <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">📊 {{ contentStats.words }} từ • {{ contentStats.images }} hình • {{ contentStats.paragraphs }} đoạn</span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <span class="text-gray-600">⏱️ {{ estimatedReadTime }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Đối tượng sử dụng</label>
                   <input
@@ -510,9 +597,9 @@
                     placeholder="Số đăng ký lưu hành"
                   />
                 </div>
-              </div>
+              </div> -->
 
-              <div>
+              <!-- <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Tags (phân cách bằng dấu phẩy)</label>
                 <input
                   type="text"
@@ -520,11 +607,11 @@
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="kháng sinh, vitamin, bổ sung, chất lượng cao..."
                 />
-              </div>
+              </div> -->
             </div>
 
             <!-- Tab 3: Thông tin y tế -->
-            <div v-show="activeTab === 'medical'" class="space-y-6">
+            <!-- <div v-show="activeTab === 'medical'" class="space-y-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Thành phần hoạt chất</label>
                 <textarea
@@ -574,11 +661,11 @@
                   placeholder="Nhiệt độ, độ ẩm, điều kiện ánh sáng..."
                 ></textarea>
               </div>
-            </div>
+            </div> -->
 
             <!-- Tab 4: Chức năng & đánh giá -->
             <div v-show="activeTab === 'extra'" class="space-y-6">
-              <div>
+              <!-- <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Chức năng (phân cách bằng dấu phẩy)</label>
                 <input
                   type="text"
@@ -586,9 +673,9 @@
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Kháng khuẩn, tăng sức đề kháng, bổ sung vitamin..."
                 />
-              </div>
+              </div> -->
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá (1-5 sao)</label>
                   <input
@@ -612,7 +699,7 @@
                     placeholder="0"
                   />
                 </div>
-              </div>
+              </div> -->
 
               <!-- Additional Images -->
               <div>
@@ -870,7 +957,7 @@ export default {
       formTabs: [
         { id: 'basic', name: 'Cơ bản', icon: 'fas fa-info-circle' },
         { id: 'details', name: 'Chi tiết', icon: 'fas fa-list-alt' },
-        { id: 'medical', name: 'Y tế', icon: 'fas fa-prescription-bottle-alt' },
+        // { id: 'medical', name: 'Y tế', icon: 'fas fa-prescription-bottle-alt' },
         { id: 'extra', name: 'Khác', icon: 'fas fa-star' }
       ],
 
@@ -903,12 +990,27 @@ export default {
         functionsText: ''
       },
       selectedImageFile: null,
-      imagePreview: null
+      imagePreview: null,
+      editorOptions: {
+        sourceMode: false,
+        showPreview: false
+      },
+      sourceContent: '',
+      contentStats: {
+        words: 0,
+        images: 0,
+        paragraphs: 0
+      }
     }
   },
 
   computed: {
-    
+    estimatedReadTime() {
+      const wordsPerMinute = 200;
+      const minutes = Math.ceil(this.contentStats.words / wordsPerMinute);
+      return `${minutes} phút đọc`;
+    },
+
     filteredProducts() {
       return this.products.filter(product => {
         const matchesSearch = !this.searchQuery || 
@@ -952,6 +1054,101 @@ export default {
   },
 
   methods: {
+    updateContent() {
+      if (!this.$refs.contentEditor) return
+      
+      this.form.fullDescription = this.$refs.contentEditor.innerHTML
+      this.updateContentStats()
+      
+      if (this.editorOptions.sourceMode) {
+        this.sourceContent = this.form.fullDescription
+      }
+    },
+
+    updateContentStats() {
+      const content = this.form.fullDescription || ''
+      const text = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+      
+      this.contentStats.words = text ? text.split(' ').length : 0
+      this.contentStats.images = (content.match(/<img/g) || []).length
+      this.contentStats.paragraphs = (content.match(/<p/g) || []).length
+    },
+
+    handlePaste(event) {
+      const clipboardData = event.clipboardData || window.clipboardData
+      const html = clipboardData.getData('text/html')
+
+      if (html) {
+        event.preventDefault()
+        const cleanedHtml = this.cleanPastedContent(html)
+        document.execCommand('insertHTML', false, cleanedHtml)
+        setTimeout(() => this.updateContent(), 100)
+      }
+    },
+
+    cleanPastedContent(html) {
+      const tempDiv = document.createElement('div')
+      tempDiv.innerHTML = html
+      
+      // Xóa các thẻ không mong muốn
+      const unwantedTags = ['script', 'style', 'meta', 'link']
+      unwantedTags.forEach(tag => {
+        const elements = tempDiv.querySelectorAll(tag)
+        elements.forEach(el => el.remove())
+      })
+      
+      return tempDiv.innerHTML
+    },
+
+    formatText(command) {
+      document.execCommand(command, false, null)
+      this.updateContent()
+    },
+
+    insertHeading(tag) {
+      const selection = window.getSelection()
+      if (selection.toString()) {
+        document.execCommand('formatBlock', false, tag)
+      } else {
+        document.execCommand('insertHTML', false, `<${tag}>Tiêu đề</${tag}>`)
+      }
+      this.updateContent()
+    },
+
+    insertList(type) {
+      if (type === 'ul') {
+        document.execCommand('insertUnorderedList', false, null)
+      } else {
+        document.execCommand('insertOrderedList', false, null)
+      }
+      this.updateContent()
+    },
+
+    toggleSourceMode() {
+      this.editorOptions.sourceMode = !this.editorOptions.sourceMode
+      
+      if (this.editorOptions.sourceMode) {
+        this.sourceContent = this.form.fullDescription
+      } else {
+        this.form.fullDescription = this.sourceContent
+        this.$nextTick(() => {
+          if (this.$refs.contentEditor) {
+            this.$refs.contentEditor.innerHTML = this.form.fullDescription
+          }
+        })
+      }
+    },
+
+    clearContent() {
+      if (confirm('Bạn có chắc muốn xóa toàn bộ nội dung?')) {
+        this.form.fullDescription = ''
+        if (this.$refs.contentEditor) {
+          this.$refs.contentEditor.innerHTML = ''
+        }
+        this.updateContentStats()
+      }
+    },
+
     // Data Loading - UPDATED to use ProductAPI
     async loadData() {
       this.loading = true;
@@ -998,12 +1195,6 @@ export default {
       this.formLoading = true;
 
       try {
-        // Debug BEFORE preparing formData
-        console.log('🔍 BEFORE preparing formData:');
-        console.log('   this.form.additionalImages:', JSON.parse(JSON.stringify(this.form.additionalImages)));
-        console.log('   this.form.additionalImages length:', this.form.additionalImages ? this.form.additionalImages.length : 'undefined');
-        console.log('   this.form object keys:', Object.keys(this.form));
-
         // Chuẩn bị dữ liệu form
         const formData = {
           // Base form data
@@ -1039,17 +1230,6 @@ export default {
           // FIX: Đặt images cuối cùng để tránh bị overwrite
           images: Array.isArray(this.form.additionalImages) ? [...this.form.additionalImages] : []
         };
-
-        // Debug AFTER preparing formData
-        console.log('🔍 AFTER preparing formData:');
-        console.log('   formData.images:', JSON.parse(JSON.stringify(formData.images)));
-        console.log('   formData.images length:', formData.images ? formData.images.length : 'undefined');
-
-        // Debug log để kiểm tra
-        console.log('🖼️ Form data being sent:');
-        console.log('   Main image:', formData.image);
-        console.log('   Gallery images (additionalImages):', this.form.additionalImages);
-        console.log('   Gallery images (images):', formData.images);
 
         let result;
         if (this.showEditModal) {
@@ -1158,10 +1338,13 @@ export default {
       this.activeTab = 'basic';
       this.showViewModal = false;
       this.showEditModal = true;
-      
-      // Debug log
-      console.log('✏️ Edit product - loaded additionalImages:', this.form.additionalImages);
-      console.log('✏️ Edit product - original images:', product.images);
+
+      this.$nextTick(() => {
+        if (this.$refs.contentEditor && this.form.fullDescription) {
+          this.$refs.contentEditor.innerHTML = this.form.fullDescription
+          this.updateContentStats()
+        }
+      })
     },
 
     closeModal() {
@@ -1203,9 +1386,17 @@ export default {
       this.selectedImageFile = null;
       this.imagePreview = null;
       this.activeTab = 'basic';
-      
-      // Debug log
-      console.log('🔄 Form reset - additionalImages:', this.form.additionalImages);
+
+      this.editorOptions.sourceMode = false
+      this.sourceContent = ''
+      this.contentStats = { words: 0, images: 0, paragraphs: 0 }
+
+      // Đợi DOM update
+      this.$nextTick(() => {
+        if (this.$refs.contentEditor) {
+          this.$refs.contentEditor.innerHTML = '<p style="color: #9ca3af; font-style: italic;">Nhập mô tả chi tiết về sản phẩm, công dụng, lợi ích...</p>'
+        }
+      })
     },
 
     // File Operations (không thay đổi)
