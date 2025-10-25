@@ -35,7 +35,7 @@
               ]"
             >
               <i class="fas fa-home mr-2"></i>
-              Banner Trang chủ ({{ homepageBanners.length }}/4)
+              Banner Trang chủ ({{ homepageBanners.length }})
             </button>
             <button
               @click="activeBannerType = 'popup'"
@@ -60,7 +60,7 @@
       <div v-if="activeBannerType === 'homepage'" class="bg-white rounded-lg shadow-sm p-6">
         <h3 class="text-lg font-semibold mb-4 flex items-center">
           <i class="fas fa-home text-blue-500 mr-2"></i>
-          Banner trang chủ ({{ homepageBanners.length }}/4)
+          Banner trang chủ ({{ homepageBanners.length }})
         </h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -102,7 +102,6 @@
           
           <!-- Add New Slot -->
           <div 
-            v-if="homepageBanners.length < 4"
             @click="openUploadModal('homepage')"
             class="border-2 border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
           >
@@ -404,11 +403,7 @@ export default {
             result = await BannerAPI.replaceBanner(this.replaceIndex, this.selectedFile)
             BannerAPI.showMessage('Đã thay thế banner', 'success')
           } else {
-            // Add new banner - THAY ĐỔI: cho phép tối đa 4 banner
-            if (this.homepageBanners.length >= 4) {
-              BannerAPI.showMessage('Chỉ được phép tối đa 4 banner trang chủ', 'error')
-              return
-            }
+            // Add new banner (không giới hạn số lượng)
             this.loadingMessage = 'Đang thêm banner mới...'
             result = await BannerAPI.addBanner(this.selectedFile)
             BannerAPI.showMessage('Đã thêm banner mới', 'success')
