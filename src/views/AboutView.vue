@@ -7,19 +7,13 @@
     />
 
     <!-- Hero Section -->
-    <div class="relative bg-gradient-to-r from-primary-500 to-primary-700 py-16 md:py-24">
+    <div class="relative bg-gradient-to-r from-primary-500 to-primary-700" style="height: 160px;">
       <!-- Background overlay -->
-      <div class="absolute inset-0 bg-black opacity-50"></div>
+      <div class="absolute inset-0 bg-black opacity-40"></div>
       <div 
         class="absolute inset-0 bg-cover bg-center"
-        style="background-color: #515151;"
+        style="background-image: url('../../public/images/gioithieu2.jpg');"
       ></div>
-      
-      <!-- Content -->
-      <div class="relative container mx-auto px-4 text-center text-white">
-        <h1 class="text-3xl md:text-5xl font-bold mb-4">Trang giới thiệu</h1>
-        <p class="text-lg md:text-xl opacity-90">HALIFE ANIMAL HEALTH - CÔNG NGHỆ THÚ Y ĐỘC QUYỀN NHẬT BẢN</p>
-      </div>
     </div>
 
     <!-- Main Content -->
@@ -32,17 +26,37 @@
           </h2>
           <div class="w-24 h-1 bg-primary-500 mx-auto mb-6"></div>
           <p class="text-lg text-gray-600 leading-relaxed">
-            Công ty Cổ phần Thuốc Thú y HALIFE Việt Nhật (HALIFE Animal Health) là đơn vị tiên phong trong việc phát triển và ứng dụng giải pháp thú y công nghệ cao, mang tầm quốc tế, được chuyển giao trực tiếp từ Nhật Bản. Chúng tôi tập trung nghiên cứu, sản xuất và phân phối các sản phẩm sinh học – đặc biệt là dòng Best Phage độc quyền – nhằm thay thế kháng sinh truyền thống, hướng tới chăn nuôi an toàn, sạch và bền vững
+            Công ty TNHH Công nghệ Sinh học Halife tự hào là đơn vị tiên phong trong lĩnh vực nghiên cứu, sản xuất và phân phối thuốc thú y dành cho gia súc, gia cầm và thủy cầm tại Việt Nam.
+          </p>
+          <br>
+          <p class="text-lg text-gray-600 leading-relaxed">
+            Với nhà máy hiện đại đạt chuẩn GMP – WHO, hệ thống kiểm soát chất lượng nghiêm ngặt cùng đội ngũ chuyên gia và kỹ sư thú y nhiều năm kinh nghiệm, Halife luôn kiên định mục tiêu mang đến những sản phẩm chuẩn hàm lượng – chuẩn chất lượng – chuẩn an toàn. Hàng chục sản phẩm điều trị và hỗ trợ đã đồng hành cùng hàng nghìn trang trại lớn nhỏ, góp phần giúp bà con chăn nuôi kiểm soát dịch bệnh, nâng cao hiệu quả sản xuất.
           </p>
         </div>
 
         <!-- Featured Image -->
         <div class="mb-12">
           <img 
-            src="/images/Halife_anh_bia.jpg" 
+            src="../../public/images/gioithieu1.jpg" 
             alt="HALIFE" 
             class="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
           />
+        </div>
+        
+        <div class="text-center mb-12">
+          <p class="text-lg text-gray-600 leading-relaxed">
+            Những nỗ lực bền bỉ ấy đã được ghi nhận bằng Giải thưởng Thương hiệu Quốc gia, minh chứng cho uy tín và vị thế ngày càng vững chắc của Halife trong ngành thú y.
+          </p>
+          <br>
+          <p class="text-lg text-gray-600 leading-relaxed">
+            Chúng tôi xin gửi lời tri ân sâu sắc đến bà con chăn nuôi, các đối tác và khách hàng đã tin tưởng đồng hành cùng Halife trong suốt chặng đường vừa qua. Sự tin cậy của bà con chính là động lực để chúng tôi tiếp tục nghiên cứu, sáng tạo và không ngừng hoàn thiện, mang đến những giải pháp thú y tối ưu, bền vững và hiệu quả nhất.
+          </p>
+          <br>
+          <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
+            Halife – Vì một nền chăn nuôi an toàn, hiệu quả và phát triển lâu dài.
+          </h2>
+          
+          <div class="w-24 h-1 bg-primary-500 mx-auto mb-6"></div>
         </div>
 
         <!-- Company Stats -->
@@ -435,6 +449,13 @@ a:hover, button:hover {
   
   .text-5xl {
     font-size: 2.5rem;
+  }
+}
+
+/* Hero section height */
+@media (min-width: 769px) {
+  .about-view .relative.bg-gradient-to-r {
+    height: 290px !important;
   }
 }
 

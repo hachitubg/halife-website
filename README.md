@@ -33,6 +33,8 @@ npm run build
 ### Backend API
 ```bash
 cd api
+python excel_api.py
+
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
