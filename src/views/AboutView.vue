@@ -12,7 +12,7 @@
       <div class="absolute inset-0 bg-black opacity-40"></div>
       <div 
         class="absolute inset-0 bg-cover bg-center"
-        style="background-image: url('../../public/images/gioithieu2.jpg');"
+        style="background-image: url('/images/gioithieu2.jpg');"
       ></div>
     </div>
 
@@ -37,9 +37,9 @@
         <!-- Featured Image -->
         <div class="mb-12">
           <img 
-            src="../../public/images/gioithieu1.jpg" 
+            src="/images/gioithieu1.jpg" 
             alt="HALIFE" 
-            class="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
+            class="w-full h-auto object-contain rounded-lg shadow-lg"
           />
         </div>
         

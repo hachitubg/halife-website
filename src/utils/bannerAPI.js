@@ -411,7 +411,7 @@ export class BannerAPI {
         email: formData.email || 'Không cung cấp',
         location: formData.location || 'Không chọn',
         timestamp: new Date().toLocaleString('vi-VN'),
-        to_email: 'info@halife.vn'
+        to_email: 'amedvn94@gmail.com'
       };
       
       // Send email
