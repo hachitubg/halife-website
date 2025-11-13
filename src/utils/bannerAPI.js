@@ -400,9 +400,9 @@ export class BannerAPI {
       const emailjs = await import('@emailjs/browser');
       
       // EmailJS configuration
-      const serviceId = 'service_dlzpqnu';
-      const templateId = 'template_5iugwni';
-      const publicKey = 'y2eF1NKDKicGABCFN';
+      const serviceId = 'service_5jgoxht';
+      const templateId = 'template_hnziole';
+      const publicKey = 'KZ5702kiCduSryCng';
       
       // Email template parameters
       const templateParams = {
