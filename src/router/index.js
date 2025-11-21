@@ -94,7 +94,7 @@ const routes = [
     component: () => import('../views/ContactView.vue'),
     meta: {
       title: 'Liên hệ - HALIFE ANIMAL HEALTH',
-      description: 'Thông tin liên hệ và hỗ trợ khách hàng HALIFE ANIMAL HEALTH. Hotline: 0866.583.223'
+      description: 'Thông tin liên hệ và hỗ trợ khách hàng HALIFE ANIMAL HEALTH. Hotline: 1900.866.660'
     }
   },
   // Redirect old routes for SEO

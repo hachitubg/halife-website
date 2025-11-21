@@ -111,7 +111,7 @@
           <div class="text-center space-y-2">
             <a href="tel:0866583223" class="block text-green-600 font-bold text-lg">
               <i class="fas fa-phone mr-2"></i>
-              0866.583.223
+              1900.866.660
             </a>
             <p class="text-sm text-gray-600">Hotline hỗ trợ 24/7</p>
           </div>
@@ -155,7 +155,7 @@
           <div class="text-right">
             <p class="text-sm text-gray-600">Hỗ trợ khách hàng</p>
             <p class="font-semibold text-primary-500">
-              <a href="tel:0866583223" class="hover:text-blue-800">0866.583.223</a>
+              <a href="tel:0866583223" class="hover:text-blue-800">1900.866.660</a>
             </p>
           </div>
           <div class="flex gap-2">

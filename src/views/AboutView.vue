@@ -250,7 +250,7 @@
               <div>
                 <h4 class="font-semibold text-gray-800">Hotline</h4>
                 <p class="text-gray-600">
-                  <a href="tel:0866583223" class="text-primary-500 hover:text-blue-800">0866.583.223</a>
+                  <a href="tel:0866583223" class="text-primary-500 hover:text-blue-800">1900.866.660</a>
                 </p>
               </div>
             </div>
@@ -323,7 +323,7 @@
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <a href="tel:0866583223" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
             <i class="fas fa-phone mr-2"></i>
-            Gọi ngay: 0866.583.223
+            Gọi ngay: 1900.866.660
           </a>
           <router-link to="/products" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
             <i class="fas fa-shopping-cart mr-2"></i>
