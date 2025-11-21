@@ -300,7 +300,7 @@
             Đội ngũ chuyên gia thú y của chúng tôi sẵn sàng hỗ trợ bạn 24/7
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:0866583223" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center">
+            <a href="tel:1900866660" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center">
               <i class="fas fa-phone mr-2"></i>
               Gọi ngay: 1900.866.660
             </a>

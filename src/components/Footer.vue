@@ -63,7 +63,7 @@
                 </div>
                 <div class="flex items-center">
                   <i class="fas fa-phone mr-3 text-blue-500"></i>
-                  <a href="tel:0866583223" class="hover:text-blue-600">1900.866.660</a>
+                  <a href="tel:1900866660" class="hover:text-blue-600">1900.866.660</a>
                 </div>
                 <div class="flex items-center">
                   <i class="fas fa-globe mr-3 text-blue-500"></i>
@@ -107,7 +107,7 @@
               <h4 class="font-semibold text-gray-800 mb-4">HỖ TRỢ KHÁCH HÀNG</h4>
               <ul class="space-y-2 text-sm text-gray-600">
                 <li>
-                  <a href="tel:0866583223" class="hover:text-blue-600 transition-colors flex items-center">
+                  <a href="tel:1900866660" class="hover:text-blue-600 transition-colors flex items-center">
                     <i class="fas fa-phone mr-2 text-green-500"></i>
                     Hotline: 1900.866.660
                   </a>

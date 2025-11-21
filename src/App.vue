@@ -16,7 +16,7 @@
 
     <!-- Main phone button -->
     <a
-      href="tel:0866583223"
+      href="tel:1900866660"
       class="phone-button group"
     >
       <!-- Icon container -->
@@ -27,7 +27,7 @@
       <!-- Text container -->
       <div class="phone-text-container">
         <span class="phone-label">Hotline</span>
-        <span class="phone-number">0866583223</span>
+        <span class="phone-number">1900866660</span>
       </div>
       
       <!-- Glow effect -->
@@ -40,13 +40,13 @@
     <div class="social-media-stack">
       <!-- Zalo -->
       <a 
-        href="https://zalo.me/0866583223" 
+        href="https://zalo.me/1900866660" 
         target="_blank"
         class="social-btn zalo-btn"
-        title="Chat Zalo - 0866583223"
+        title="Chat Zalo - 1900866660"
       >
         <i class="fas fa-comments"></i>
-        <span class="social-tooltip">Zalo<br><small>0866583223</small></span>
+        <span class="social-tooltip">Zalo<br><small>1900866660</small></span>
       </a>
 
       <!-- TikTok -->

@@ -109,7 +109,7 @@
         <!-- Contact Info -->
         <div class="p-4 border-t bg-gray-50">
           <div class="text-center space-y-2">
-            <a href="tel:0866583223" class="block text-green-600 font-bold text-lg">
+            <a href="tel:1900866660" class="block text-green-600 font-bold text-lg">
               <i class="fas fa-phone mr-2"></i>
               1900.866.660
             </a>
@@ -155,7 +155,7 @@
           <div class="text-right">
             <p class="text-sm text-gray-600">Hỗ trợ khách hàng</p>
             <p class="font-semibold text-primary-500">
-              <a href="tel:0866583223" class="hover:text-blue-800">1900.866.660</a>
+              <a href="tel:1900866660" class="hover:text-blue-800">1900.866.660</a>
             </p>
           </div>
           <div class="flex gap-2">

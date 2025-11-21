@@ -72,7 +72,7 @@
                   </div>
                   <div>
                     <h3 class="font-semibold text-gray-800 mb-1">Điện thoại</h3>
-                    <a href="tel:0866583223" class="text-blue-600 hover:text-blue-800">1900.866.660</a>
+                    <a href="tel:1900866660" class="text-blue-600 hover:text-blue-800">1900.866.660</a>
                   </div>
                 </div>
 
@@ -251,7 +251,7 @@
           </div>
           <h3 class="font-semibold text-lg mb-2">Hotline</h3>
           <p class="text-gray-600 text-sm mb-4">Gọi ngay để được hỗ trợ</p>
-          <a href="tel:0866583223" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block">
+          <a href="tel:1900866660" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors inline-block">
             1900.866.660
           </a>
         </div>

@@ -186,7 +186,7 @@
             <div class="flex items-center justify-center">
               <i class="fas fa-phone mr-2"></i>
               <span>Hotline: </span>
-              <a href="tel:0866583223" class="font-semibold ml-1 hover:underline">1900.866.660</a>
+              <a href="tel:1900866660" class="font-semibold ml-1 hover:underline">1900.866.660</a>
             </div>
             <div class="flex items-center justify-center">
               <i class="fas fa-envelope mr-2"></i>
