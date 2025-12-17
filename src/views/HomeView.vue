@@ -511,7 +511,10 @@ export default {
 
   computed: {
     featuredProducts() {
-      return this.dataLoaded ? this.allProducts.filter(product => product.isFeatured) : []
+      if (!this.dataLoaded) return []
+      const haliFeatured = this.allProducts.filter(product => product.isFeatured)
+      const tamvetFeatured = this.tamvetProducts.filter(product => product.isFeatured)
+      return [...haliFeatured, ...tamvetFeatured]
     },
 
     latestNews() {

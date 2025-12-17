@@ -366,16 +366,26 @@
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Danh mục *</label>
-                  <select
-                    v-model="form.category"
-                    required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="">Chọn danh mục</option>
-                    <option v-for="category in categories" :key="category.id" :value="category.name">
-                      {{ category.name }}
-                    </option>
-                  </select>
+                  <div class="flex gap-2">
+                    <select
+                      v-model="form.category"
+                      required
+                      class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      <option value="">Chọn danh mục</option>
+                      <option v-for="category in categories" :key="category.id" :value="category.name">
+                        {{ category.name }}
+                      </option>
+                    </select>
+                    <button
+                      type="button"
+                      @click="openAddCategoryModal"
+                      class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 whitespace-nowrap"
+                      title="Thêm danh mục mới"
+                    >
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
                 </div>
 
                 <div>
@@ -461,13 +471,96 @@
             <!-- Tab 2: Thông tin chi tiết -->
             <div v-show="activeTab === 'details'" class="space-y-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả đầy đủ</label>
-                <textarea
-                  v-model="form.fullDescription"
-                  rows="6"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder="Mô tả chi tiết về sản phẩm..."
-                ></textarea>
+                <label class="block text-sm font-medium text-gray-700 mb-2">📝 Mô tả đầy đủ</label>
+                
+                <!-- Editor Toolbar -->
+                <div class="border border-gray-300 rounded-t-lg bg-gray-50 p-3 flex flex-wrap items-center gap-2">
+                  <div class="flex items-center space-x-1">
+                    <button type="button" @click="formatText('bold')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                      <i class="fas fa-bold"></i>
+                    </button>
+                    <button type="button" @click="formatText('italic')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                      <i class="fas fa-italic"></i>
+                    </button>
+                    <button type="button" @click="formatText('underline')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                      <i class="fas fa-underline"></i>
+                    </button>
+                  </div>
+                  
+                  <div class="border-l pl-2 flex items-center space-x-1">
+                    <button type="button" @click="insertHeading('h2')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100 text-sm">
+                      H2
+                    </button>
+                    <button type="button" @click="insertHeading('h3')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100 text-sm">
+                      H3
+                    </button>
+                  </div>
+                  
+                  <div class="border-l pl-2 flex items-center space-x-1">
+                    <button type="button" @click="insertList('ul')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                      <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button type="button" @click="insertList('ol')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                      <i class="fas fa-list-ol"></i>
+                    </button>
+                  </div>
+                  
+                  <div class="border-l pl-2 flex items-center space-x-1">
+                    <button type="button" @click="formatText('justifyLeft')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                      <i class="fas fa-align-left"></i>
+                    </button>
+                    <button type="button" @click="formatText('justifyCenter')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                      <i class="fas fa-align-center"></i>
+                    </button>
+                    <button type="button" @click="formatText('justifyRight')" class="px-3 py-1 bg-white border rounded hover:bg-gray-100">
+                      <i class="fas fa-align-right"></i>
+                    </button>
+                  </div>
+                  
+                  <div class="border-l pl-2 flex items-center space-x-1">
+                    <button type="button" @click="toggleSourceMode" 
+                      :class="editorOptions.sourceMode ? 'bg-blue-500 text-white' : 'bg-white'"
+                      class="px-3 py-1 border rounded hover:bg-gray-100 text-sm">
+                      <i class="fas fa-code"></i>
+                    </button>
+                    <button type="button" @click="clearContent" class="px-3 py-1 bg-white border rounded hover:bg-gray-100 text-red-600">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Editor Content -->
+                <div class="border-l border-r border-b border-gray-300 rounded-b-lg overflow-hidden">
+                  <!-- Source Mode -->
+                  <textarea
+                    v-if="editorOptions.sourceMode"
+                    v-model="sourceContent"
+                    @input="form.fullDescription = sourceContent; updateContentStats()"
+                    class="w-full min-h-[400px] p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="<p>Nhập mã HTML...</p>"
+                  ></textarea>
+                  
+                  <!-- WYSIWYG Mode -->
+                  <div 
+                    v-else
+                    ref="contentEditor"
+                    @input="updateContent"
+                    @paste="handlePaste"
+                    contenteditable="true"
+                    class="min-h-[400px] p-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    style="max-height: 600px; overflow-y: auto;"
+                  ></div>
+                  
+                  <!-- Editor Footer -->
+                  <div class="bg-gray-50 p-2 border-t flex items-center justify-between text-sm">
+                    <div class="flex items-center space-x-4">
+                      <span class="text-gray-600">📊 {{ contentStats.words }} từ • {{ contentStats.images }} hình • {{ contentStats.paragraphs }} đoạn</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span class="text-gray-600">⏱️ {{ estimatedReadTime }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -639,6 +732,47 @@
       </div>
     </div>
 
+    <!-- Add Category Modal -->
+    <div v-if="showCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-md w-full">
+        <div class="flex items-center justify-between p-6 border-b">
+          <h3 class="text-lg font-semibold">Thêm danh mục mới</h3>
+          <button @click="showCategoryModal = false" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+        
+        <div class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tên danh mục *</label>
+            <input
+              v-model="newCategoryName"
+              type="text"
+              @keyup.enter="addNewCategory"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Nhập tên danh mục..."
+              autofocus
+            />
+          </div>
+          
+          <div class="flex space-x-3 pt-4">
+            <button
+              @click="showCategoryModal = false"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+            >
+              Hủy
+            </button>
+            <button
+              @click="addNewCategory"
+              class="flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+            >
+              <i class="fas fa-plus mr-2"></i>Thêm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Upload Excel Modal -->
     <div v-if="showUploadModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-lg max-w-md w-full">
@@ -715,7 +849,9 @@ export default {
       showEditModal: false,
       showViewModal: false,
       showUploadModal: false,
+      showCategoryModal: false,
       selectedProduct: null,
+      newCategoryName: '',
 
       activeTab: 'basic',
       formTabs: [
@@ -752,7 +888,18 @@ export default {
         functionsText: ''
       },
       selectedImageFile: null,
-      imagePreview: null
+      imagePreview: null,
+      
+      // Editor options
+      editorOptions: {
+        sourceMode: false
+      },
+      sourceContent: '',
+      contentStats: {
+        words: 0,
+        images: 0,
+        paragraphs: 0
+      }
     }
   },
 
@@ -785,6 +932,12 @@ export default {
 
     totalPages() {
       return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+    },
+
+    estimatedReadTime() {
+      const words = this.contentStats.words || 0;
+      const minutes = Math.max(1, Math.round(words / 200));
+      return `${minutes} phút`;
     }
   },
   
@@ -882,7 +1035,8 @@ export default {
           result = await TamvetProductAPI.updateProduct(
             this.selectedProduct.id, 
             formData, 
-            this.selectedImageFile
+            this.selectedImageFile,
+            this.selectedProduct.image
           );
         } else {
           result = await TamvetProductAPI.createProduct(formData, this.selectedImageFile);
@@ -966,8 +1120,17 @@ export default {
       this.selectedImageFile = null;
       this.imagePreview = null;
       this.activeTab = 'basic';
+      this.editorOptions.sourceMode = false;
       this.showViewModal = false;
       this.showEditModal = true;
+      
+      // Load editor content
+      this.$nextTick(() => {
+        if (this.$refs.contentEditor && this.form.fullDescription) {
+          this.$refs.contentEditor.innerHTML = this.form.fullDescription;
+          this.updateContentStats();
+        }
+      });
     },
 
     closeModal() {
@@ -1147,6 +1310,132 @@ export default {
     showMessage(message, type = 'info') {
       const icons = { success: '✅', error: '❌', info: 'ℹ️' };
       alert(`${icons[type]} ${message}`);
+    },
+
+    // Editor methods
+    updateContent() {
+      if (!this.$refs.contentEditor) return
+      
+      this.form.fullDescription = this.$refs.contentEditor.innerHTML
+      this.updateContentStats()
+      
+      if (this.editorOptions.sourceMode) {
+        this.sourceContent = this.form.fullDescription
+      }
+    },
+
+    updateContentStats() {
+      const content = this.form.fullDescription || ''
+      const text = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+      
+      this.contentStats.words = text ? text.split(' ').length : 0
+      this.contentStats.images = (content.match(/<img/g) || []).length
+      this.contentStats.paragraphs = (content.match(/<p/g) || []).length
+    },
+
+    handlePaste(event) {
+      const clipboardData = event.clipboardData || window.clipboardData
+      const html = clipboardData.getData('text/html')
+
+      if (html) {
+        event.preventDefault()
+        const cleanedHtml = this.cleanPastedContent(html)
+        document.execCommand('insertHTML', false, cleanedHtml)
+        setTimeout(() => this.updateContent(), 100)
+      }
+    },
+
+    cleanPastedContent(html) {
+      const tempDiv = document.createElement('div')
+      tempDiv.innerHTML = html
+      
+      // Xóa các thẻ không mong muốn
+      const unwantedTags = ['script', 'style', 'meta', 'link']
+      unwantedTags.forEach(tag => {
+        const elements = tempDiv.querySelectorAll(tag)
+        elements.forEach(el => el.remove())
+      })
+      
+      return tempDiv.innerHTML
+    },
+
+    formatText(command) {
+      document.execCommand(command, false, null)
+      this.updateContent()
+    },
+
+    insertHeading(tag) {
+      const selection = window.getSelection()
+      if (selection.toString()) {
+        document.execCommand('formatBlock', false, tag)
+      } else {
+        document.execCommand('insertHTML', false, `<${tag}>Tiêu đề</${tag}>`)
+      }
+      this.updateContent()
+    },
+
+    insertList(type) {
+      if (type === 'ul') {
+        document.execCommand('insertUnorderedList', false, null)
+      } else {
+        document.execCommand('insertOrderedList', false, null)
+      }
+      this.updateContent()
+    },
+
+    toggleSourceMode() {
+      this.editorOptions.sourceMode = !this.editorOptions.sourceMode
+      
+      if (this.editorOptions.sourceMode) {
+        this.sourceContent = this.form.fullDescription
+      } else {
+        this.form.fullDescription = this.sourceContent
+        this.$nextTick(() => {
+          if (this.$refs.contentEditor) {
+            this.$refs.contentEditor.innerHTML = this.form.fullDescription
+          }
+        })
+      }
+    },
+
+    clearContent() {
+      if (confirm('Bạn có chắc muốn xóa toàn bộ nội dung?')) {
+        this.form.fullDescription = ''
+        if (this.$refs.contentEditor) {
+          this.$refs.contentEditor.innerHTML = ''
+        }
+        this.updateContentStats()
+      }
+    },
+
+    // Category methods
+    openAddCategoryModal() {
+      this.newCategoryName = '';
+      this.showCategoryModal = true;
+    },
+
+    addNewCategory() {
+      if (!this.newCategoryName.trim()) {
+        this.showMessage('Vui lòng nhập tên danh mục', 'error');
+        return;
+      }
+
+      // Kiểm tra danh mục đã tồn tại
+      if (this.categories.some(c => c.name === this.newCategoryName.trim())) {
+        this.showMessage('Danh mục này đã tồn tại', 'error');
+        return;
+      }
+
+      // Thêm danh mục mới
+      const newCategory = {
+        id: `CAT${this.categories.length + 1}`,
+        name: this.newCategoryName.trim()
+      };
+      
+      this.categories.push(newCategory);
+      this.form.category = newCategory.name;
+      this.showCategoryModal = false;
+      this.showMessage(`Đã thêm danh mục "${newCategory.name}" thành công`, 'success');
     }
   },
 

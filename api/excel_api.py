@@ -2008,5 +2008,559 @@ def delete_popup_banner():
             'message': f'Lỗi xóa popup banner: {str(e)}'
         }), 500
 
+# ==============================================
+# TAMVET PRODUCT API ENDPOINTS
+# ==============================================
+
+TAMVET_EXCEL_FILE = os.path.join(BASE_DIR, 'public/data/tamvet_product.xlsx')
+
+@app.route('/api/tamvet-products', methods=['GET'])
+def get_tamvet_products():
+    """Lấy tất cả sản phẩm Tâm Vet từ Excel"""
+    try:
+        if not os.path.exists(TAMVET_EXCEL_FILE):
+            return jsonify({
+                'success': False,
+                'message': f'File Excel Tâm Vet không tồn tại: {TAMVET_EXCEL_FILE}',
+                'data': []
+            }), 404
+
+        # Kiểm tra các sheet có sẵn
+        excel_file = pd.ExcelFile(TAMVET_EXCEL_FILE)
+        available_sheets = excel_file.sheet_names
+        
+        # Thử đọc sheet Products trước
+        sheet_name = 'Products'
+        if sheet_name not in available_sheets:
+            if available_sheets:
+                sheet_name = available_sheets[0]
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'File Excel Tâm Vet không có sheet nào',
+                    'data': []
+                }), 404
+
+        # Đọc Excel
+        df = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name=sheet_name)
+        
+        if df.empty:
+            return jsonify({
+                'success': True,
+                'message': f'Sheet {sheet_name} không có dữ liệu',
+                'data': []
+            })
+
+        # Chuyển đổi thành list dict
+        products = []
+        for index, row in df.iterrows():
+            try:
+                # Xử lý hình ảnh chính
+                main_image = safe_str(row.get('image', ''))
+                if main_image == 'nan':
+                    main_image = ''
+                
+                # Xử lý hình ảnh phụ
+                additional_images = safe_split(row.get('images', ''), ';')
+                additional_images = [img for img in additional_images if img != 'nan' and img != '']
+                
+                product = {
+                    'id': safe_str(row.get('id', f'TAMVET{index+1:03d}')),
+                    'name': safe_str(row.get('name', f'Sản phẩm {index+1}')),
+                    'category': safe_str(row.get('category', 'Khác')),
+                    'price': safe_int(row.get('price', 0)),
+                    'originalPrice': safe_int(row.get('originalPrice', 0)),
+                    'description': safe_str(row.get('description', '')),
+                    'fullDescription': safe_str(row.get('fullDescription', '')),
+                    'packageSize': safe_str(row.get('packageSize', '')),
+                    'stockQuantity': safe_int(row.get('stockQuantity', 0)),
+                    'inStock': safe_bool(row.get('inStock', True)),
+                    'isFeatured': safe_bool(row.get('featured', False)),
+                    'image': main_image,
+                    'images': [main_image] + additional_images if main_image else additional_images,
+                    'targetAnimal': safe_str(row.get('targetAnimal', '')),
+                    'manufacturer': safe_str(row.get('manufacturer', 'Tâm Vet')),
+                    'originCountry': safe_str(row.get('originCountry', 'Việt Nam')),
+                    'registrationNumber': safe_str(row.get('registrationNumber', '')),
+                    'activeIngredients': safe_str(row.get('activeIngredients', '')),
+                    'dosage': safe_str(row.get('dosage', '')),
+                    'usageInstructions': safe_str(row.get('usageInstructions', '')),
+                    'warnings': safe_str(row.get('warnings', '')),
+                    'storageConditions': safe_str(row.get('storageConditions', '')),
+                    'rating': safe_float(row.get('rating', 0)),
+                    'reviewCount': safe_int(row.get('reviewCount', 0)),
+                    'tags': safe_split(row.get('tags', ''), ','),
+                    'functions': safe_split(row.get('functions', ''), ';')
+                }
+                products.append(product)
+                
+            except Exception as e:
+                continue
+
+        return jsonify(products)
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi đọc Excel Tâm Vet: {str(e)}',
+            'data': []
+        }), 500
+
+@app.route('/api/tamvet-categories', methods=['GET'])
+def get_tamvet_categories():
+    """Lấy tất cả danh mục sản phẩm Tâm Vet"""
+    try:
+        if not os.path.exists(TAMVET_EXCEL_FILE):
+            return jsonify({
+                'success': False,
+                'message': f'File Excel Tâm Vet không tồn tại',
+                'data': []
+            }), 404
+
+        # Kiểm tra sheet Categories
+        excel_file = pd.ExcelFile(TAMVET_EXCEL_FILE)
+        available_sheets = excel_file.sheet_names
+        
+        sheet_name = 'Categories'
+        if sheet_name not in available_sheets:
+            # Tạo danh mục từ dữ liệu Products
+            products_sheet = 'Products' if 'Products' in available_sheets else available_sheets[0]
+            df_products = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name=products_sheet)
+            
+            if 'category' in df_products.columns:
+                unique_categories = df_products['category'].dropna().unique()
+                categories = []
+                for i, cat_name in enumerate(unique_categories):
+                    if pd.notna(cat_name) and str(cat_name).strip():
+                        categories.append({
+                            'id': f'CAT{i+1:03d}',
+                            'name': str(cat_name).strip()
+                        })
+                
+                return jsonify(categories)
+            else:
+                return jsonify([])
+
+        # Đọc sheet Categories
+        df = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name=sheet_name)
+        
+        categories = []
+        for _, row in df.iterrows():
+            category = {
+                'id': safe_str(row.get('id', '')),
+                'name': safe_str(row.get('name', ''))
+            }
+            if category['name']:
+                categories.append(category)
+
+        return jsonify(categories)
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi đọc danh mục Tâm Vet: {str(e)}',
+            'data': []
+        }), 500
+
+@app.route('/api/tamvet-products', methods=['POST'])
+def create_tamvet_product():
+    """Thêm sản phẩm Tâm Vet mới"""
+    try:
+        # Lấy dữ liệu từ form
+        form_data = request.form.to_dict()
+        image_file = request.files.get('image')
+        
+        # Validate dữ liệu bắt buộc
+        if not form_data.get('name') or not form_data.get('category') or not form_data.get('price'):
+            return jsonify({
+                'success': False,
+                'message': 'Thiếu thông tin bắt buộc: tên, danh mục, giá'
+            }), 400
+
+        if not os.path.exists(TAMVET_EXCEL_FILE):
+            return jsonify({
+                'success': False,
+                'message': f'File Excel Tâm Vet không tồn tại: {TAMVET_EXCEL_FILE}'
+            }), 404
+
+        df = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name='Products')
+        
+        # Xử lý upload ảnh nếu có
+        image_url = form_data.get('image', '')
+        if image_file:
+            try:
+                file_extension = image_file.filename.rsplit('.', 1)[1].lower()
+                unique_filename = f"tamvet-{uuid.uuid4().hex[:8]}-{int(datetime.now().timestamp())}.{file_extension}"
+                file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+                image_file.save(file_path)
+                image_url = f"/images/{unique_filename}"
+            except Exception as img_error:
+                return jsonify({
+                    'success': False,
+                    'message': f'Lỗi upload ảnh: {str(img_error)}'
+                }), 400
+        
+        # Tạo ID mới
+        max_id = 0
+        if not df.empty and 'id' in df.columns:
+            try:
+                numeric_ids = []
+                for id_val in df['id'].dropna().astype(str):
+                    try:
+                        numeric_part = str(id_val).replace('TAMVET', '').replace('PRD', '')
+                        if numeric_part.isdigit():
+                            numeric_ids.append(int(numeric_part))
+                    except:
+                        pass
+                if numeric_ids:
+                    max_id = max(numeric_ids)
+            except:
+                max_id = len(df)
+        
+        new_id = f'TAMVET{max_id + 1:03d}'
+        
+        # Xử lý arrays từ form
+        try:
+            images_array = json.loads(form_data.get('images', '[]')) if form_data.get('images') else []
+        except:
+            images_array = []
+        
+        try:
+            tags_array = json.loads(form_data.get('tags', '[]')) if form_data.get('tags') else []
+        except:
+            tags_array = []
+        
+        try:
+            functions_array = json.loads(form_data.get('functions', '[]')) if form_data.get('functions') else []
+        except:
+            functions_array = []
+        
+        # Tạo dòng mới
+        new_row = {
+            'id': new_id,
+            'name': form_data.get('name', ''),
+            'category': form_data.get('category', ''),
+            'price': int(form_data.get('price', 0)),
+            'originalPrice': int(form_data.get('originalPrice', form_data.get('price', 0))),
+            'description': form_data.get('description', ''),
+            'fullDescription': form_data.get('fullDescription', ''),
+            'packageSize': form_data.get('packageSize', ''),
+            'stockQuantity': int(form_data.get('stockQuantity', 0)),
+            'inStock': form_data.get('inStock', 'true').lower() == 'true',
+            'featured': form_data.get('isFeatured', 'false').lower() == 'true',
+            'image': image_url,
+            'images': ';'.join(images_array),
+            'targetAnimal': form_data.get('targetAnimal', ''),
+            'manufacturer': form_data.get('manufacturer', 'Tâm Vet'),
+            'originCountry': form_data.get('originCountry', 'Việt Nam'),
+            'registrationNumber': form_data.get('registrationNumber', ''),
+            'activeIngredients': form_data.get('activeIngredients', ''),
+            'dosage': form_data.get('dosage', ''),
+            'usageInstructions': form_data.get('usageInstructions', ''),
+            'warnings': form_data.get('warnings', ''),
+            'storageConditions': form_data.get('storageConditions', ''),
+            'rating': float(form_data.get('rating', 0)),
+            'reviewCount': int(form_data.get('reviewCount', 0)),
+            'tags': ','.join(tags_array),
+            'functions': ';'.join(functions_array)
+        }
+        
+        # Thêm vào DataFrame
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+        
+        # Ghi lại Excel
+        try:
+            backup_file = TAMVET_EXCEL_FILE + '.backup'
+            if os.path.exists(TAMVET_EXCEL_FILE):
+                shutil.copy2(TAMVET_EXCEL_FILE, backup_file)
+            
+            existing_sheets = {}
+            if os.path.exists(TAMVET_EXCEL_FILE):
+                excel_file_obj = pd.ExcelFile(TAMVET_EXCEL_FILE)
+                for sheet_name in excel_file_obj.sheet_names:
+                    if sheet_name != 'Products':
+                        existing_sheets[sheet_name] = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name=sheet_name)
+                excel_file_obj.close()
+            
+            with pd.ExcelWriter(TAMVET_EXCEL_FILE, engine='openpyxl') as writer:
+                df.to_excel(writer, sheet_name='Products', index=False)
+                for sheet_name, sheet_data in existing_sheets.items():
+                    sheet_data.to_excel(writer, sheet_name=sheet_name, index=False)
+            
+        except Exception as write_error:
+            if os.path.exists(backup_file):
+                shutil.copy2(backup_file, TAMVET_EXCEL_FILE)
+            raise write_error
+        
+        return jsonify({
+            'success': True,
+            'message': f'Đã thêm sản phẩm "{form_data.get("name")}" thành công',
+            'product': new_row
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi thêm sản phẩm Tâm Vet: {str(e)}'
+        }), 500
+
+@app.route('/api/tamvet-products/<product_id>', methods=['PUT'])
+def update_tamvet_product(product_id):
+    """Cập nhật sản phẩm Tâm Vet"""
+    try:
+        form_data = request.form.to_dict()
+        image_file = request.files.get('image')
+        
+        if not os.path.exists(TAMVET_EXCEL_FILE):
+            return jsonify({
+                'success': False,
+                'message': f'File Excel Tâm Vet không tồn tại: {TAMVET_EXCEL_FILE}'
+            }), 404
+
+        df = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name='Products')
+        
+        # Tìm sản phẩm
+        product_index = df[
+            (df['id'].astype(str) == str(product_id))
+        ].index
+        
+        if len(product_index) == 0:
+            return jsonify({
+                'success': False,
+                'message': f'Không tìm thấy sản phẩm ID: {product_id}'
+            }), 404
+        
+        idx = product_index[0]
+        
+        # Xử lý upload ảnh nếu có
+        if image_file:
+            try:
+                # Xóa ảnh cũ nếu có
+                old_image_path = request.form.get('oldImagePath', '')
+                if old_image_path:
+                    # Chuyển đổi /images/xxx.jpg thành đường dẫn thực tế
+                    if old_image_path.startswith('/images/'):
+                        old_filename = old_image_path.replace('/images/', '')
+                        old_file_path = os.path.join(UPLOAD_FOLDER, old_filename)
+                    else:
+                        # Nếu là đường dẫn tuyệt đối
+                        old_file_path = old_image_path
+                    
+                    try:
+                        if os.path.exists(old_file_path):
+                            os.remove(old_file_path)
+                            print(f"Đã xóa ảnh cũ: {old_file_path}")
+                    except Exception as delete_error:
+                        print(f"Cảnh báo: Không thể xóa ảnh cũ {old_file_path}: {str(delete_error)}")
+                
+                # Upload ảnh mới
+                if not allowed_file(image_file.filename):
+                    return jsonify({
+                        'success': False,
+                        'message': f'Định dạng file không được phép. Cho phép: {", ".join(ALLOWED_EXTENSIONS)}'
+                    }), 400
+                
+                file_extension = image_file.filename.rsplit('.', 1)[1].lower()
+                unique_filename = f"tamvet-{uuid.uuid4().hex[:8]}-{int(datetime.now().timestamp())}.{file_extension}"
+                file_path = os.path.join(UPLOAD_FOLDER, unique_filename)
+                image_file.save(file_path)
+                image_url = f"/images/{unique_filename}"
+                df.at[idx, 'image'] = image_url
+                print(f"Đã upload ảnh mới: {file_path}")
+            except Exception as img_error:
+                return jsonify({
+                    'success': False,
+                    'message': f'Lỗi upload ảnh: {str(img_error)}'
+                }), 400
+        
+        # Cập nhật dữ liệu
+        if 'name' in form_data:
+            df.at[idx, 'name'] = form_data['name']
+        if 'category' in form_data:
+            df.at[idx, 'category'] = form_data['category']
+        if 'price' in form_data:
+            df.at[idx, 'price'] = int(form_data['price'])
+        if 'originalPrice' in form_data:
+            df.at[idx, 'originalPrice'] = int(form_data['originalPrice'])
+        if 'description' in form_data:
+            df.at[idx, 'description'] = form_data['description']
+        if 'fullDescription' in form_data:
+            df.at[idx, 'fullDescription'] = form_data['fullDescription']
+        if 'packageSize' in form_data:
+            df.at[idx, 'packageSize'] = form_data['packageSize']
+        if 'stockQuantity' in form_data:
+            df.at[idx, 'stockQuantity'] = int(form_data['stockQuantity'])
+        if 'inStock' in form_data:
+            df.at[idx, 'inStock'] = form_data['inStock'].lower() == 'true'
+        if 'isFeatured' in form_data:
+            df.at[idx, 'featured'] = form_data['isFeatured'].lower() == 'true'
+        if 'targetAnimal' in form_data:
+            df.at[idx, 'targetAnimal'] = form_data['targetAnimal']
+        if 'manufacturer' in form_data:
+            df.at[idx, 'manufacturer'] = form_data['manufacturer']
+        if 'originCountry' in form_data:
+            df.at[idx, 'originCountry'] = form_data['originCountry']
+        if 'registrationNumber' in form_data:
+            df.at[idx, 'registrationNumber'] = form_data['registrationNumber']
+        if 'activeIngredients' in form_data:
+            df.at[idx, 'activeIngredients'] = form_data['activeIngredients']
+        if 'dosage' in form_data:
+            df.at[idx, 'dosage'] = form_data['dosage']
+        if 'usageInstructions' in form_data:
+            df.at[idx, 'usageInstructions'] = form_data['usageInstructions']
+        if 'storageConditions' in form_data:
+            df.at[idx, 'storageConditions'] = form_data['storageConditions']
+        if 'rating' in form_data:
+            df.at[idx, 'rating'] = float(form_data['rating'])
+        if 'reviewCount' in form_data:
+            df.at[idx, 'reviewCount'] = int(form_data['reviewCount'])
+        
+        # Xử lý arrays
+        if 'images' in form_data:
+            try:
+                images_array = json.loads(form_data['images'])
+                df.at[idx, 'images'] = ';'.join(images_array)
+            except:
+                pass
+        
+        if 'tags' in form_data:
+            try:
+                tags_array = json.loads(form_data['tags'])
+                df.at[idx, 'tags'] = ','.join(tags_array)
+            except:
+                pass
+        
+        if 'functions' in form_data:
+            try:
+                functions_array = json.loads(form_data['functions'])
+                df.at[idx, 'functions'] = ';'.join(functions_array)
+            except:
+                pass
+        
+        # Ghi lại Excel
+        try:
+            backup_file = TAMVET_EXCEL_FILE + '.backup'
+            if os.path.exists(TAMVET_EXCEL_FILE):
+                shutil.copy2(TAMVET_EXCEL_FILE, backup_file)
+            
+            existing_sheets = {}
+            if os.path.exists(TAMVET_EXCEL_FILE):
+                excel_file_obj = pd.ExcelFile(TAMVET_EXCEL_FILE)
+                for sheet_name in excel_file_obj.sheet_names:
+                    if sheet_name != 'Products':
+                        existing_sheets[sheet_name] = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name=sheet_name)
+                excel_file_obj.close()
+            
+            with pd.ExcelWriter(TAMVET_EXCEL_FILE, engine='openpyxl') as writer:
+                df.to_excel(writer, sheet_name='Products', index=False)
+                for sheet_name, sheet_data in existing_sheets.items():
+                    sheet_data.to_excel(writer, sheet_name=sheet_name, index=False)
+                
+        except Exception as write_error:
+            if os.path.exists(backup_file):
+                shutil.copy2(backup_file, TAMVET_EXCEL_FILE)
+            raise write_error
+        
+        return jsonify({
+            'success': True,
+            'message': f'Đã cập nhật sản phẩm "{df.at[idx, "name"]}" thành công',
+            'product': df.iloc[idx].to_dict()
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi cập nhật sản phẩm Tâm Vet: {str(e)}'
+        }), 500
+
+@app.route('/api/tamvet-products/<product_id>', methods=['DELETE'])
+def delete_tamvet_product(product_id):
+    """Xóa sản phẩm Tâm Vet"""
+    try:
+        if not os.path.exists(TAMVET_EXCEL_FILE):
+            return jsonify({
+                'success': False,
+                'message': f'File Excel Tâm Vet không tồn tại: {TAMVET_EXCEL_FILE}'
+            }), 404
+
+        df = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name='Products')
+        
+        # Tìm sản phẩm
+        product_row = df[df['id'].astype(str) == str(product_id)]
+        
+        if len(product_row) == 0:
+            return jsonify({
+                'success': False,
+                'message': f'Không tìm thấy sản phẩm ID: {product_id}'
+            }), 404
+        
+        product_data = product_row.iloc[0]
+        product_name = product_data['name']
+        
+        # Thu thập tất cả hình ảnh cần xóa
+        images_to_delete = []
+        
+        # Hình ảnh chính
+        main_image = str(product_data.get('image', ''))
+        if main_image and main_image != 'nan' and main_image.startswith('/images/'):
+            images_to_delete.append(main_image)
+        
+        # Hình ảnh phụ
+        additional_images_str = str(product_data.get('images', ''))
+        if additional_images_str and additional_images_str != 'nan':
+            additional_images = [img.strip() for img in additional_images_str.split(';') if img.strip()]
+            for img in additional_images:
+                if img.startswith('/images/'):
+                    images_to_delete.append(img)
+        
+        # Xóa tất cả hình ảnh
+        for image_url in images_to_delete:
+            try:
+                filename = image_url.replace('/images/', '')
+                file_path = os.path.join(UPLOAD_FOLDER, filename)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except:
+                pass
+        
+        # Xóa sản phẩm khỏi DataFrame
+        df = df[df['id'].astype(str) != str(product_id)]
+        
+        # Ghi lại Excel
+        try:
+            backup_file = TAMVET_EXCEL_FILE + '.backup'
+            if os.path.exists(TAMVET_EXCEL_FILE):
+                shutil.copy2(TAMVET_EXCEL_FILE, backup_file)
+            
+            existing_sheets = {}
+            if os.path.exists(TAMVET_EXCEL_FILE):
+                excel_file_obj = pd.ExcelFile(TAMVET_EXCEL_FILE)
+                for sheet_name in excel_file_obj.sheet_names:
+                    if sheet_name != 'Products':
+                        existing_sheets[sheet_name] = pd.read_excel(TAMVET_EXCEL_FILE, sheet_name=sheet_name)
+                excel_file_obj.close()
+            
+            with pd.ExcelWriter(TAMVET_EXCEL_FILE, engine='openpyxl') as writer:
+                df.to_excel(writer, sheet_name='Products', index=False)
+                for sheet_name, sheet_data in existing_sheets.items():
+                    sheet_data.to_excel(writer, sheet_name=sheet_name, index=False)
+                    
+        except Exception as write_error:
+            if os.path.exists(backup_file):
+                shutil.copy2(backup_file, TAMVET_EXCEL_FILE)
+            raise write_error
+        
+        return jsonify({
+            'success': True,
+            'message': f'Đã xóa sản phẩm "{product_name}" thành công',
+            'deletedImages': images_to_delete
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Lỗi xóa sản phẩm Tâm Vet: {str(e)}'
+        }), 500
+
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=8000)
