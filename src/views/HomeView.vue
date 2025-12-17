@@ -275,8 +275,8 @@
                   <i class="fas fa-chevron-right text-gray-600"></i>
                 </button>
               </div>
-              <router-link to="/admin/tamvet-products" class="hidden md:flex text-purple-500 hover:text-purple-700 text-sm font-medium items-center">
-                Quản lý <i class="fas fa-arrow-right ml-1 text-xs"></i>
+              <router-link to="/products" class="hidden md:flex text-purple-500 hover:text-purple-700 text-sm font-medium items-center">
+                Xem tất cả <i class="fas fa-arrow-right ml-1 text-xs"></i>
               </router-link>
             </div>
           </div>

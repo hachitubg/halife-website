@@ -85,6 +85,46 @@
                 </div>
               </div>
 
+              <!-- Brand/Source Filter -->
+              <div>
+                <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                  <i class="fas fa-store mr-2 text-blue-500"></i>
+                  Thương hiệu
+                </h3>
+                <div class="space-y-2">
+                  <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input 
+                      type="radio" 
+                      value="all"
+                      v-model="selectedBrand"
+                      class="mr-3 text-blue-500"
+                    >
+                    <span class="text-sm">Tất cả</span>
+                    <span class="ml-auto text-xs text-gray-500">({{ products.length }})</span>
+                  </label>
+                  <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input 
+                      type="radio" 
+                      value="halife"
+                      v-model="selectedBrand"
+                      class="mr-3 text-blue-500"
+                    >
+                    <span class="text-sm">HALIFE</span>
+                    <span class="ml-auto text-xs text-gray-500">({{ getProductCountByBrand('halife') }})</span>
+                  </label>
+                  <label class="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input 
+                      type="radio" 
+                      value="tamvet"
+                      v-model="selectedBrand"
+                      class="mr-3 text-blue-500"
+                    >
+                    <span class="text-sm">Tâm Vet</span>
+                    <span class="ml-auto text-xs text-gray-500">({{ getProductCountByBrand('tamvet') }})</span>
+                  </label>
+                </div>
+              </div>
+
               <!-- Stock Status Filter -->
               <div>
                 <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
@@ -315,6 +355,7 @@ import {
   sidebarCategories
 } from '@/data/products.js'
 import { ProductAPI } from '@/utils/productAPI.js'
+import TamvetProductAPI from '@/utils/tamvetProductAPI.js'
 
 export default {
   name: 'ProductsView',
@@ -329,10 +370,12 @@ export default {
       categories: sidebarCategories,
       productCategories: productCategories,
       products: [],
+      tamvetProducts: [],
       dataLoaded: false,
       
       // Filters
       selectedCategory: 'Tất cả',
+      selectedBrand: 'all',
       selectedPriceRange: null,
       showInStockOnly: false,
       showFeaturedOnly: false,
@@ -366,6 +409,11 @@ export default {
       let result = this.searchResults || this.products.filter(product => 
         this.selectedCategory === 'Tất cả' ? true : product.category === this.selectedCategory
       )
+      
+      // Filter by brand/source
+      if (this.selectedBrand !== 'all') {
+        result = result.filter(product => product.source === this.selectedBrand)
+      }
       
       // Filter by price range
       if (this.selectedPriceRange && this.selectedPriceRange.label !== 'Tất cả') {
@@ -414,11 +462,22 @@ export default {
   methods: {
     async loadData() {
       try {
-        this.products = await ProductAPI.getAllProducts();
+        const [halProducts, tamvetProducts] = await Promise.all([
+          ProductAPI.getAllProducts(),
+          TamvetProductAPI.getAllProducts()
+        ]);
+        
+        // Thêm source để phân biệt nguồn gốc
+        const halProductsWithSource = halProducts.map(p => ({ ...p, source: 'halife' }));
+        const tamvetProductsWithSource = tamvetProducts.map(p => ({ ...p, source: 'tamvet' }));
+        
+        this.products = [...halProductsWithSource, ...tamvetProductsWithSource];
+        this.tamvetProducts = tamvetProductsWithSource;
         this.dataLoaded = true;
       } catch (error) {
         console.error('Error loading products:', error);
         this.products = [];
+        this.tamvetProducts = [];
         this.dataLoaded = true;
       }
     },
@@ -460,6 +519,11 @@ export default {
       return this.products.filter(product => product.category === category).length
     },
     
+    getProductCountByBrand(brand) {
+      if (brand === 'all') return this.products.length
+      return this.products.filter(product => product.source === brand).length
+    },
+    
     sortProducts(products) {
       const sorted = [...products]
       
@@ -483,6 +547,7 @@ export default {
     
     clearAllFilters() {
       this.selectedCategory = 'Tất cả'
+      this.selectedBrand = 'all'
       this.selectedPriceRange = null
       this.showInStockOnly = false
       this.showFeaturedOnly = false
@@ -499,6 +564,10 @@ export default {
   
   watch: {
     selectedCategory() {
+      this.currentPage = 1
+    },
+    
+    selectedBrand() {
       this.currentPage = 1
     },
     
