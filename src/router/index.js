@@ -42,6 +42,16 @@ const routes = [
     }
   },
   {
+    path: '/admin/tamvet-products',
+    name: 'tamvet-product-manager',
+    component: () => import('../views/TamvetProductManagerView.vue'),
+    meta: {
+      title: 'Product Manager - Tâm Vet Admin',
+      description: 'Quản lý sản phẩm cho Tâm Vet',
+      requiresAuth: true
+    }
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('../views/AboutView.vue'),
@@ -117,7 +127,13 @@ const routes = [
   // Admin routes - có thể thêm authentication guard sau
   {
     path: '/admin',
-    redirect: '/file-manager'
+    name: 'admin-dashboard',
+    component: () => import('../views/AdminDashboardView.vue'),
+    meta: {
+      title: 'Admin Dashboard - HALIFE ANIMAL HEALTH',
+      description: 'Bảng điều khiển quản lý cho HALIFE ANIMAL HEALTH',
+      requiresAuth: true
+    }
   },
   // 404 Not Found - must be last
   {

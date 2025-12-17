@@ -126,7 +126,7 @@
                 <div class="bg-blue-100 p-2 rounded-lg mr-3">
                   <i class="fas fa-list text-blue-500"></i>
                 </div>
-                TẤT CẢ SẢN PHẨM
+                SẢN PHẨM HALIFE
               </h3>
               <p class="text-gray-600 text-sm">{{ allProducts.length }} sản phẩm có sẵn</p>
             </div>
