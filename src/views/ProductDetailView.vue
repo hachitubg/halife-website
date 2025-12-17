@@ -334,6 +334,7 @@ import Footer from '@/components/Footer.vue'
 import { useCart } from '@/scripts/cartManager.js'
 import { sidebarCategories } from '@/data/products.js'
 import { ProductAPI } from '@/utils/productAPI.js'
+import TamvetProductAPI from '@/utils/tamvetProductAPI.js'
 
 export default {
   name: 'ProductDetailView',
@@ -416,7 +417,15 @@ export default {
     async loadProduct() {
       try {
         const productId = this.$route.params.id
+        
+        // Try to get product from HALIFE first
         this.product = await ProductAPI.getProductById(productId)
+        
+        // If not found in HALIFE, try Tâm Vet
+        if (!this.product) {
+          const allTamvetProducts = await TamvetProductAPI.getAllProducts()
+          this.product = allTamvetProducts.find(p => String(p.id) === String(productId))
+        }
         
         if (!this.product) {
           this.productNotFound = true
@@ -434,7 +443,11 @@ export default {
 
     async loadRelatedProducts() {
       try {
-        const allProducts = await ProductAPI.getAllProducts()
+        const [halifeProducts, tamvetProducts] = await Promise.all([
+          ProductAPI.getAllProducts(),
+          TamvetProductAPI.getAllProducts()
+        ])
+        const allProducts = [...halifeProducts, ...tamvetProducts]
         this.relatedProducts = allProducts
           .filter(p => p.category === this.product.category && p.id !== this.productId)
           .slice(0, 5)

@@ -117,7 +117,7 @@
         </div>
       </div>
 
-      <!-- All Products -->
+      <!-- HALIFE -->
       <div class="container mx-auto px-4 py-8 md:py-12">
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
           <div class="flex items-center justify-between mb-6">
@@ -245,6 +245,134 @@
         </div>
       </div>
 
+      <!-- TÂM VET -->
+      <div class="container mx-auto px-4 py-8 md:py-12">
+        <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center mb-2">
+                <div class="bg-purple-100 p-2 rounded-lg mr-3">
+                  <i class="fas fa-list text-purple-600"></i>
+                </div>
+                SẢN PHẨM TÂM VET
+              </h3>
+              <p class="text-gray-600 text-sm">{{ tamvetProducts.length }} sản phẩm có sẵn</p>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div class="hidden lg:flex items-center space-x-2">
+                <button 
+                  @click="prevTamvetSlide" 
+                  :disabled="currentTamvetSlide === 0"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <i class="fas fa-chevron-left text-gray-600"></i>
+                </button>
+                <button 
+                  @click="nextTamvetSlide"
+                  :disabled="currentTamvetSlide >= maxTamvetSlide"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <i class="fas fa-chevron-right text-gray-600"></i>
+                </button>
+              </div>
+              <router-link to="/admin/tamvet-products" class="hidden md:flex text-purple-500 hover:text-purple-700 text-sm font-medium items-center">
+                Quản lý <i class="fas fa-arrow-right ml-1 text-xs"></i>
+              </router-link>
+            </div>
+          </div>
+          
+          <!-- Mobile: Single product per slide with swipe -->
+          <div class="block md:hidden">
+            <div 
+              class="relative overflow-hidden swipe-container"
+              @touchstart="handleTamvetTouchStart"
+              @touchmove="handleTamvetTouchMove"
+              @touchend="handleTamvetTouchEnd"
+            >
+              <div 
+                class="flex transition-transform duration-300 ease-in-out"
+                :style="{ transform: `translateX(-${currentTamvetSlide * 100}%)` }"
+              >
+                <div 
+                  v-for="(product, index) in tamvetProducts" 
+                  :key="product.id"
+                  class="w-full flex-shrink-0 px-1"
+                >
+                  <ProductCard
+                    :product="product"
+                    :show-quick-actions="true"
+                    :show-description="true"
+                    @add-to-cart="handleAddToCart"
+                    class="mx-auto product-card-mobile"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mobile navigation buttons -->
+            <div v-if="tamvetProducts.length > 1" class="mt-4 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <button 
+                  @click="prevTamvetSlide" 
+                  :disabled="currentTamvetSlide === 0"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="fas fa-chevron-left text-gray-600"></i>
+                </button>
+                <button 
+                  @click="nextTamvetSlide"
+                  :disabled="currentTamvetSlide >= maxTamvetSlideMobile"
+                  class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="fas fa-chevron-right text-gray-600"></i>
+                </button>
+              </div>
+              
+              <!-- Mobile pagination dots -->
+              <div class="flex items-center space-x-1">
+                <div 
+                  v-for="(product, index) in tamvetProducts.slice(0, 10)" 
+                  :key="index"
+                  @click="currentTamvetSlide = index"
+                  class="w-2 h-2 rounded-full transition-colors cursor-pointer"
+                  :class="currentTamvetSlide === index ? 'bg-purple-500' : 'bg-gray-300'"
+                ></div>
+                <div v-if="tamvetProducts.length > 10" class="text-xs text-gray-500 ml-2">
+                  +{{ tamvetProducts.length - 10 }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Desktop: 4 products per slide -->
+          <div class="hidden md:block">
+            <div class="relative overflow-hidden">
+              <div 
+                class="flex transition-transform duration-300 ease-in-out"
+                :style="{ transform: `translateX(-${currentTamvetSlide * 100}%)` }"
+              >
+                <div 
+                  v-for="slide in tamvetProductsSlides" 
+                  :key="slide"
+                  class="w-full flex-shrink-0"
+                >
+                  <div class="grid grid-cols-4 gap-4">
+                    <ProductCard
+                      v-for="product in getTamvetSlideProducts(slide)"
+                      :key="product.id"
+                      :product="product"
+                      :show-quick-actions="true"
+                      :show-description="true"
+                      @add-to-cart="handleAddToCart"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Debug Section (temporary) -->
       <div v-if="!dataLoaded" class="container mx-auto px-4 py-8">
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -335,6 +463,7 @@ import {
   sidebarCategories
 } from '@/data/products.js'
 import { ProductAPI } from '@/utils/productAPI.js'
+import TamvetProductAPI from '@/utils/tamvetProductAPI.js'
 
 export default {
   name: 'HomeView',
@@ -350,8 +479,10 @@ export default {
       categories: sidebarCategories,
       productCategories: productCategories,
       allProducts: [],
+      tamvetProducts: [],
       currentFeaturedSlide: 0,
       currentAllProductsSlide: 0,
+      currentTamvetSlide: 0,
       categorySlides: {},
       itemsPerSlide: 4, // Changed from 5 to 4
       dataLoaded: false,
@@ -369,7 +500,12 @@ export default {
       featuredTouchStartX: 0,
       featuredTouchStartY: 0,
       featuredTouchEndX: 0,
-      featuredTouchEndY: 0
+      featuredTouchEndY: 0,
+      // Tamvet touch handling
+      tamvetTouchStartX: 0,
+      tamvetTouchStartY: 0,
+      tamvetTouchEndX: 0,
+      tamvetTouchEndY: 0
     }
   },
 
@@ -410,6 +546,21 @@ export default {
       }
       // Desktop: slides based on itemsPerSlide
       return Math.max(0, this.featuredSlides.length - 1)
+    },
+
+    tamvetProductsSlides() {
+      if (!this.tamvetProducts.length) return []
+      return Array.from({ length: Math.ceil(this.tamvetProducts.length / this.itemsPerSlide) }, (_, i) => i)
+    },
+
+    maxTamvetSlide() {
+      // Desktop: slides based on itemsPerSlide
+      return Math.max(0, this.tamvetProductsSlides.length - 1)
+    },
+
+    maxTamvetSlideMobile() {
+      // Mobile: one product per slide
+      return Math.max(0, this.tamvetProducts.length - 1)
     }
   },
 
@@ -425,12 +576,14 @@ export default {
 
     async loadData() {
       try {
-        const [products, categories] = await Promise.all([
+        const [products, categories, tamvetProducts] = await Promise.all([
           ProductAPI.getAllProducts(),
-          ProductAPI.getAllCategories()
+          ProductAPI.getAllCategories(),
+          TamvetProductAPI.getAllProducts()
         ]);
 
         this.allProducts = products || [];
+        this.tamvetProducts = tamvetProducts || [];
         this.categories = categories || sidebarCategories;
         this.dataLoaded = true;
         
@@ -577,6 +730,62 @@ export default {
     prevFeaturedSlide() {
       if (this.currentFeaturedSlide > 0) {
         this.currentFeaturedSlide--
+      }
+    },
+
+    // Tamvet products slide navigation
+    nextTamvetSlide() {
+      const isMobile = window.innerWidth < 768
+      const maxSlide = isMobile ? this.maxTamvetSlideMobile : this.maxTamvetSlide
+      
+      if (this.currentTamvetSlide < maxSlide) {
+        this.currentTamvetSlide++
+      }
+    },
+
+    prevTamvetSlide() {
+      if (this.currentTamvetSlide > 0) {
+        this.currentTamvetSlide--
+      }
+    },
+
+    getTamvetSlideProducts(slideIndex) {
+      const start = slideIndex * this.itemsPerSlide
+      const end = start + this.itemsPerSlide
+      return this.tamvetProducts.slice(start, end)
+    },
+
+    // Tamvet touch handlers
+    handleTamvetTouchStart(e) {
+      this.tamvetTouchStartX = e.touches[0].clientX
+      this.tamvetTouchStartY = e.touches[0].clientY
+    },
+
+    handleTamvetTouchMove(e) {
+      const touchMoveX = e.touches[0].clientX
+      const touchMoveY = e.touches[0].clientY
+      
+      const diffX = Math.abs(touchMoveX - this.tamvetTouchStartX)
+      const diffY = Math.abs(touchMoveY - this.tamvetTouchStartY)
+      
+      if (diffX > 30 && diffX > diffY * 2 && e.cancelable) {
+        e.preventDefault()
+      }
+    },
+
+    handleTamvetTouchEnd(e) {
+      this.tamvetTouchEndX = e.changedTouches[0].clientX
+      this.tamvetTouchEndY = e.changedTouches[0].clientY
+      
+      const diffX = this.tamvetTouchStartX - this.tamvetTouchEndX
+      const diffY = Math.abs(this.tamvetTouchStartY - this.tamvetTouchEndY)
+      
+      if (Math.abs(diffX) > 60 && Math.abs(diffX) > diffY * 1.5) {
+        if (diffX > 0) {
+          this.nextTamvetSlide()
+        } else {
+          this.prevTamvetSlide()
+        }
       }
     },
 
