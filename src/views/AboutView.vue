@@ -22,7 +22,7 @@
       <div class="max-w-4xl mx-auto mb-16">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-            Công ty cổ phần thuốc thú y HALIFE Việt Nhật
+            Công ty TNHH công nghệ sinh học Halife
           </h2>
           <div class="w-24 h-1 bg-primary-500 mx-auto mb-6"></div>
           <p class="text-lg text-gray-600 leading-relaxed">
@@ -229,7 +229,7 @@
               </div>
               <div>
                 <h4 class="font-semibold text-gray-800">Tên công ty</h4>
-                <p class="text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
+                <p class="text-gray-600">Công ty TNHH công nghệ sinh học Halife</p>
               </div>
             </div>
 
@@ -369,7 +369,7 @@ export default {
     // Set meta description
     const metaDescription = document.querySelector('meta[name="description"]')
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Công ty cổ phần thuốc thú y HALIFE Việt Nhật - Công nghệ thú y độc quyền Nhật Bản, cung cấp sản phẩm chất lượng cao cho ngành chăn nuôi.')
+      metaDescription.setAttribute('content', 'Công ty TNHH công nghệ sinh học Halife - Công nghệ thú y độc quyền Nhật Bản, cung cấp sản phẩm chất lượng cao cho ngành chăn nuôi.')
     }
   }
 }

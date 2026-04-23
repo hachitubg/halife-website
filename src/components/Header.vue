@@ -128,7 +128,7 @@
           <img src="/images/logo_white.png" alt="HALIFE" class="h-12 w-12 mr-3 rounded-full">
           <div>
             <h1 class="text-xl font-bold text-primary-500">HALIFE ANIMAL HEALTH</h1>
-            <p class="text-xs text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
+            <p class="text-xs text-gray-600">Công ty TNHH công nghệ sinh học Halife</p>
           </div>
         </router-link>
 

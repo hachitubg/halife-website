@@ -51,7 +51,7 @@
 
       <!-- TikTok -->
       <a 
-        href="https://www.tiktok.com/@bstyhalife8" 
+        href="https://www.tiktok.com/@thuyhalife" 
         target="_blank"
         class="social-btn tiktok-btn"
         title="Follow TikTok - 10K+ followers"
@@ -73,7 +73,7 @@
 
       <!-- Facebook -->
       <a 
-        href="https://www.facebook.com/CongTyThuocThuY.Halife" 
+        href="https://www.facebook.com/people/C%C3%B4ng-Ty-Thu%E1%BB%91c-Th%C3%BA-Y-Halife/100081800238982/" 
         target="_blank"
         class="social-btn facebook-btn"
         title="Follow Facebook - 25K+ followers"

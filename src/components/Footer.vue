@@ -48,7 +48,7 @@
                 <img src="/images/logo_white.png" alt="HALIFE" class="h-10 w-10 mr-3 rounded-full">
                 <div>
                   <h4 class="font-bold text-blue-600">HALIFE ANIMAL HEALTH</h4>
-                  <p class="text-sm text-gray-600">Công ty cổ phần thuốc thú y HALIFE Việt Nhật</p>
+                  <p class="text-sm text-gray-600">Công ty TNHH công nghệ sinh học Halife</p>
                 </div>
               </div>
               
@@ -75,13 +75,13 @@
               <div class="mt-6">
                 <h5 class="font-semibold text-gray-800 mb-3">Theo dõi chúng tôi</h5>
                 <div class="flex space-x-3">
-                  <a href="https://www.facebook.com/CongTyThuocThuY.Halife" class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
+                  <a href="https://www.facebook.com/people/C%C3%B4ng-Ty-Thu%E1%BB%91c-Th%C3%BA-Y-Halife/100081800238982/" class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors">
                     <i class="fab fa-facebook-f"></i>
                   </a>
                   <a href="https://www.youtube.com/@halifevietnam" class="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors">
                     <i class="fab fa-youtube"></i>
                   </a>
-                  <a href="https://www.tiktok.com/@bstyhalife8" class="bg-blue-400 text-white p-2 rounded-full hover:bg-blue-500 transition-colors">
+                  <a href="https://www.tiktok.com/@thuyhalife" class="bg-blue-400 text-white p-2 rounded-full hover:bg-blue-500 transition-colors">
                     <i class="fab fa-tiktok"></i>
                   </a>
                 </div>

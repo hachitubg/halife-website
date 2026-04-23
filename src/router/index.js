@@ -57,7 +57,7 @@ const routes = [
     component: () => import('../views/AboutView.vue'),
     meta: {
       title: 'Giới thiệu - HALIFE ANIMAL HEALTH',
-      description: 'Công ty cổ phần thuốc thú y HALIFE Việt Nhật - Công nghệ thú y độc quyền Nhật Bản, cung cấp sản phẩm chất lượng cao.'
+      description: 'Công ty TNHH công nghệ sinh học Halife - Công nghệ thú y độc quyền Nhật Bản, cung cấp sản phẩm chất lượng cao.'
     }
   },
   {
